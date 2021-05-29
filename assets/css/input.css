@@ -265,7 +265,7 @@ body.dark .formGroup[data-color="red"] > .formField:focus {
     font-size: 16px;
 
     margin: 14px 20px;
-    border: none !important;
+    border: none;
     caret-color: var(--focus-color);
     background-color: transparent;
     

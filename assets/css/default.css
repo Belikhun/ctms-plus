@@ -808,6 +808,10 @@ icon[data-icon="hive"]::after {
 	content: "\e07f";
 }
 
+icon[data-icon="infoCircle"]::after {
+	content: "\f05a";
+}
+
 /** ======================== NOTE ======================== **/
 
 .note {

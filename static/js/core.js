@@ -333,18 +333,18 @@ const core = {
 
 					this.view = makeTree("div", ["component", "ctmsStatus"], {
 						basic: { tag: "div", class: "row", child: {
-							online: { tag: "span", class: "item", child: {
+							online: { tag: "span", class: ["item", "infoCard"], child: {
 								label: { tag: "t", class: "label", text: "Số Truy Cập" },
 								value: { tag: "t", class: "value", text: "---" }
 							}},
 
-							request: { tag: "span", class: "item", child: {
+							request: { tag: "span", class: ["item", "infoCard"], child: {
 								label: { tag: "t", class: "label", text: "Số Yêu Cầu" },
 								value: { tag: "t", class: "value", text: "0" }
 							}}
 						}},
 
-						network: { tag: "div", class: ["item", "network"], child: {
+						network: { tag: "div", class: ["item", "infoCard", "network"], child: {
 							label: { tag: "t", class: "label", text: "Mạng" },
 							nodes: { tag: "div", class: "nodes", child: {
 								server: { tag: "span", class: "node", child: {
@@ -426,6 +426,100 @@ const core = {
 					this.view.network.nodes.middleware.status.failed.innerText = this.middleware.failed;
 					this.view.network.nodes.m2s.innerText = `${this.m2s.count > 0 ? round((this.m2s.total / this.m2s.count) * 1000, 2) : "X"} ms`;
 					this.view.network.nodes.c2m.innerText = `${this.c2m.count > 0 ? round((this.c2m.total / this.c2m.count) * 1000, 2) : "X"} ms`;
+				}
+			},
+
+			services: {
+				/** @type {smenu.Child} */
+				child: undefined,
+
+				/** @type {HTMLDivElement} */
+				view: undefined,
+				
+				/** @type {smenu.Panel} */
+				panel: undefined,
+
+				serviceInfo: undefined,
+
+				name: {
+					basicAccess: "Truy Cập CTMS",
+					unverifiedScore: "Xem Điểm Không Chờ Xác Nhận",
+					payAsk: "Vấn Đáp Có Trả Phí PayAsk",
+					coupleCheckIn: "Couple Check-In",
+					shortAccess: "Truy Cập CTMS Ngắn Hạn"
+				},
+
+				Service: class {
+					constructor({
+						id = "sample",
+						name = "Sample Service",
+						time: timeData
+					} = {}) {
+						if (timeData && timeData.from && timeData.to) {
+							this.container = makeTree("div", "infoCard", {
+								label: { tag: "t", class: "label", text: name },
+								time: { tag: "t", class: "text", html: `${timeData.from.toLocaleString()}<arr></arr>${timeData.to.toLocaleString()}` },
+								value: { tag: "div", class: "value" }
+							});
+
+							liveTime(this.container.value, time(timeData.to), {
+								type: "minimal",
+								count: "down",
+								ended: "VỪA HẾT HẠN!"
+							});
+						} else {
+							this.container = makeTree("div", "infoCard", {
+								label: { tag: "t", class: "label", text: name },
+								buttons: { tag: "div", class: "buttons", child: {
+									serviceInfo: createButton("Thông Tin", { color: "blue", icon: "infoCircle", complex: true, disabled: true }),
+									buyService: createButton("MUA DỊCH VỤ", { color: "pink", icon: "externalLink", complex: true })
+								}}
+							});
+						}
+					}
+				},
+
+				init() {
+					this.child = new smenu.Child({
+						label: "Dịch Vụ"
+					}, this.super.group);
+
+					this.panel = new smenu.Panel(undefined, { size: "large" });
+
+					this.view = makeTree("div", ["component", "ctmsServices"], {
+						occCard: { tag: "div", class: "infoCard", child: {
+							label: { tag: "t", class: "label", text: "OCC" },
+							value: { tag: "t", class: "value", text: "X occ" }
+						}},
+
+						list: { tag: "div", class: "list" }
+					});
+
+					this.child.insert(this.view);
+
+					core.account.onLogout(() => {
+						this.view.occCard.value.innerText = "X occ";
+						emptyNode(this.view.list);
+					});
+
+					api.onResponse("services", (data) => {
+						this.view.occCard.value.innerText = data.info.occ;
+						emptyNode(this.view.list);
+
+						for (let key of Object.keys(data.info.services)) {
+							let s = new this.Service({
+								id: key,
+								name: this.name[key] || key,
+								time: data.info.services[key]
+							});
+
+							this.view.list.appendChild(s.container);
+						}
+					});
+				},
+
+				buy(id) {
+					// TODO: Buying Services Implementation
 				}
 			}
 		}
@@ -556,12 +650,12 @@ const core = {
 
 				department: { tag: "div", class: ["infoCard", "department"], child: {
 					label: { tag: "t", class: "label", text: "Ngành Học" },
-					content: { tag: "t", class: "content", text: "Không rõ" }
+					content: { tag: "t", class: ["value", "small"], text: "Không rõ" }
 				}},
 
 				tForm: { tag: "div", class: ["infoCard", "tForm"], child: {
 					label: { tag: "t", class: "label", text: "Hình Thức Đào Tạo" },
-					content: { tag: "t", class: "content", text: "Không rõ" }
+					content: { tag: "t", class: ["value", "small"], text: "Không rõ" }
 				}},
 
 				signoutBtn: createButton("ĐĂNG XUẤT", {

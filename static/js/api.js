@@ -13,6 +13,12 @@
  * to crawl the data from the response html, which will require
  * converting raw html into dom object
  * 
+ * To minimize API call and reduce load on CTMS's server, we designed
+ * a event-based api call. Which mean anything that need a certain data
+ * from a specific api an register a listener that will be called
+ * when the request is complete. You can register your listener with
+ * `api.onResponse(<type>, <listener>)`
+ * 
  * @author	Belikhun
  * @version	1.0
  */

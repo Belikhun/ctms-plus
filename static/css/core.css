@@ -17,34 +17,54 @@ body {
 	height: 100vh;
 }
 
+arr::before {
+	content: "\f061";
+	position: relative;
+	margin: 0 5px;
+
+    font-family: "Font Awesome 5 Free";
+    font-size: 15px;
+    font-weight: 600;
+	text-align: center;
+	line-height: 22px;
+	color: #000000;
+}
+
 /** ===================== COMPONENT:infoCard ===================== */
 
 .infoCard {
-	position: relative;
-	display: inline-block;
+	display: flex;
+	flex-direction: column;
 
 	padding: 10px 20px;
-	border-radius: 7px;
-	background-color: rgb(240, 240, 240);
+	border-radius: 12px;
+	background-color: white;
+	overflow: hidden;
 }
 
 .infoCard > .label {
-	padding-bottom: 2px;
-	margin-bottom: 4px;
-	border-bottom: 2px solid rgba(124, 124, 124, 0.3);
-
-	font-size: 11px;
+	font-size: 13px;
 	font-weight: bold;
 	text-transform: uppercase;
-	letter-spacing: .4px;
-	color: rgba(26, 26, 26, 0.9);
-	user-select: none;
 }
 
-.infoCard > .content {
+.infoCard > .value {
+	margin-top: 15px;
 	font-family: Nunito;
-	font-size: 18px;
-	font-weight: 500;
+	font-size: 34px;
+	font-weight: 300;
+	line-height: 30px;
+}
+
+.infoCard > .value.small {
+	margin-top: 10px;
+	font-size: 22px;
+	line-height: 20px;
+}
+
+.infoCard > button {
+	margin-top: 10px;
+	border-radius: 7px;
 }
 
 /** ===================== COMPONENT:generalTable ===================== */
@@ -447,19 +467,6 @@ body {
 	font-weight: bold;
 }
 
-.scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="time"] > arr::before {
-	content: "\f061";
-	position: relative;
-	margin: 0 5px;
-
-    font-family: "Font Awesome 5 Free";
-    font-size: 15px;
-    font-weight: 600;
-	text-align: center;
-	line-height: 22px;
-	color: #000000;
-}
-
 .scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="classID"],
 .scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="listID"] {
 	text-align: right;
@@ -593,9 +600,9 @@ body {
 }
 
 .userDetailView > .userCard > .top > .info > .email {
-	margin-top: 5px;
+	margin-top: 10px;
 	font-family: Calibri;
-	font-size: 18px;
+	font-size: 16px;
 	color: rgb(26, 26, 26);
 }
 
@@ -656,8 +663,6 @@ body {
 
 .component.ctmsStatus > .row > .item,
 .component.ctmsStatus > .item {
-	display: flex;
-	flex-direction: column;
 	flex-grow: 1;
 
 	margin: 10px 0 0 10px;
@@ -669,21 +674,6 @@ body {
 .component.ctmsStatus > .row > .item:first-child,
 .component.ctmsStatus > .item {
 	margin-left: unset;
-}
-
-.component.ctmsStatus > .row > .item > .label,
-.component.ctmsStatus > .item > .label {
-	font-size: 13px;
-	font-weight: bold;
-	text-transform: uppercase;
-}
-
-.component.ctmsStatus > .row > .item > .value {
-	margin-top: 15px;
-	font-family: Nunito;
-	font-size: 34px;
-	font-weight: 300;
-	line-height: 30px;
 }
 
 .component.ctmsStatus > .item.network > .nodes {
@@ -791,4 +781,38 @@ body {
 
 .component.ctmsStatus > .item.network > .nodes > .node > .status > .failed::before {
 	content: "\f057";
+}
+
+/** ===================== SMENU:ctmsServices ===================== */
+
+.component.ctmsServices > .infoCard,
+.component.ctmsServices > .list > .infoCard {
+	margin-top: 10px;
+	padding: 10px;
+}
+
+.component.ctmsServices > .list > .infoCard > .value > timer {
+	font-family: Nunito;
+	font-size: 28px;
+	font-weight: 300;
+	line-height: 30px;
+}
+
+.component.ctmsServices > .list > .infoCard > .value > timer > days {
+	font-size: 34px;
+}
+
+.component.ctmsServices > .list > .infoCard > .buttons {
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+}
+
+.component.ctmsServices > .list > .infoCard > .buttons > button {
+	border-radius: 8px;
+}
+
+.component.ctmsServices > .list > .infoCard > .buttons > button[key="buyService"] {
+	flex-grow: 1;
+	margin-left: 10px;
 }

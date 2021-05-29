@@ -682,7 +682,15 @@ function formatTime(seconds, {
 		: res[0];
 }
 
-function liveTime(element, start = time(new Date()), { type = "full", count = "up", prefix = "", surfix = "", ended = "Đã kết thúc", endedCallback = () => {}, interval = 1000 } = {}) {
+function liveTime(element, start = time(new Date()), {
+	type = "full",
+	count = "up",
+	prefix = "",
+	surfix = "",
+	ended = "Đã kết thúc",
+	endedCallback = () => {},
+	interval = 1000
+} = {}) {
 	let updateInterval = setInterval(() => {
 		if (!document.body.contains(element)) {
 			clog("DEBG", "Live Time Element does not exist in document. Clearing...");
@@ -1492,7 +1500,7 @@ function triBg(element, {
 	const DARKCOLOR = ["brown", "dark", "darkRed", "darkGreen", "darkBlue"]
 	const LIGHTCOLOR = ["lightBlue"]
 
-	let current = element.querySelector(".triBgContainer");
+	let current = element.querySelector(":scope > .triBgContainer");
 
 	if (current)
 		element.removeChild(current);

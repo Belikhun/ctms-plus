@@ -42,4 +42,5 @@ jobs:
       - name: ⛳ Commit Update
         run: |
           dos2unix build/deploy.sh
+          sudo chmod a+x build/deploy.sh
           build/deploy.sh

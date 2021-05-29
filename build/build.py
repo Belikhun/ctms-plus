@@ -58,7 +58,7 @@ for user in contributorsData:
 if (os.environ.get("CI")):
 	log("INFO", "CI Environment Detected! Updaing Optional Data")
 	metadata["branch"] = os.environ.get("GITHUB_REF")
-	metadata["version"] += f".{os.environ.get('GITHUB_RUN_ID')}/{os.environ.get('GITHUB_SHA')[0:6]}"
+	metadata["version"] += f".{os.environ.get('GITHUB_RUN_NUMBER')}/{os.environ.get('GITHUB_SHA')[0:6]}"
 
 	log("DEBG", "branch = " + metadata["branch"])
 	log("DEBG", "version = " + metadata["version"])

@@ -35,4 +35,4 @@ git stash pop
 git add .
 git diff
 git commit -m "[GA Build $GITHUB_RUN_NUMBER] 🔮 BUILD: Version $version" -m "Commit $GITHUB_SHA by $GITHUB_ACTOR" -m "Ref: $GITHUB_REF"
-git push --set-upstream origin "${INPUT_BRANCH}"
+git push --force --set-upstream origin "${INPUT_BRANCH}"

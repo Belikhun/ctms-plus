@@ -1027,6 +1027,8 @@ const core = {
 					this.loginView.note.set({ message: errMsg.innerText });
 				} else
 					this.loginView.note.group.style.display = "none";
+
+				this.subWindow.loading = false;
 			} else if (this.loggedIn === false) {
 				this.log("OKAY", "User Signed In");
 				this.loggedIn = true;

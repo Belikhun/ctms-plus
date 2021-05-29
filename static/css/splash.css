@@ -1,0 +1,143 @@
+/*
+? |-----------------------------------------------------------------------------------------------|
+? |  /static/css/splash.css                                                                       |
+? |                                                                                               |
+? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
+? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+? |-----------------------------------------------------------------------------------------------|
+*/
+
+.splash {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    opacity: 1;
+    z-index: 100;
+}
+
+.splash.hide {
+    animation: splash-disapear 0.5s ease-out 0.5s 1 alternate forwards;
+}
+
+.splash::before {
+    content: "";
+    position: absolute;
+    display: block;
+
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    box-shadow: inset 0 -500px 150px -200px rgba(208, 208, 208, 0.7);
+}
+
+.splash > .icon {
+	width: 54px;
+	height: 54px;
+}
+
+.splash > .title {
+	margin-top: 4px;
+	margin-bottom: 10px;
+	font-family: Nunito;
+	font-size: 20px;
+	font-weight: 900;
+}
+
+.splash > .phase {
+	font-size: 11px;
+	font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    color: rgb(46, 46, 46);
+}
+
+.splash > .detail {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.splash > .detail > .module {
+    margin-right: 6px;
+
+    font-family: Consolas;
+    font-size: 21px;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+}
+
+.splash > .detail > .module::after {
+    content: ":";
+}
+
+.splash > .detail > .status {
+    min-height: 18px;
+
+    font-size: 17px;
+    letter-spacing: .6px;
+    color: rgb(44, 44, 44);
+}
+
+.splash > .error {
+    margin-bottom: 8px;
+
+    font-family: Consolas;
+    font-size: 17px;
+    font-weight: bold;
+    color: rgb(240, 39, 83);
+}
+
+.splash > .progressBar {
+    width: 100%;
+    height: 12px;
+	margin-top: unset;
+
+    overflow: hidden;
+}
+
+@keyframes splash-disapear {
+    0% {
+        opacity: 1;
+        z-index: 100;
+        display: flex;
+    }
+
+    99% {
+        opacity: 0;
+        z-index: 100;
+        display: flex;
+    }
+
+    100% {
+        opacity: 0;
+        z-index: -10;
+        display: none;
+    }
+}
+
+body.dark .splash::before {
+	box-shadow: inset 0 -500px 150px -200px rgba(36, 36, 36, 0.7);
+}
+
+body.dark .splash > .detail > .module {
+	color: white;
+}
+
+body.dark .splash > .detail > .status {
+	color: rgb(230, 230, 230);
+}
+
+body.dark .splash > .error {
+	color: rgb(255, 157, 178);
+}

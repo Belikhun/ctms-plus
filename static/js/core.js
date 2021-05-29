@@ -172,13 +172,15 @@ const core = {
 	metadata: {
 		priority: 0,
 
-		async init() {
+		async init(set) {
 			try {
+				set({ p: 0, d: `Fetching Metadata` });
 				let response = await myajax({
 					url: "/metadata.json",
 					method: "GET"
 				});
 
+				set({ p: 100, d: `Updating Metadata` });
 				window.META = response;
 				window.APPNAME = response.name;
 				window.VERSION = response.version;
@@ -846,7 +848,8 @@ const core = {
 		loginHandlers: [],
 		logoutHandlers: [],
 
-		async init() {
+		async init(set) {
+			set({ p: 0, d: `Setting Up Account Panel` });
 			let container = document.createElement("span");
 			container.classList.add("component", "account");
 
@@ -972,6 +975,7 @@ const core = {
 				speed: 64
 			});
 
+			set({ p: 30, d: `Attaching Listeners` });
 			core.darkmode.onToggle((dark) => userCardBG.setColor(dark ? "dark" : "lightBlue"));
 			navbar.insert({ container }, "right");
 
@@ -984,6 +988,7 @@ const core = {
 				this.detailView.userCard.top.info.email.innerText = response.info.email;
 			});
 
+			set({ p: 50, d: `Fetching Account Data` });
 			await api.request();
 		},
 
@@ -1412,10 +1417,3 @@ const core = {
 		},
 	}
 }
-
-window.addEventListener(
-	"DOMContentLoaded",
-	async () => {
-		await core.init().catch(errorHandler);
-	}
-);

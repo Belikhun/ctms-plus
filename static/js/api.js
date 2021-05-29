@@ -1,5 +1,5 @@
 //? |-----------------------------------------------------------------------------------------------|
-//? |  /static/js/core.js                                                                           |
+//? |  /static/js/api.js                                                                            |
 //? |                                                                                               |
 //? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |

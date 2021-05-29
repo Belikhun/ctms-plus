@@ -40,6 +40,9 @@ jobs:
         run: python build/build.py
 
       - name: ⛳ Commit Update
+        env:
+          INPUT_BRANCH: "production"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
         run: |
           dos2unix build/deploy.sh
           sudo chmod a+x build/deploy.sh

@@ -179,9 +179,12 @@ const core = {
 					method: "GET"
 				});
 
+				window.META = response;
 				window.APPNAME = response.name;
 				window.VERSION = response.version;
 				window.STATE = response.branch;
+				window.REPORT_ERROR = response.link.report;
+				window.REPO_ADDRESS = response.link.repo;
 			} catch(e) {
 				this.log("WARN", "Could not fetch metadata file! Maybe it's missing?");
 			}
@@ -520,6 +523,110 @@ const core = {
 
 				buy(id) {
 					// TODO: Buying Services Implementation
+				}
+			},
+
+			projectInfo: {
+				group: smenu.Group.prototype,
+				licensePanel: smenu.Panel.prototype,
+	
+				async init() {
+					this.group = new smenu.Group({ label: "thông tin", icon: "info" });
+					let links = new smenu.Child({ label: "Liên Kết Ngoài" }, this.group);
+	
+					// Project Info View
+					let projectInfo = makeTree("div", "projectInfo", {
+						header: { tag: "div", class: "header", child: {
+							icon: new lazyload({ source: "/assets/img/icon.png", classes: "icon" })
+						}},
+
+						pTitle: { tag: "t", class: "title", text: APPNAME },
+						description: { tag: "t", class: "description", text: "The Next Generation Of CTMS" },
+
+						note: createNote({
+							level: "info",
+							message: "CTMS+ không được hỗ trợ bởi OTSC hoặc các bên liên quan"
+						}),
+
+						authorLabel: { tag: "t", class: "label", text: "Tác Giả" },
+						author: { tag: "span", class: "author" },
+
+						contributorLabel: { tag: "t", class: "label", child: {
+							content: { tag: "span", text: "Người Đóng Góp" },
+							tip: { tag: "tip", title: "Tên của bạn sẽ xuất hiện trong danh sách này nếu bạn có đóng góp cho dự án (bằng cách tạo commit hoặc pull request)" }
+						}},
+
+						contributors: { tag: "span", class: "contributor" },
+					});
+
+					for (let username of Object.keys(META.author))
+						projectInfo.author.appendChild(makeTree("span", "item", {
+							avatar: new lazyload({ source: `https://github.com/${username}.png?size=80`, classes: "avatar" }),
+							aName: { tag: "a", href: META.author[username].link, class: "name", text: META.author[username].name },
+							department: { tag: "t", class: "department", text: META.author[username].department },
+							role: { tag: "t", class: "role", text: META.author[username].role }
+						}));
+					
+					for (let username of Object.keys(META.contributors))
+						projectInfo.contributors.appendChild(makeTree("div", "item", {
+							avatar: new lazyload({ source: `https://github.com/${username}.png?size=40`, classes: "avatar" }),
+							username: { tag: "a", href: `https://github.com/${username}`, class: "username", text: username },
+							contributions: { tag: "t", class: "contributions", text: META.contributors[username].contributions }
+						}));
+
+					// Components
+					new smenu.components.Button({
+						label: "Báo Lỗi",
+						color: "pink",
+						icon: "externalLink",
+						complex: true,
+						onClick: () => window.open(REPORT_ERROR, "_blank")
+					}, links);
+					
+					new smenu.components.Button({
+						label: "Wiki",
+						color: "pink",
+						icon: "externalLink",
+						complex: true,
+						onClick: () => window.open(REPO_ADDRESS + "/wiki", "_blank")
+					}, links);
+					
+					new smenu.components.Button({
+						label: "Mã Nguồn",
+						color: "pink",
+						icon: "externalLink",
+						complex: true,
+						onClick: () => window.open(REPO_ADDRESS, "_blank")
+					}, links);
+	
+					let project = new smenu.Child({ label: "Dự Án" }, this.group);
+	
+					let detailsButton = new smenu.components.Button({
+						label: "Thông Tin",
+						color: "blue",
+						icon: "arrowLeft",
+						complex: true
+					}, project);
+	
+					(new smenu.Panel(projectInfo)).setToggler(detailsButton);
+	
+					let licenseButton = new smenu.components.Button({
+						label: "LICENSE",
+						color: "blue",
+						icon: "arrowLeft",
+						complex: true
+					}, project);
+	
+					this.licensePanel = new smenu.Panel(undefined, { size: "large" });
+					this.licensePanel.setToggler(licenseButton);
+					await this.licensePanel.content("iframe:/license.html");
+					// core.darkmode.onToggle((enabled) => this.licensePanel.iframe.contentDocument.body.classList[enabled ? "add" : "remove"]("dark"));
+	
+					new smenu.components.Footer({
+						icon: "/assets/img/icon.png",
+						appName: APPNAME,
+						version: `${VERSION} - ${STATE}`
+					}, project);
 				}
 			}
 		}

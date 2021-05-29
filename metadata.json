@@ -1,5 +1,20 @@
 {
 	"name": "CTMS+",
 	"version": "0.1",
-	"branch": "development"
+	"branch": "development",
+	"link": {
+		"repo": "https://github.com/belivipro9x99/ctms-plus",
+		"report": "https://github.com/belivipro9x99/ctms-plus/issues"
+	},
+
+	"author": {
+		"belivipro9x99": {
+			"name": "Belikhun",
+			"link": "https://github.com/belivipro9x99",
+			"department": "2010A03",
+			"role": "Core Developer"
+		}
+	},
+
+	"contributors": {}
 }

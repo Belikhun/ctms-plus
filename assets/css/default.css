@@ -799,6 +799,15 @@ icon[data-icon="signout"]::after {
 	content: "\f2f5";
 }
 
+icon[data-icon="laptop"]::after {
+	content: "\f109";
+}
+
+icon[data-icon="hive"]::after {
+	font-family: "Font Awesome 5 Brands";
+	content: "\e07f";
+}
+
 /** ======================== NOTE ======================== **/
 
 .note {

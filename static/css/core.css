@@ -641,3 +641,154 @@ body {
 .userDetailView > .sq-btn {
 	margin-top: 10px;
 }
+
+/** ===================== SMENU:ctmsStatus ===================== */
+
+.component.ctmsStatus {
+	display: flex;
+	flex-direction: column;
+}
+
+.component.ctmsStatus > .row { 
+	display: flex;
+	flex-direction: row;
+}
+
+.component.ctmsStatus > .row > .item,
+.component.ctmsStatus > .item {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	margin: 10px 0 0 10px;
+	padding: 10px;
+	border-radius: 12px;
+	background-color: white;
+}
+
+.component.ctmsStatus > .row > .item:first-child,
+.component.ctmsStatus > .item {
+	margin-left: unset;
+}
+
+.component.ctmsStatus > .row > .item > .label,
+.component.ctmsStatus > .item > .label {
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.component.ctmsStatus > .row > .item > .value {
+	margin-top: 15px;
+	font-family: Nunito;
+	font-size: 34px;
+	font-weight: 300;
+	line-height: 30px;
+}
+
+.component.ctmsStatus > .item.network > .nodes {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	
+	margin-top: 15px;
+}
+
+.component.ctmsStatus > .item.network > .nodes::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	top: 50%;
+	left: 20px;
+	right: 20px;
+	height: 3px;
+
+	background-color: gray;	
+}
+
+.component.ctmsStatus > .item.network > .nodes > .value {
+	position: absolute;
+	top: calc(50% - 16px);
+	font-size: 12px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .value.c2m {
+	right: 70px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .value.m2s {
+	left: 67px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 0 0 0;
+
+	width: 70px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node[key="server"] {
+	margin-left: 5px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node[key="middleware"] {
+	flex-grow: 1;
+	flex-shrink: 1;
+	width: auto;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .label {
+	font-family: Nunito;
+	font-size: 13px;
+	font-weight: 800;
+	letter-spacing: .2px;
+	text-transform: uppercase;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > icon {
+	padding: 0 10px;
+	background-color: white;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > icon::after {
+	font-size: 36px;
+	line-height: normal;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status {
+	display: flex;
+	flex-direction: row;
+	margin-top: 5px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status > t {
+	font-weight: bold;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status > t:not(:first-child) {
+	margin-left: 10px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status > t::before {
+	content: "\f058";
+	margin-right: 3px;
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	font-size: 14px;
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status > .success {
+	color: rgb(23, 157, 6);
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status > .failed {
+	color: rgb(242, 46, 105);
+}
+
+.component.ctmsStatus > .item.network > .nodes > .node > .status > .failed::before {
+	content: "\f057";
+}

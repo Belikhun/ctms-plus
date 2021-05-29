@@ -300,6 +300,134 @@ const core = {
 					)
 				)
 			}
+		},
+
+		ctms: {
+			/** @type {smenu.Group} */
+			group: undefined,
+			
+			init() {
+				this.group = new smenu.Group({
+					icon: "circle",
+					label: "CTMS"
+				});
+			},
+
+			status: {
+				/** @type {smenu.Child} */
+				child: undefined,
+
+				view: undefined,
+				
+				requests: 0,
+				online: 0,
+				c2m: { total: 0, count: 0 },
+				m2s: { total: 0, count: 0 },
+				server: { success: 0, failed: 0 },
+				middleware: { success: 0, failed: 0 },
+
+				init() {
+					this.child = new smenu.Child({
+						label: "Tình Trạng"
+					}, this.super.group);
+
+					this.view = makeTree("div", ["component", "ctmsStatus"], {
+						basic: { tag: "div", class: "row", child: {
+							online: { tag: "span", class: "item", child: {
+								label: { tag: "t", class: "label", text: "Số Truy Cập" },
+								value: { tag: "t", class: "value", text: "---" }
+							}},
+
+							request: { tag: "span", class: "item", child: {
+								label: { tag: "t", class: "label", text: "Số Yêu Cầu" },
+								value: { tag: "t", class: "value", text: "0" }
+							}}
+						}},
+
+						network: { tag: "div", class: ["item", "network"], child: {
+							label: { tag: "t", class: "label", text: "Mạng" },
+							nodes: { tag: "div", class: "nodes", child: {
+								server: { tag: "span", class: "node", child: {
+									label: { tag: "t", class: "label", text: "CTMS" },
+									icon: { tag: "icon", data: { icon: "server" } },
+									status: { tag: "div", class: "status", child: {
+										success: { tag: "t", class: "success", text: "0" },
+										failed: { tag: "t", class: "failed", text: "0" }
+									}}
+								}},
+
+								m2s: { tag: "t", class: ["value", "m2s"], text: "--- ms" },
+
+								middleware: { tag: "span", class: "node", child: {
+									label: { tag: "t", class: "label", text: "Middleware" },
+									icon: { tag: "icon", data: { icon: "hive" } },
+									status: { tag: "div", class: "status", child: {
+										success: { tag: "t", class: "success", text: "0" },
+										failed: { tag: "t", class: "failed", text: "0" }
+									}}
+								}},
+
+								c2m: { tag: "t", class: ["value", "c2m"], text: "--- ms" },
+
+								client: { tag: "span", class: "node", child: {
+									label: { tag: "t", class: "label", text: "Client" },
+									icon: { tag: "icon", data: { icon: "laptop" } }
+								}}
+							}}
+						}}
+					});
+
+					this.child.insert(this.view);
+
+					api.onResponse("global", (data) => {
+						this.requests++;
+						this.server.success++;
+						this.middleware.success++;
+
+						this.m2s.count++;
+						this.m2s.total += data.time;
+
+						this.c2m.count++;
+						this.c2m.total += data.c2m;
+
+						let onlineNode = data.dom.getElementById("menubottom");
+						if (onlineNode)
+							this.online = parseInt(onlineNode.innerText.match(/\d+/)[0]);
+
+						this.update();
+					});
+
+					api.onResponse("error", (error) => {
+						this.requests++;
+						this.c2m.count++;
+						this.c2m.total += error.c2m;
+						
+						if (error.data.code > 0 && error.data.code < 100) {
+							this.middleware.failed++;
+						} else {
+							this.middleware.success++;
+
+							if (error.data.status >= 400)
+								this.server.failed++;
+							else
+								this.server.success++;
+						}
+
+						this.update();
+					});
+				},
+
+				update() {
+					this.view.basic.online.value.innerText = this.online;
+					this.view.basic.request.value.innerText = this.requests;
+					this.view.network.nodes.server.status.success.innerText = this.server.success;
+					this.view.network.nodes.server.status.failed.innerText = this.server.failed;
+					this.view.network.nodes.middleware.status.success.innerText = this.middleware.success;
+					this.view.network.nodes.middleware.status.failed.innerText = this.middleware.failed;
+					this.view.network.nodes.m2s.innerText = `${this.m2s.count > 0 ? round((this.m2s.total / this.m2s.count) * 1000, 2) : "X"} ms`;
+					this.view.network.nodes.c2m.innerText = `${this.c2m.count > 0 ? round((this.c2m.total / this.c2m.count) * 1000, 2) : "X"} ms`;
+				}
+			}
 		}
 	},
 

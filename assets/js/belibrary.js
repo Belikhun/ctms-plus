@@ -819,16 +819,26 @@ function clamp(value, min, max) {
 }
 
 class StopClock {
-	__time(date = new Date()) {
-		return date.getTime();
+	__time(date) {
+		return (typeof date !== "undefined")
+			? date.getTime()
+			: performance.now();
 	}
 
-	constructor(date = new Date()) {
+	/**
+	 * Create a new StopClock instance
+	 * @param {Date} date 
+	 */
+	constructor(date) {
 		this.start = this.__time(date);
 	}
 
 	get stop() {
 		return (this.__time() - this.start) / 1000;
+	}
+
+	tick() {
+		return this.stop;
 	}
 }
 

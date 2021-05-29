@@ -67,28 +67,39 @@ const api = {
 			}
 		}
 		
-		let response = await myajax({
-			url: `${this.MIDDLEWARE}/api/middleware`,
-			method,
-			header: {
-				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-				"Session-Cookie-Key": "ASP.NET_SessionId",
-				"Session-Cookie-Value": localStorage.getItem("session") || "",
-				"Set-Host": "ctms.fithou.net.vn",
-				"Set-Origin": this.HOST,
-				"Set-Referer": `${this.HOST}${path}`,
-				"Upgrade-Insecure-Requests": 1,
-				...header
-			},
-			query: {
-				url: `${this.HOST}${path}`,
-				...query
-			},
-			form,
-			json,
-			withCredentials: true,
-			formEncodeURL: true
-		});
+		let start = new StopClock();
+		let response;
+		
+		try {
+			response = await myajax({
+				url: `${this.MIDDLEWARE}/api/middleware`,
+				method,
+				header: {
+					"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+					"Session-Cookie-Key": "ASP.NET_SessionId",
+					"Session-Cookie-Value": localStorage.getItem("session") || "",
+					"Set-Host": "ctms.fithou.net.vn",
+					"Set-Origin": this.HOST,
+					"Set-Referer": `${this.HOST}${path}`,
+					"Upgrade-Insecure-Requests": 1,
+					...header
+				},
+				query: {
+					url: `${this.HOST}${path}`,
+					...query
+				},
+				form,
+				json,
+				withCredentials: true,
+				formEncodeURL: true
+			});
+		} catch(error) {
+			error.c2m = start.tick() - error.data.runtime;
+			this.__handleResponse("error", error);
+
+			let e = parseException(error);
+			throw { code: e.code, description: e.description, data: error }
+		}
 
 		if (response.data.session) {
 			clog("DEBG", "api.request(): session", { text: response.data.session, color: oscColor("blue") });
@@ -129,6 +140,7 @@ const api = {
 
 		let data = {
 			dom: dom.content,
+			c2m: start.tick() - response.runtime,
 			...response.data
 		}
 

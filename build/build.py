@@ -63,6 +63,8 @@ if (os.environ.get("CI")):
 	log("DEBG", "branch = " + metadata["branch"])
 	log("DEBG", "version = " + metadata["version"])
 
+	with open("VERSION", "w") as file:
+		file.write(metadata["version"])
 
 logStatus("Lưu Thông Tin Dự Án", 0)
 with open("metadata.json", "w", encoding="utf-8") as file:

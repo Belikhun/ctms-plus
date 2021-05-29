@@ -5,9 +5,9 @@
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
-const APPNAME = "CTMS+";
-const VERSION = "0.1";
-const STATE = "indev";
+var APPNAME = "CTMS+";
+var VERSION = "0.1";
+var STATE = "local";
 
 /**
  * This object contains CTMS+ core modules and will be
@@ -169,6 +169,25 @@ const core = {
 		init: () => popup.init()
 	},
 
+	metadata: {
+		priority: 0,
+
+		async init() {
+			try {
+				let response = await myajax({
+					url: "/metadata.json",
+					method: "GET"
+				});
+
+				window.APPNAME = response.name;
+				window.VERSION = response.version;
+				window.STATE = response.branch;
+			} catch(e) {
+				this.log("WARN", "Could not fetch metadata file! Maybe it's missing?");
+			}
+		}
+	},
+
 	tooltip: {
 		priority: 0,
 
@@ -265,7 +284,7 @@ const core = {
 			smenu.onShow(() => core.content.classList.add("parallax"));
 			smenu.onHide(() => core.content.classList.remove("parallax"));
 
-			if (["beta", "indev", "debug", "test"].includes(STATE)) {
+			if (["beta", "indev", "debug", "test", "development"].includes(STATE)) {
 				new smenu.components.Note({
 					level: "warning",
 					message: `

@@ -280,6 +280,7 @@ arr::before {
 
 #content > div > .overlay > .description {
 	font-size: 15px;
+	text-align: center;
 }
 
 #content > div > .overlay > .buttons {

@@ -84,10 +84,24 @@ arr::before {
 	padding: 0 10px 5px;
 }
 
+.generalTable > thead > tr > th.center,
+.generalTable > tbody > tr > td.center {
+	text-align: center;
+}
+
+.generalTable > thead > tr > th.right,
+.generalTable > tbody > tr > td.right {
+	text-align: right;
+}
+
 .generalTable > tbody > tr > td {
 	padding-bottom: 0;
 	color: black;
 	text-decoration: none;
+}
+
+.generalTable > tbody > tr > td.bold {
+	font-weight: bold;
 }
 
 .generalTable > thead > tr > th {
@@ -178,7 +192,7 @@ arr::before {
 }
 
 #content[data-screen="schedule"] > div.schedule,
-#content[data-layout = "2"] > div:nth-child(2) {
+#content[data-screen="results"] > div.results {
 	display: flex;
 }
 
@@ -316,6 +330,7 @@ arr::before {
 	font-family: Nunito;
 	font-weight: 600;
 	font-size: 15px;
+	letter-spacing: .3px;
 }
 
 #content > div > .content {
@@ -399,12 +414,6 @@ arr::before {
 .scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="stt"],
 .scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="stt"] {
 	width: 20px;
-	text-align: right;
-}
-
-.scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="stt"] {
-	font-size: 12px;
-	font-weight: bold;
 }
 
 .scheduleScreen > .list > .item > .generalTable > tbody > tr > .status > span {
@@ -456,8 +465,9 @@ arr::before {
 
 .scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="subject"] {
 	font-family: Nunito;
-	font-size: 16px;
-	font-weight: bold;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: .2px;
 }
 
 .scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="classroom"],
@@ -465,23 +475,46 @@ arr::before {
 	width: 60px;
 }
 
-.scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="time"] {
-	font-weight: bold;
-}
-
 .scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="classID"],
-.scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="listID"] {
-	text-align: right;
-	width: 120px;
-}
-
+.scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="listID"],
 .scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="classID"],
 .scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="listID"] {
 	width: 120px;
-	font-family: Consolas;
-	font-size: 15px;
+}
+
+/** ==================== SCREEN.RESULTS ==================== */
+
+.resultsScreen > tbody > tr {
+	counter-increment: resultsTableNth;
+}
+
+.resultsScreen > tbody > tr > td {
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.resultsScreen > thead > tr > th[key="stt"],
+.resultsScreen > tbody > tr > td[key="stt"] {
+	width: 20px;
+}
+
+.resultsScreen > tbody > tr > td:first-child::before {
+	content: counter(resultsTableNth);
+	font-size: 12px;
 	font-weight: bold;
-	text-align: right;
+	color: initial;
+}
+
+.resultsScreen > thead > tr > th[key="subject"],
+.resultsScreen > tbody > tr > td[key="subject"] {
+	width: 320px;
+}
+
+.resultsScreen > tbody > tr > td[key="subject"] {
+	font-family: Nunito;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: .2px;
 }
 
 /** ==================== ACCOUNT.LOGIN ==================== */

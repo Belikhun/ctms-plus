@@ -27,7 +27,6 @@ Nếu có thể, hãy đính kèm một ảnh chụp màn hình tại đây.
 ### 🌍 Phiên Bản
  - Hệ điều hành: [vd: Windows, Ubuntu, MacOS]
  - Trình duyệt: [vd: Chrome, CocCoc, Edge, Safari]
- - Trình chấm: [vd: Themis v1.9.8 b.2806]
 
 #### Thông tin thêm
 Thêm bất kỳ thông tin nào liên quan đến lỗi tại đây.

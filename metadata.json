@@ -1,7 +1,7 @@
 {
     "name": "CTMS+",
-    "version": "0.1",
-    "branch": "development",
+    "version": "0.1.17/0975222",
+    "branch": "refs/heads/main",
     "link": {
         "repo": "https://github.com/belivipro9x99/ctms-plus",
         "report": "https://github.com/belivipro9x99/ctms-plus/issues"
@@ -27,7 +27,7 @@
     },
     "contributors": {
         "belivipro9x99": {
-            "contributions": 20
+            "contributions": 35
         }
     }
 }

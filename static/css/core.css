@@ -502,7 +502,7 @@ arr::before {
 	content: counter(resultsTableNth);
 	font-size: 12px;
 	font-weight: bold;
-	color: initial;
+	color: inherit;
 }
 
 .resultsScreen > thead > tr > th[key="subject"],

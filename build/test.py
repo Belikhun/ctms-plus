@@ -84,7 +84,7 @@ class LocalStorage:
 PORT = 8000
 class MyServer(Thread):
 	class MyHTTPHandler(SimpleHTTPRequestHandler):
-		def log_message(self, format, *args):
+		def log_message(self, logFormat, *args):
 			try:
 				if (int(args[0]) >= 400):
 					log("WARN", f"HTTP {int(args[0])} {args[1]}")
@@ -94,8 +94,6 @@ class MyServer(Thread):
 
 			if (int(args[1]) >= 400):
 				log("WARN", f"{args[0]} >>> HTTP {args[1]}")
-
-			pass
 
 	def run(self):
 		log("INFO", f"HTTP Server Will Start At Port {PORT}")

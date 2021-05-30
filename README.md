@@ -15,6 +15,8 @@ CTMS+ là dự án phi lợi nhuận, không hề liên quan và không được
 
 CTMS+ hiện đang chạy trên các host sau:
  * Netlify: https://ctmsplus.netlify.com
+ * Vercel: https://ctmsplus.vercel.app
+ * Github Pages: https://belivipro9x99.github.io/ctms-plus/
 
 ### ☠ CTMS+ có đáng tin cậy không ?
 

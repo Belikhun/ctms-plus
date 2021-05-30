@@ -484,10 +484,6 @@ arr::before {
 
 /** ==================== SCREEN.RESULTS ==================== */
 
-.resultsScreen {
-
-}
-
 .resultsScreen > tbody > tr {
 	counter-increment: resultsTableNth;
 }

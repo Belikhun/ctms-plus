@@ -51,6 +51,10 @@ body.dark .userDetailView > .userCard > .bottom > t::before {
 	color: #ffffff;
 }
 
+body.dark .component.ctmsStatus > .item.network > .nodes > .node {
+	--failed: rgb(255, 152, 183);
+}
+
 body.dark .component.ctmsStatus > .item.network > .nodes > .node > icon {
 	background-color: #242424;
 }

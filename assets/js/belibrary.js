@@ -2091,7 +2091,8 @@ function createSelectInput({
 
 	if (typeof Scrollable === "function")
 		new Scrollable(container.select, {
-			content: container.select.list
+			content: container.select.list,
+			scrollbar: false
 		});
 
 	/** @type {HTMLDivElement} */

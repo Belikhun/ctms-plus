@@ -100,11 +100,17 @@ const api = {
 				formEncodeURL: true
 			});
 		} catch(error) {
-			error.c2m = start.tick() - error.data.runtime;
-			this.__handleResponse("error", error);
-
-			let e = parseException(error);
-			throw { code: e.code, description: e.description, data: error }
+			if (error.data) {
+				error.c2m = start.tick() - error.data.runtime;
+				this.__handleResponse("error", error);
+	
+				let e = parseException(error);
+				throw { code: e.code, description: e.description, data: error }
+			} else {
+				error.c2m = start.tick();
+				this.__handleResponse("error", error);
+				throw { code: -1, description: `api.request(): invalid middleware response (middleware: ${this.MIDDLEWARE})`, data: error }
+			}
 		}
 
 		if (response.data.session) {

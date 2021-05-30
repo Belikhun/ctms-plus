@@ -6,6 +6,18 @@
         "repo": "https://github.com/belivipro9x99/ctms-plus",
         "report": "https://github.com/belivipro9x99/ctms-plus/issues"
     },
+	"middleware": {
+		"DHS": {
+			"host": "https://dealhuntersuite.com",
+			"name": "DHS Middleware",
+			"default": true
+		},
+
+		"local": {
+			"host": "http://localhost:80",
+			"name": "localhost"
+		}
+	},
     "author": {
         "belivipro9x99": {
             "name": "Belikhun",

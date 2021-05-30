@@ -466,7 +466,7 @@ const core = {
 						this.c2m.count++;
 						this.c2m.total += error.c2m;
 						
-						if (error.data.code > 0 && error.data.code < 100) {
+						if (!error.data || error.data.code > 0 && error.data.code < 100) {
 							this.middleware.failed++;
 						} else {
 							this.middleware.success++;
@@ -490,6 +490,16 @@ const core = {
 					this.view.network.nodes.middleware.status.failed.innerText = this.middleware.failed;
 					this.view.network.nodes.m2s.innerText = `${this.m2s.count > 0 ? round((this.m2s.total / this.m2s.count) * 1000, 2) : "X"} ms`;
 					this.view.network.nodes.c2m.innerText = `${this.c2m.count > 0 ? round((this.c2m.total / this.c2m.count) * 1000, 2) : "X"} ms`;
+
+					if (this.middleware.success === 0 && this.middleware.failed > 0)
+						this.view.network.nodes.middleware.classList.add("failed");
+					else
+						this.view.network.nodes.middleware.classList.remove("failed");
+
+					if (this.server.success === 0 && this.server.failed > 0)
+						this.view.network.nodes.server.classList.add("failed");
+					else
+						this.view.network.nodes.server.classList.remove("failed");
 				}
 			},
 
@@ -584,6 +594,34 @@ const core = {
 
 				buy(id) {
 					// TODO: Buying Services Implementation
+				}
+			},
+
+			server: {
+				group: smenu.Group.prototype,
+
+				init() {
+					this.group = new smenu.Group({ label: "máy chủ", icon: "server" });
+					let general = new smenu.Child({ label: "Chung" }, this.group);
+
+					let mwOptions = {}
+					let mwDefault = undefined;
+
+					for (let key of Object.keys(META.middleware)) {
+						mwOptions[key] = META.middleware[key].name;
+
+						if (META.middleware[key].default)
+							mwDefault = key;
+					}
+
+					let mwSelect = new smenu.components.Select({
+						label: "Middleware",
+						icon: "hive",
+						options: mwOptions,
+						defaultValue: mwDefault,
+						save: "server.middleware",
+						onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
+					}, general);
 				}
 			},
 

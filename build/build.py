@@ -19,6 +19,9 @@ log("OKAY", "Imported: json")
 import os
 log("OKAY", "Imported: os")
 
+import re
+log("OKAY", "Imported: re")
+
 def logStatus(text, status, overWrite = False):
 	statusText = [f"{Fore.RED}✗ ERRR", f"{Fore.YELLOW}● WAIT", f"{Fore.GREEN}✓ OKAY"]
 	logStatus = ["ERRR", "INFO", "OKAY"]
@@ -71,4 +74,21 @@ with open("metadata.json", "w", encoding="utf-8") as file:
 	file.write(json.dumps(metadata, indent=4))
 
 logStatus("Lưu Thông Tin Dự Án", 1, True)
+
+
+logStatus("Cập Nhật Phiên Bản Các Liên Kết", 0)
+
+with open("index.html", "r", encoding="utf-8") as file:
+	content = file.read()
+	srcRegex = r"(?:assets|static)\/.+\.(?:css|js)"
+	search = re.findall(srcRegex, content)
+
+	for item in search:
+		log("DEBG", "Update " + item)
+		content = content.replace(item, f"{item}?v={metadata['version']}")
+
+	with open("index.html", "w", encoding="utf-8") as fileWrite:
+		fileWrite.write(content)
+
+logStatus("Cập Nhật Phiên Bản Các Liên Kết", 1, True)
 exit(0)

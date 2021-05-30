@@ -227,7 +227,26 @@ const api = {
 			faculty: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(3) > td:nth-child(2)`).innerText.replace(":\n", "").trim().replace("  ", " "),
 			department: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(3) > td:nth-child(4)`).innerText.replace(":\n", "").trim().replace("  ", " "),
 			course: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(2)`).innerText.replace(":\n", "").trim().replace("  ", " "),
-			classroom: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(4)`).innerText.replace(":\n", "").trim().replace("  ", " ")
+			classroom: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(4)`).innerText.replace(":\n", "").trim().replace("  ", " "),
+			mode: response.dom.getElementById("leftcontent").childNodes.item(2).wholeText.trim().replace("\n", " "),
+			results: []
+		}
+
+		let resultTableRows = [ ...response.dom.querySelectorAll(`#leftcontent > table.RowEffect.CenterElement > tbody > tr`) ]
+		for (let row of resultTableRows) {
+			response.info.results.push({
+				subject: row.children[0].innerText.trim(),
+				tinChi: parseInt(row.children[1].innerText.trim()),
+				classID: row.children[2].innerText.trim(),
+				teacher: row.children[3].innerText.trim(),
+				diemCC: parseFloat(row.children[4].innerText.trim()),
+				diemDK: parseFloat(row.children[5].innerText.trim()),
+				diemHK: parseFloat(row.children[6].innerText.trim())
+
+				// We will add note later as currently we don't
+				// know what kind of data goes in here
+				// note: row.children[7].innerText.trim()
+			});
 		}
 
 		this.__handleResponse("results", response);

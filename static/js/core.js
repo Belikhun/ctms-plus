@@ -1074,11 +1074,13 @@ const core = {
 				this.subWindow.loading = true;
 				this.subWindow.content = this.detailView;
 				this.background.setColor("navyBlue");
-				
-				await api.results();
-				await api.services();
 				this.loginHandlers.forEach(f => f());
-
+				
+				await Promise.all([
+					api.results(),
+					api.services()
+				]);
+				
 				this.subWindow.loading = false;
 			}
 		},

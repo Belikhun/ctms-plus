@@ -16,8 +16,6 @@ git_setup() {
 	git config --global user.name "$GITHUB_ACTOR"
 }
 
-version=`cat VERSION`
-
 git_setup
 git remote update
 git fetch --all
@@ -34,5 +32,5 @@ fi
 git stash pop
 git add .
 git diff
-git commit -m "[GA Build $GITHUB_RUN_NUMBER] 🔮 BUILD: Version $version" -m "Commit $GITHUB_SHA by $GITHUB_ACTOR" -m "Ref: $GITHUB_REF"
+git commit -m "[GA Build $GITHUB_RUN_NUMBER] 🔮 BUILD: Version $(cat VERSION)" -m "Commit $GITHUB_SHA by $GITHUB_ACTOR" -m "Ref: $GITHUB_REF"
 git push --force --set-upstream origin "${INPUT_BRANCH}"

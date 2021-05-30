@@ -80,13 +80,14 @@ arr::before {
 
 .generalTable > thead > tr > th,
 .generalTable > tbody > tr > td {
-	padding: unset;
 	vertical-align: middle;
 	padding: 0 10px 5px;
 }
 
 .generalTable > tbody > tr > td {
 	padding-bottom: 0;
+	color: black;
+	text-decoration: none;
 }
 
 .generalTable > thead > tr > th {
@@ -99,11 +100,6 @@ arr::before {
 .generalTable > thead > tr > th > tip {
 	margin-left: 5px;
 	transform: translateY(-2px);
-}
-
-.generalTable > tbody > tr > td {
-    color: black;
-	text-decoration: none;
 }
 
 .generalTable > tbody > tr:nth-child(2n + 1) > td {

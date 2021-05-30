@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from json.decoder import JSONDecodeError
-from lib import ehook;
-from lib.log import log;
+from lib import ehook
+from lib.log import log
 
 import colorama
 from colorama import Fore
@@ -61,7 +61,7 @@ for user in contributorsData:
 if (os.environ.get("CI")):
 	log("INFO", "CI Environment Detected! Updaing Optional Data")
 	metadata["branch"] = os.environ.get("GITHUB_REF")
-	metadata["version"] += f".{os.environ.get('GITHUB_RUN_NUMBER')}/{os.environ.get('GITHUB_SHA')[0:6]}"
+	metadata["version"] += f".{os.environ.get('GITHUB_RUN_NUMBER')}/{os.environ.get('GITHUB_SHA')[0:7]}"
 
 	log("DEBG", "branch = " + metadata["branch"])
 	log("DEBG", "version = " + metadata["version"])

@@ -176,7 +176,7 @@ const core = {
 			try {
 				set({ p: 0, d: `Fetching Metadata` });
 				let response = await myajax({
-					url: "/metadata.json",
+					url: "metadata.json",
 					method: "GET"
 				});
 
@@ -769,7 +769,7 @@ const core = {
 					// Project Info View
 					let projectInfo = makeTree("div", "projectInfo", {
 						header: { tag: "div", class: "header", child: {
-							icon: new lazyload({ source: "/assets/img/icon.png", classes: "icon" })
+							icon: new lazyload({ source: "./assets/img/icon.png", classes: "icon" })
 						}},
 
 						pTitle: { tag: "t", class: "title", text: APPNAME },
@@ -851,7 +851,7 @@ const core = {
 	
 					this.licensePanel = new smenu.Panel(undefined, { size: "large" });
 					this.licensePanel.setToggler(licenseButton);
-					await this.licensePanel.content("iframe:/license.html");
+					await this.licensePanel.content("iframe:./license.html");
 					core.darkmode.onToggle((enabled) => this.licensePanel.iframe.contentDocument.body.classList[enabled ? "add" : "remove"]("dark"));
 	
 					new smenu.components.Footer({
@@ -1439,7 +1439,7 @@ const core = {
 					table: { tag: "table", class: "generalTable", child: {
 						thead: { tag: "thead", child: {
 							row: { tag: "tr", child: {
-								stt: { tag: "th", text: "Thứ Tự" },
+								stt: { tag: "th", class: "right", text: "Thứ Tự" },
 								status: { tag: "th" },
 								subject: { tag: "th", text: "Môn Học" },
 								classroom: { tag: "th", text: "Lớp Học" },
@@ -1457,7 +1457,7 @@ const core = {
 				let nth = 0;
 				for (let row of rows)
 					item.table.tbody.appendChild(makeTree("tr", "row", {
-						stt: { tag: "td", text: ++nth },
+						stt: { tag: "td", class: ["right", "bold"], text: ++nth },
 
 						status: { tag: "td", class: "status", child: {
 							inner: { tag: "span", data: { status: row.status }, text: row.status }

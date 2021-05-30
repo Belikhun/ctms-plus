@@ -35,10 +35,10 @@ jobs:
           pip install selenium
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: 🧭 Setting Up Chrome Driver 83.0.4103.14
+      - name: 🧭 Setting Up Chrome Driver 90.0.4430.24
         uses: nanasess/setup-chromedriver@master
         with:
-          chromedriver-version: 83.0.4103.14
+          chromedriver-version: 90.0.4430.24
 
       - name: 📜 Run Test
         run: python build/test.py

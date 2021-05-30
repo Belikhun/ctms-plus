@@ -2066,6 +2066,154 @@ function createCheckbox({
 	}
 }
 
+function createSelectInput({
+	icon,
+	color = "blue",
+	options = {},
+	value
+} = {}) {
+	let container = makeTree("div", "sq-selector", {
+		current: { tag: "div", class: "current", child: {
+			icon: { tag: "icon", class: "icon" },
+			value: { tag: "t", class: "value" },
+			arrow: { tag: "icon", class: "arrow", data: { icon: "arrowDown" } }
+		}},
+
+		select: { tag: "div", class: "select", child: {
+			list: { tag: "div", class: "list" }
+		}}
+	});
+
+	container.current.icon.style.display = "none";
+
+	if (typeof sounds === "object")
+		sounds.applySound(container.current, ["soundhover"]);
+
+	if (typeof Scrollable === "function")
+		new Scrollable(container.select, {
+			content: container.select.list
+		});
+
+	/** @type {HTMLDivElement} */
+	let activeNode = undefined;
+	let activeValue = undefined;
+	let currentOptions = {}
+	let changeHandlers = []
+	let showing = false;
+
+	const show = () => {
+		if (typeof sounds === "object")
+			sounds.select(1);
+
+		showing = true;
+		container.classList.add("show");
+		container.select.style.height = `${container.select.list.offsetHeight}px`;
+	}
+
+	const hide = (isSelected = false) => {
+		if (typeof sounds === "object" && !isSelected)
+			sounds.select(1);
+		
+		showing = false;
+		container.classList.remove("show");
+		container.select.style.height = null;
+	}
+
+	const toggle = () => {
+		if (showing)
+			hide();
+		else
+			show();
+	}
+
+	const set = ({
+		icon,
+		color,
+		options,
+		value
+	} = {}) => {
+		if (typeof color === "string")
+			container.dataset.color = color;
+
+		if (typeof icon === "string") {
+			container.current.icon.style.display = null;
+			container.current.icon.dataset.icon = icon;
+		} else if (typeof icon !== "undefined")
+			container.current.icon.style.display = "none";
+
+		if (typeof options === "object") {
+			emptyNode(container.select.list);
+			activeNode = undefined;
+			activeValue = undefined;
+			currentOptions = {}
+
+			for (let key of Object.keys(options)) {
+				let item = document.createElement("div");
+				item.classList.add("item");
+				item.dataset.value = key;
+				item.innerText = options[key];
+				options[key] = item;
+
+				if (typeof sounds === "object")
+					sounds.applySound(item, ["soundhoversoft"]);
+
+				item.addEventListener("click", () => {
+					if (activeNode)
+						activeNode.classList.remove("active");
+					
+					activeNode = item;
+					item.classList.add("active");
+					container.current.value.innerText = item.innerText;
+					changeHandlers.forEach(f => f(item.dataset.value));
+
+					if (typeof sounds === "object")
+						sounds.soundToggle(sounds.sounds.valueChange);
+
+					hide(true);
+				});
+
+				container.select.list.appendChild(item);
+			}
+
+			currentOptions = options;
+		}
+
+		if (typeof value === "string" && currentOptions[value]) {
+			if (activeNode)
+				activeNode.classList.remove("active");
+
+			activeNode = currentOptions[value];
+			activeNode.classList.add("active");
+			activeValue = value;
+			container.current.value.innerText = activeNode.innerText;
+			changeHandlers.forEach(f => f(activeValue));
+		}
+	}
+
+	set({ icon, color, options, value });
+
+	container.current.addEventListener("click", () => toggle());
+
+	return {
+		group: container,
+		showing,
+		value: activeValue,
+		show,
+		hide,
+		set,
+
+		onChange: (f) => {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createSelectInput().onChange(): not a valid function` }
+
+			changeHandlers.push(f);
+
+			if (activeValue)
+				f(activeValue);
+		}
+	}
+}
+
 function createSlider({
 	color = "pink",
 	value = 0,

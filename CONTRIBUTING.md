@@ -16,7 +16,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Githu
 In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using Github's [issues](https://github.com/belivipro9x99/ctms-plus/issues)
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](); it's that easy!
+We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/belivipro9x99/ctms-plus/issues/new?labels=bug%2C+help+wanted&template=bug_report.md); it's that easy!
 
 ## Use a Consistent Coding Style
 

@@ -34,6 +34,6 @@ Repo này chứa mã nguồn của `CTMS+` và `middleware API` được sử d�
 
 Chúng mình không nhận tiền mặt làm hình thức đóng góp, thay vào đó chúng mình sẽ tiếp nhận công sức đóng góp của mọi người! Mọi đóng góp về code, ý tưởng hoặc góp ý đều được chào mừng!
 
-Nếu bạn có một ý tưởng, một tính năng mà bạn muốn thấy trong tương lai, hoặc gặp một lỗi nào đó khi dùng phần mềm, bạn có thể gửi nó bằng cách tạo một **Bug Report/Feature Request** trong tab *Issues* của repo này.
+Nếu bạn có một ý tưởng, một tính năng mà bạn muốn thấy trong tương lai, hoặc gặp một lỗi nào đó khi dùng phần mềm, bạn có thể gửi nó bằng cách tạo một **[Bug Report](https://github.com/belivipro9x99/ctms-plus/issues/new?labels=bug%2C+help+wanted&template=bug_report.md)/[Feature Request](https://github.com/belivipro9x99/ctms-plus/issues/new?labels=enhancement&template=feature_request.md)** trong tab *Issues* của repo này.
 
 Nếu bạn muốn ủng hộ bằng cách viết code, hãy chắc chắn rằng bạn đã đọc qua [Contributing Guidelines](CONTRIBUTING.md) trước khi submit một pull request

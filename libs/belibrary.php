@@ -218,8 +218,10 @@
 	}
 
 	function header_set($name) {
+		$name = strtolower($name);
+
 		foreach (headers_list() as $item)
-			if (strpos($item, $name) > 0)
+			if (strpos(strtolower($item), $name) >= 0)
 				return true;
 			
 		return false;
@@ -436,7 +438,7 @@
 			case "API":
 				if (!headers_sent()) {
 					header("Content-Type: application/json", true);
-					
+
 					if (!header_set("Access-Control-Allow-Origin"))
 						header("Access-Control-Allow-Origin: *", true);
 				}

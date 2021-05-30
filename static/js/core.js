@@ -1175,6 +1175,12 @@ const core = {
 							sTitle: { tag: "t", class: "title", text: title },
 							subTitle: { tag: "t", class: "subTitle", html: subTitle }
 						}},
+
+						reload: createButton("TẢI LẠI", {
+							style: "round",
+							icon: "reload",
+							complex: true
+						})
 					}},
 
 					content: { tag: "div", class: "content" }
@@ -1182,6 +1188,19 @@ const core = {
 
 				if (applyScrollable)
 					new Scrollable(this.view, { content: this.view.content });
+
+				this.view.header.reload.addEventListener("click", async () => {
+					this.view.header.reload.disabled = true;
+
+					try {
+						for (let f of this.reloadHandlers)
+							await f();
+					} catch(error) {
+						errorHandler(error);
+					}
+
+					this.view.header.reload.disabled = false;
+				});
 
 				this.view.overlay.style.display = "none";
 				core.screen.container.appendChild(this.view);
@@ -1211,6 +1230,13 @@ const core = {
 					throw { code: -1, description: `core.screen.Screen(${this.id}).onHide(): not a valid function` }
 	
 				this.hideHandlers.push(f);
+			}
+
+			onReload(f) {
+				if (typeof f !== "function")
+					throw { code: -1, description: `core.screen.Screen(${this.id}).onReload(): not a valid function` }
+	
+				this.reloadHandlers.push(f);
 			}
 
 			set({
@@ -1318,6 +1344,7 @@ const core = {
 					applyScrollable: false
 				});
 
+				this.screen.view.header.reload.style.display = "none";
 				this.screen.content = this.view;
 				this.screen.loading = true;
 				this.screen.onShow(() => this.load());
@@ -1416,10 +1443,10 @@ const core = {
 								status: { tag: "th" },
 								subject: { tag: "th", text: "Môn Học" },
 								classroom: { tag: "th", text: "Lớp Học" },
-								time: { tag: "th", text: "Giờ" },
+								time: { tag: "th", class: "bold", text: "Giờ" },
 								teacher: { tag: "th", text: "Giảng Viên" },
-								classID: { tag: "th", text: "Mã Lớp" },
-								listID: { tag: "th", text: "Mã DS Thi" },
+								classID: { tag: "th", class: "right", text: "Mã Lớp" },
+								listID: { tag: "th", class: "right", text: "Mã DS Thi" },
 							}}
 						}},
 
@@ -1438,10 +1465,10 @@ const core = {
 
 						subject: { tag: "td", text: row.subject },
 						classroom: { tag: "td", text: row.classroom },
-						time: { tag: "td", html: row.time.replace("->", "<arr></arr>") },
+						time: { tag: "td", class: "bold", html: row.time.replace("->", "<arr></arr>") },
 						teacher: { tag: "td", text: row.teacher },
-						classID: { tag: "td", text: row.classID },
-						listID: { tag: "td", text: row.listID }
+						classID: { tag: "td", class: ["bold", "right"], text: row.classID },
+						listID: { tag: "td", class: ["bold", "right"], text: row.listID }
 					}));
 
 				this.view.list.appendChild(item);
@@ -1455,8 +1482,127 @@ const core = {
 		},
 
 		results: {
-			init() {
-				
+			/** @type {core.screen.Screen} */
+			screen: null,
+
+			view: null,
+			loaded: false,
+
+			async init() {
+				this.view = makeTree("table", ["generalTable", "resultsScreen"], {
+					thead: { tag: "thead", child: {
+						row: { tag: "tr", child: {
+							stt: { tag: "th", class: "right", text: "Thứ Tự" },
+							subject: { tag: "th", text: "Môn Học" },
+							tinChi: { tag: "th", class: "right", text: "Số Tín Chỉ" },
+							classroom: { tag: "th", class: "right", text: "Mã Lớp" },
+							teacher: { tag: "th", text: "Giảng Viên" },
+							
+							diemCC: { tag: "th", class: "right", child: {
+								content: { tag: "span", text: "Điểm CC" },
+								tip: { tag: "tip", title: "Điểm Chuyên Cần" }
+							}},
+
+							diemDK: { tag: "th", class: "right", child: {
+								content: { tag: "span", text: "Điểm ĐK" },
+								tip: { tag: "tip", title: "Điểm Điều Kiện" }
+							}},
+
+							diemHK: { tag: "th", class: "right", child: {
+								content: { tag: "span", text: "Điểm HK" },
+								tip: { tag: "tip", title: "Điểm Học Kì" }
+							}},
+						}}
+					}},
+
+					tbody: { tag: "tbody" }
+				});
+
+				this.screen = new core.screen.Screen({
+					id: "results",
+					icon: "poll",
+					title: "kết quả học tập",
+					description: "xem toàn bộ kết quả học tập của các môn!"
+				});
+
+				this.screen.content = this.view;
+				this.onLogout();
+				this.screen.loading = true;
+
+				core.account.onLogout(() => this.onLogout());
+				this.screen.onReload(async () => await this.load());
+
+				api.onResponse("results", (response) => {
+					if (!this.loaded)
+						this.screen.overlay({ show: false });
+
+					this.loaded = true;
+					emptyNode(this.view.tbody);
+					this.screen.set({ subTitle: response.info.mode });
+
+					for (let item of response.info.results)
+						this.addListItem(item);
+
+					this.screen.loading = false;
+				});
+			},
+
+			reset() {
+				this.loaded = false;
+				emptyNode(this.view.tbody);
+				this.screen.set({ subTitle: "" });
+			},
+
+			onLogout() {
+				this.reset();
+				this.screen.overlay({
+					icon: "exclamation",
+					title: "Yêu Cầu Đăng Nhập",
+					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này!`,
+					buttons: {
+						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true }
+					}
+				});
+
+				this.screen.loading = false;
+			},
+
+			/**
+			 * @param {Date} date 
+			 * @returns
+			 */
+			async load() {
+				if (!core.account.loggedIn) {
+					this.onLogout();
+					return;
+				}
+
+				this.screen.loading = true;
+				await api.results();
+				this.screen.loading = false;
+			},
+
+			addListItem({
+				subject,
+				tinChi,
+				classID,
+				teacher,
+				diemCC,
+				diemDK,
+				diemHK
+			} = {}) {
+				let row = makeTree("tr", "item", {
+					stt: { tag: "td", class: ["bold", "right"] },
+					subject: { tag: "td", text: subject },
+					tinChi: { tag: "td", class: "right", text: tinChi },
+					classID: { tag: "td", class: ["bold", "right"], text: classID },
+					teacher: { tag: "td", text: teacher },
+					diemCC: { tag: "td", class: ["bold", "right"], text: diemCC ? diemCC.toFixed(2) : "" },
+					diemDK: { tag: "td", class: ["bold", "right"], text: diemDK ? diemDK.toFixed(2) : "" },
+					diemHK: { tag: "td", class: ["bold", "right"], text: diemHK ? diemHK.toFixed(2) : "" }
+				});
+
+				this.view.tbody.appendChild(row);
 			}
 		},
 	}

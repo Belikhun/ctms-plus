@@ -17,6 +17,11 @@ class Splash {
 		if (!container || !container.classList)
 			throw { code: -1, description: `Splash(): container is not a valid Element!` }
 
+		// Initialize variables for testing with selenium
+		localStorage.setItem("__TEST_STATUS", "loading");
+		localStorage.setItem("__TEST_CODE", 0);
+		localStorage.setItem("__TEST_DESCRIPTION", "Hello World!");
+
 		/**
 		 * The container will contain splash
 		 * @type {HTMLElement}
@@ -169,6 +174,8 @@ class Splash {
 		this.status.innerText = "Tải Hoàn Thành";
 		cookie.set("splashInitSuccess", true, 1);
 		this.splash.classList.add("hide");
+
+		localStorage.setItem("__TEST_STATUS", "complete");
 	}
 
 	async panic(error, stop = true) {
@@ -180,6 +187,10 @@ class Splash {
 		this.bar.dataset.blink = "fade";
 		cookie.set("splashInitSuccess", false, 1);
 		clog("ERRR", error);
+
+		localStorage.setItem("__TEST_STATUS", "complete");
+		localStorage.setItem("__TEST_CODE", e.code);
+		localStorage.setItem("__TEST_DESCRIPTION", e.description);
 		
 		for (let f of this.onErrorHandlers)
 			await f(error, e.code, e.description, e.stack)

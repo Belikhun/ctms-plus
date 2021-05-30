@@ -1,0 +1,9 @@
+{
+	"liveServer.settings.file": "index.html",
+	"liveServer.settings.ignoreFiles": [
+		".vscode/**",
+		"**/*.py",
+		"**/*.pyc",
+		"**/*.log"
+	]
+}

@@ -1,0 +1,52 @@
+name: 🚀 build and deploy
+
+on:
+  push:
+    branches:
+      - main
+  
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: 📁 Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: 🛠 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 🛒 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install colorama
+          pip install requests
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: 📜 Run Build
+        run: python build/build.py
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛒 Install dependencies
+        run: |
+          sudo apt install dos2unix
+
+      - name: ⛳ Deploy Changes
+        env:
+          INPUT_BRANCH: "production"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dos2unix build/deploy.sh
+          sudo chmod a+x build/deploy.sh
+          build/deploy.sh

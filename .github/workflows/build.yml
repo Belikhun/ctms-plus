@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  build:
+  main:
     runs-on: ubuntu-latest
 
     strategy:
@@ -26,6 +26,7 @@ jobs:
 
       - name: 🛒 Install dependencies
         run: |
+          sudo apt install dos2unix
           python -m pip install --upgrade pip
           pip install colorama
           pip install requests
@@ -33,25 +34,6 @@ jobs:
 
       - name: 📜 Run Build
         run: python build/build.py
-
-      - name: 📦 Creating Build Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ctmsplus-${{ env.GITHUB_JOB }}
-          path: ${{ github.workspace }}
-
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📦 Dơnloading Build Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ctmsplus-${{ env.GITHUB_JOB }}
-
-      - name: 🛒 Install dependencies
-        run: |
-          sudo apt install dos2unix
 
       - name: ⛳ Deploy Changes
         env:

@@ -5,10 +5,6 @@ on:
     branches:
       - main
   
-  pull_request:
-    branches:
-      - main
-  
   workflow_dispatch:
   
 jobs:
@@ -36,7 +32,7 @@ jobs:
           pip install requests
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: 📜 Update Metadata
+      - name: 📜 Update Information
         run: python build/build.py
 
       - name: ⛳ Commit Update

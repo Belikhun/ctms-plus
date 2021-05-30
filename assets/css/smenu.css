@@ -669,7 +669,7 @@
 	width: 100%;
 	height: 100%;
 
-	background-color: rgba(245, 245, 245, 0.8);
+	background-color: rgba(245, 245, 245, 0.95);
 	z-index: 10;
 }
 
@@ -996,7 +996,7 @@ body.dark .smenuContainer > .panels > .panel > .buttons > .close:hover::after {
 }
 
 body.dark .smenuContainer > .panels > .panel > .main {
-	background-color: rgba(12, 12, 12, 0.85);
+	background-color: rgba(12, 12, 12, 0.9);
 }
 
 /** COMPONENT: CHOICE **/

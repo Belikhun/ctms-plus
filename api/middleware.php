@@ -2,7 +2,7 @@
     //? |-----------------------------------------------------------------------------------------------|
     //? |  /api/middleware.php                                                                          |
     //? |                                                                                               |
-    //? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
+    //? |  Copyright (c) 2020 Belikhun. All right reserved                                              |
     //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
     //? |-----------------------------------------------------------------------------------------------|
 
@@ -11,7 +11,7 @@
 
 	$url = reqQuery("url");
 	$data = Array();
-	$headers = getallheaders();
+	$headers = getAllHeadersUC();
 	$craftedHeaders = Array();
 	$resHeaders = Array();
 	$ignHeaders = Array("content-length", "location", "pragma");
@@ -125,7 +125,10 @@
 	// Set proxy for debugging
 	// curl_setopt($ch, CURLOPT_PROXY, "127.0.0.1:8080");
 
+	// Start request
+	$m2sRuntime = new StopClock();
 	$response = curl_exec($ch);
+	$m2sRuntime = $m2sRuntime -> stop();
 
 	if ($code = curl_errno($ch))
 		stop($code, "Request Error: ". curl_error($ch), 500);
@@ -134,5 +137,6 @@
 		"session" => $sessCookieValue,
 		"headers" => $resHeaders,
 		"sentHeaders" => $headers,
-		"response" => $response
+		"response" => $response,
+		"time" => $m2sRuntime
 	));

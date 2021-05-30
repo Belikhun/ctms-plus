@@ -1439,7 +1439,7 @@ const core = {
 					table: { tag: "table", class: "generalTable", child: {
 						thead: { tag: "thead", child: {
 							row: { tag: "tr", child: {
-								stt: { tag: "th", text: "Thứ Tự" },
+								stt: { tag: "th", class: "right", text: "Thứ Tự" },
 								status: { tag: "th" },
 								subject: { tag: "th", text: "Môn Học" },
 								classroom: { tag: "th", text: "Lớp Học" },
@@ -1457,7 +1457,7 @@ const core = {
 				let nth = 0;
 				for (let row of rows)
 					item.table.tbody.appendChild(makeTree("tr", "row", {
-						stt: { tag: "td", text: ++nth },
+						stt: { tag: "td", class: ["right", "bold"], text: ++nth },
 
 						status: { tag: "td", class: "status", child: {
 							inner: { tag: "span", data: { status: row.status }, text: row.status }

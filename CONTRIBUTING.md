@@ -29,5 +29,9 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 	}
 	```
 
+## Additional
+
+Be sure to add an emoji before every commit message 😎
+
 ## License
 By contributing, you agree that your contributions will be licensed under its MIT License.

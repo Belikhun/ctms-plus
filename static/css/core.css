@@ -95,7 +95,7 @@ arr::before {
 }
 
 .generalTable > tbody > tr > td {
-	padding-bottom: 0;
+	padding: 4px 10px;
 	color: black;
 	text-decoration: none;
 }
@@ -280,6 +280,7 @@ arr::before {
 
 #content > div > .overlay > .description {
 	font-size: 15px;
+	text-align: center;
 }
 
 #content > div > .overlay > .buttons {
@@ -502,7 +503,7 @@ arr::before {
 	content: counter(resultsTableNth);
 	font-size: 12px;
 	font-weight: bold;
-	color: initial;
+	color: inherit;
 }
 
 .resultsScreen > thead > tr > th[key="subject"],

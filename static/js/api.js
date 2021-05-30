@@ -24,8 +24,10 @@
  */
 const api = {
 	HOST: `http://ctms.fithou.net.vn`,
-	MIDDLEWARE: `http://localhost:80`,
+	MIDDLEWARE: `http://localhost`,
 
+	__PATH: undefined,
+	__FORM: {},
 	__VIEWSTATE: undefined,
 	__VIEWSTATEGENERATOR: undefined,
 	__EVENTVALIDATION: undefined,
@@ -63,6 +65,7 @@ const api = {
 		renewSession = false
 	} = {}) {
 		if (method === "POST") {
+			this.__FORM = form || {}
 			form.__EVENTTARGET = target;
 			form.__EVENTARGUMENT = argument;
 
@@ -73,6 +76,7 @@ const api = {
 			}
 		}
 		
+		this.__PATH = path;
 		let start = new StopClock();
 		let response;
 		
@@ -104,8 +108,7 @@ const api = {
 				error.c2m = start.tick() - error.data.runtime;
 				this.__handleResponse("error", error);
 	
-				let e = parseException(error);
-				throw { code: e.code, description: e.description, data: error }
+				throw error;
 			} else {
 				error.c2m = start.tick();
 				this.__handleResponse("error", error);
@@ -191,12 +194,13 @@ const api = {
 
 	/**
 	 * Đăng xuất khỏi tài khoản hiện tại
-	 * ! API này hiện KHÔNG HOẠT ĐỘNG
 	 */
 	async logout() {
 		let response = await this.request({
+			path: this.__PATH,
 			method: "POST",
 			form: {
+				...this.__FORM,
 				"__CALLBACKID": "ctl00$QuanlyMenu1",
 				"__CALLBACKPARAM": "logout"
 			}
@@ -301,11 +305,17 @@ const api = {
 					"ctl00$LeftCol$Lichhoc1$btnXemlich": "Xem lịch"
 				}
 			});
-		else
+		else {
 			response = await this.request({
 				path: "/Lichhoc.aspx",
 				method: "GET"
 			});
+
+			this.__FORM = {
+				"ctl00$LeftCol$Lichhoc1$txtNgaydautuan": response.dom.getElementById("LeftCol_Lichhoc1_txtNgaydautuan").value,
+				"ctl00$LeftCol$Lichhoc1$btnXemlich": "Xem lịch"
+			}
+		}
 
 		// Update current schedule viewstate
 		this.__SCHEDULE_VIEWSTATE = this.__VIEWSTATE;

@@ -1117,9 +1117,13 @@ const core = {
 			this.detailView.signoutBtn.disabled = true;
 			this.subWindow.loading = true;
 
-			//await api.logout();
-			localStorage.setItem("session", "");
-			await api.request();
+			try {
+				await api.logout();
+				//localStorage.setItem("session", "");
+				await api.request();
+			} catch(error) {
+				errorHandler(error);
+			}
 
 			this.detailView.signoutBtn.disabled = false;
 			this.subWindow.loading = false;

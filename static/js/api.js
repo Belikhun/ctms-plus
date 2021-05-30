@@ -270,7 +270,10 @@ const api = {
 					let t = s.title
 						.substring(1, s.title.length - 1)
 						.split("-")
-						.map(i => new Date(i));
+						.map(i => {
+							let t = /(\d+)\/(\d+)\/(\d+) (\d+)\:(\d+)/gm.exec(i);
+							return new Date(t[3], parseInt(t[2]) - 1, t[1], t[4], t[5]);
+						});
 
 					return {
 						from: t[0],

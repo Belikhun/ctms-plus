@@ -112,10 +112,15 @@ server.start()
 chromeOptions = webdriver.ChromeOptions()
 chromeOptions.add_argument("--log-level=0")
 desiredCapabilities = DesiredCapabilities.CHROME
-driver = webdriver.Chrome(
-	options = chromeOptions,
-	desired_capabilities = desiredCapabilities
-)
+
+try:
+	driver = webdriver.Chrome(
+		options = chromeOptions,
+		desired_capabilities = desiredCapabilities
+	)
+except Exception as e:
+	server.stop()
+	raise e
 
 # load the desired webpage
 driver.get("http://localhost:8000")

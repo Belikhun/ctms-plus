@@ -8,10 +8,13 @@
 from colorama import init
 from colorama import Fore, Style
 from inspect import currentframe
+from threading import Semaphore
 import atexit
 import time
 import re
 import os
+
+screenlock = Semaphore(value = 1)
 
 #init
 init(autoreset=True)
@@ -27,6 +30,7 @@ def escape_ansi(line):
 	return ansi_escape.sub("", line)
 
 def log(level, *args, resetCursor = False):
+	screenlock.acquire()
 	level = level.upper()
 	ticks = time.time()
 	ltime = time.localtime(ticks)
@@ -84,6 +88,8 @@ def log(level, *args, resetCursor = False):
 	print(out, end = "\r" if (resetCursor) else "\n")
 	with open(logPath, "a", encoding="utf-8") as f:
 		print(escape_ansi(out), file=f)
+
+	screenlock.release()
 
 def logExitHandler():
 	log("INFO", "Program ended")

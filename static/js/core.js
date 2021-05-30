@@ -176,7 +176,7 @@ const core = {
 			try {
 				set({ p: 0, d: `Fetching Metadata` });
 				let response = await myajax({
-					url: "/metadata.json",
+					url: "./metadata.json",
 					method: "GET"
 				});
 

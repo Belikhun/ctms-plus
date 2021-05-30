@@ -110,6 +110,9 @@ server.start()
 
 # Initialize chrome driver
 chromeOptions = webdriver.ChromeOptions()
+chromeOptions.add_argument("--headless")
+chromeOptions.add_argument("--no-sandbox")
+chromeOptions.add_argument("--disable-dev-shm-usage")
 chromeOptions.add_argument("--log-level=0")
 desiredCapabilities = DesiredCapabilities.CHROME
 

@@ -796,7 +796,7 @@ const core = {
 							avatar: new lazyload({ source: `https://github.com/${username}.png?size=80`, classes: "avatar" }),
 							aName: { tag: "a", target: "_blank", href: META.author[username].link, class: "name", text: META.author[username].name },
 							department: { tag: "t", class: "department", text: META.author[username].department },
-							role: { tag: "t", class: "role", text: META.author[username].role }
+							aRole: { tag: "t", class: "role", text: META.author[username].role }
 						}));
 					
 					for (let username of Object.keys(META.contributors))

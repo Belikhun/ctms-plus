@@ -37,17 +37,18 @@ jobs:
       - name: 📦 Creating Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ctmsplus-${{ env.GITHUB_JOB }}
+          name: ctmsplus-$GITHUB_JOB
           path: ${{ github.workspace }}
 
   deploy:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: 📦 Dơnloading Build Artifact
         uses: actions/download-artifact@v2
         with:
-          name: ctmsplus-${{ env.GITHUB_JOB }}
+          name: ctmsplus-$GITHUB_JOB
 
       - name: 🛒 Install dependencies
         run: |

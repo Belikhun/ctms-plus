@@ -11,6 +11,8 @@
 
 CTMS+ là một phiên bản được *thay áo mới* của CTMS với giao diện thân thiện hơn với người dùng. Toàn bộ dữ liệu hiển thị trong CTMS+ được lấy trực tiếp từ CTMS
 
+CTMS+ là dự án phi lợi nhuận, không hề liên quan và không được hỗ trợ bởi OTSC hoặc các bên liên quan khác
+
 CTMS+ hiện đang chạy trên các host sau:
  * Netlify: https://ctmsplus.netlify.com
 

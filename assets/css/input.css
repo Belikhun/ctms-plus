@@ -346,7 +346,7 @@ body.dark .formGroup[data-color="red"] > .formField:focus {
     border-radius: 0 4px 4px 0;
 }
 
-.sq-input > .outline > .notch {
+.sq-input > .outline > span.notch {
     border-color: var(--normal-color);
 }
 

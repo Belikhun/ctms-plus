@@ -299,6 +299,9 @@ const api = {
 		let __procPoint = (node) => {
 			let v = node.innerText.trim();
 
+			if (v === "")
+				return undefined;
+
 			return (v === "?")
 				? "?"
 				: parseFloat(v);

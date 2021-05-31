@@ -153,6 +153,12 @@ const api = {
 			this.__EVENTVALIDATION = __ev.value;
 		}
 
+		// Update logout state for home page
+		if (path === "" || path === "/") {
+			this.__LOGOUT_VIEWSTATE = this.__VIEWSTATE;
+			this.__LOGOUT_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
+		}
+
 		let data = {
 			dom: dom.content,
 			c2m: start.tick() - response.runtime,
@@ -192,21 +198,33 @@ const api = {
 		return response;
 	},
 
+	// States used to perform logout call
+	__LOGOUT_VIEWSTATE: undefined,
+	__LOGOUT_VIEWSTATEGENERATOR: undefined,
+
 	/**
 	 * Đăng xuất khỏi tài khoản hiện tại
 	 */
 	async logout() {
+		if (!this.__LOGOUT_VIEWSTATE || !this.__LOGOUT_VIEWSTATEGENERATOR)
+			throw { code: -1, description: `api.logout(): cannot perform a logout without viewstate data` }
+
 		let response = await this.request({
-			path: this.__PATH,
 			method: "POST",
 			form: {
-				...this.__FORM,
+				...this.__LOGOUT_FORM,
+				__VIEWSTATE: this.__LOGOUT_VIEWSTATE,
+				__VIEWSTATEGENERATOR: this.__LOGOUT_VIEWSTATEGENERATOR,
+				__EVENTVALIDATION: this.__LOGOUT_EVENTVALIDATION,
 				"__CALLBACKID": "ctl00$QuanlyMenu1",
 				"__CALLBACKPARAM": "logout"
 			}
 		});
 
+		this.__LOGOUT_VIEWSTATE = undefined;
+		this.__LOGOUT_VIEWSTATEGENERATOR = undefined;
 		this.__handleResponse("logout", response);
+
 		return response;
 	},
 

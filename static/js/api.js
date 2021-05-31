@@ -229,6 +229,46 @@ const api = {
 	},
 
 	/**
+	 * Chuyển điểm hệ số 10 sang hệ số 4 và xếp loại
+	 * @param {Number} average 
+	 */
+	resultGrading(average) {
+		let point = 0;
+		let letter = "?";
+
+		if (average >= 9.0) {
+			point = 4.0;
+			letter = "A+";
+		} else if (average >= 8.5) {
+			point = 4.0;
+			letter = "A";
+		} else if (average >= 8.0) {
+			point = 3.5;
+			letter = "B+";
+		} else if (average >= 7.0) {
+			point = 3.0;
+			letter = "B";
+		} else if (average >= 6.5) {
+			point = 2.5;
+			letter = "C+";
+		} else if (average >= 5.5) {
+			point = 2.0;
+			letter = "C";
+		} else if (average >= 5.0) {
+			point = 1.5;
+			letter = "D+";
+		} else if (average >= 4.0) {
+			point = 1.0;
+			letter = "D";
+		} else {
+			point = 0;
+			letter = "F";
+		}
+
+		return { point, letter }
+	},
+
+	/**
 	 * Lấy kết quả học tập của sinh viên kèm theo thông tin cơ bản
 	 */
 	async results() {
@@ -247,25 +287,62 @@ const api = {
 			course: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(2)`).innerText.replace(":\n", "").trim().replace("  ", " "),
 			classroom: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(4)`).innerText.replace(":\n", "").trim().replace("  ", " "),
 			mode: response.dom.getElementById("leftcontent").childNodes.item(2).wholeText.trim().replace("\n", " "),
-			results: []
+			results: [],
+			cpa: 0,
+			grade: "Yếu"
 		}
 
 		let resultTableRows = [ ...response.dom.querySelectorAll(`#leftcontent > table.RowEffect.CenterElement > tbody > tr`) ]
+		
+		let totalGrade = 0;
+		let totalCredits = 0;
+		let __procPoint = (node) => {
+			let v = node.innerText.trim();
+
+			return (v === "?")
+				? "?"
+				: parseFloat(v);
+		}
+
 		for (let row of resultTableRows) {
-			response.info.results.push({
+			let data = {
 				subject: row.children[0].innerText.trim(),
-				tinChi: parseInt(row.children[1].innerText.trim()),
+				credits: parseInt(row.children[1].innerText.trim()),
 				classID: row.children[2].innerText.trim(),
 				teacher: row.children[3].innerText.trim(),
-				diemCC: parseFloat(row.children[4].innerText.trim()),
-				diemDK: parseFloat(row.children[5].innerText.trim()),
-				diemHK: parseFloat(row.children[6].innerText.trim())
+				diemCC: __procPoint(row.children[4]),
+				diemDK: __procPoint(row.children[5]),
+				diemHK: __procPoint(row.children[6]),
+				average: undefined,
+				grade: undefined,
 
 				// We will add note later as currently we don't
 				// know what kind of data goes in here
 				// note: row.children[7].innerText.trim()
-			});
+			}
+
+			if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
+				data.average = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
+				data.grade = this.resultGrading(data.average);
+				totalGrade += data.grade.point * data.credits;
+				totalCredits += data.credits;
+			}
+
+			response.info.results.push(data);
 		}
+
+		response.info.cpa = totalGrade / totalCredits;
+
+		if (response.info.cpa >= 3.6)
+			response.info.grade = "Xuất Xắc"
+		else if (response.info.cpa >= 3.2)
+			response.info.grade = "Giỏi"
+		else if (response.info.cpa >= 2.5)
+			response.info.grade = "Khá"
+		else if (response.info.cpa >= 2)
+			response.info.grade = "Trung Bình"
+		else
+			response.info.grade = "Yếu"
 
 		this.__handleResponse("results", response);
 		return response;

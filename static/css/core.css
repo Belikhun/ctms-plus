@@ -344,7 +344,7 @@ arr::before {
 
 	margin: 0 auto;
 	box-sizing: border-box;
-	overflow: hidden;
+	overflow: auto;
 }
 
 /** ==================== SCREEN.SCHEDULE ==================== */

@@ -879,7 +879,7 @@ const smenu = {
 				header.append(this.labelNode, this.previewNode);
 				this.container.append(header, this.slider.group);
 
-				this.onInput((value) => this.update(value));
+				this.onInput((value, e) => this.update(value, !!(e && e.isTrusted)));
 				this.update(value, false);
 
 				if (typeof onInput === "function")

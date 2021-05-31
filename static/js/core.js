@@ -546,7 +546,7 @@ const core = {
 								label: { tag: "t", class: "label", text: name },
 								buttons: { tag: "div", class: "buttons", child: {
 									serviceInfo: createButton("Thông Tin", { color: "blue", icon: "infoCircle", complex: true, disabled: true }),
-									buyService: createButton("MUA DỊCH VỤ", { color: "pink", icon: "externalLink", complex: true })
+									buyService: createButton("MUA DỊCH VỤ", { color: "pink", icon: "shoppingCart", complex: true })
 								}}
 							});
 						}

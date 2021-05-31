@@ -808,6 +808,10 @@ icon[data-icon="infoCircle"]::after {
 	content: "\f05a";
 }
 
+icon[data-icon="shoppingCart"]::after {
+	content: "\f07a";
+}
+
 /** ======================== NOTE ======================== **/
 
 .note {

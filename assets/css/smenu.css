@@ -364,7 +364,11 @@
 	border-bottom-right-radius: 5px;
 }
 
-/** COMPONENT: CHOICE **/
+/** COMPONENT: SELECT **/
+
+.smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.select > .label {
+	font-size: 13px;
+}
 
 .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.select > .sq-selector {
 	width: 100%;

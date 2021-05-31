@@ -101,6 +101,18 @@ arr::before {
 	text-align: right;
 }
 
+.generalTable > thead > tr > th {
+	position: sticky;
+	top: 0;
+	font-size: 11px;
+    font-weight: 700;
+	text-align: left;
+    text-transform: uppercase;
+
+	z-index: 2;
+	background-color: var(--global-background);
+}
+
 .generalTable > tbody > tr > td {
 	font-size: 13px;
 	padding: 4px 10px;
@@ -111,13 +123,6 @@ arr::before {
 
 .generalTable > tbody > tr > td.bold {
 	font-weight: bold;
-}
-
-.generalTable > thead > tr > th {
-	font-size: 11px;
-    font-weight: 700;
-	text-align: left;
-    text-transform: uppercase;
 }
 
 .generalTable > thead > tr > th > tip {

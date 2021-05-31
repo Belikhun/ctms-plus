@@ -1462,7 +1462,7 @@ const core = {
 						stt: { tag: "td", class: ["right", "bold"], text: ++nth },
 
 						status: { tag: "td", class: "status", child: {
-							inner: { tag: "span", data: { status: row.status }, text: row.status }
+							inner: { tag: "span", class: "generalTag", data: { status: row.status }, text: row.status }
 						}},
 
 						subject: { tag: "td", text: row.subject },
@@ -1491,43 +1491,73 @@ const core = {
 			loaded: false,
 
 			async init() {
-				this.view = makeTree("table", ["generalTable", "resultsScreen"], {
-					thead: { tag: "thead", child: {
-						row: { tag: "tr", child: {
-							stt: { tag: "th", class: "right", text: "Thứ Tự" },
-							subject: { tag: "th", text: "Môn Học" },
-							tinChi: { tag: "th", class: "right", text: "Số Tín Chỉ" },
-							classroom: { tag: "th", class: "right", text: "Mã Lớp" },
-							teacher: { tag: "th", text: "Giảng Viên" },
-							
-							diemCC: { tag: "th", class: "right", child: {
-								content: { tag: "span", text: "Điểm CC" },
-								tip: { tag: "tip", title: "Điểm Chuyên Cần" }
-							}},
+				this.view = makeTree("div", "resultsScreen", {
+					info: { tag: "div", class: "info", child: {
+						cpa: { tag: "span", class: ["item", "infoCard"], child: {
+							label: { tag: "t", class: "label", text: "Điểm TBC Tích Lũy" },
+							value: { tag: "t", class: "value", text: "---" },
+							tip: { tag: "tip", title: "<div><b>Điểm Trung Bình Chung Tích Lũy</b><br>Điểm được tính trên đây có thể không hoàn toàn chính xác 100% do trọng số của mỗi môn sẽ khác nhau</div>" }
+						}},
 
-							diemDK: { tag: "th", class: "right", child: {
-								content: { tag: "span", text: "Điểm ĐK" },
-								tip: { tag: "tip", title: "Điểm Điều Kiện" }
-							}},
-
-							diemHK: { tag: "th", class: "right", child: {
-								content: { tag: "span", text: "Điểm HK" },
-								tip: { tag: "tip", title: "Điểm Học Kì" }
-							}},
-						}}
+						grade: { tag: "span", class: ["item", "infoCard"], child: {
+							label: { tag: "t", class: "label", text: "Xếp Loại" },
+							value: { tag: "t", class: "value", text: "---" }
+						}},
 					}},
 
-					tbody: { tag: "tbody" }
+					table: { tag: "table", class: "generalTable", child: {
+						thead: { tag: "thead", child: {
+							row: { tag: "tr", child: {
+								stt: { tag: "th", class: "right", text: "Thứ Tự" },
+								subject: { tag: "th", text: "Môn Học" },
+								credits: { tag: "th", class: "right", text: "Số Tín Chỉ" },
+								classroom: { tag: "th", class: "right", text: "Mã Lớp" },
+								teacher: { tag: "th", text: "Giảng Viên" },
+								
+								diemCC: { tag: "th", class: "right", child: {
+									content: { tag: "span", text: "Điểm CC" },
+									tip: { tag: "tip", title: "Điểm Chuyên Cần (weighted 10%)" }
+								}},
+	
+								diemDK: { tag: "th", class: "right", child: {
+									content: { tag: "span", text: "Điểm ĐK" },
+									tip: { tag: "tip", title: "Điểm Điều Kiện (weighted 20%)" }
+								}},
+	
+								diemHK: { tag: "th", class: "right", child: {
+									content: { tag: "span", text: "Điểm HK" },
+									tip: { tag: "tip", title: "Điểm Học Kì (weighted 70%)" }
+								}},
+	
+								average: { tag: "th", class: "right", child: {
+									content: { tag: "span", text: "TB10" },
+									tip: { tag: "tip", title: "Điểm Trung Bình Hệ Số 10" }
+								}},
+	
+								gradePoint: { tag: "th", class: "right", child: {
+									content: { tag: "span", text: "TB4" },
+									tip: { tag: "tip", title: "Điểm Trung Bình Hệ Số 4" }
+								}},
+	
+								gradeLetter: { tag: "th", class: "right", text: "Xếp Loại" }
+							}}
+						}},
+	
+						tbody: { tag: "tbody" }
+					}}
 				});
 
 				this.screen = new core.screen.Screen({
 					id: "results",
 					icon: "poll",
 					title: "kết quả học tập",
-					description: "xem toàn bộ kết quả học tập của các môn!"
+					description: "xem toàn bộ kết quả học tập của các môn!",
+					applyScrollable: false
 				});
 
 				this.screen.content = this.view;
+				new Scrollable(this.view, { content: this.view.table });
+
 				this.onLogout();
 				this.screen.loading = true;
 
@@ -1539,8 +1569,11 @@ const core = {
 						this.screen.overlay({ show: false });
 
 					this.loaded = true;
-					emptyNode(this.view.tbody);
+					emptyNode(this.view.table.tbody);
 					this.screen.set({ subTitle: response.info.mode });
+
+					this.view.info.cpa.value.innerText = response.info.cpa.toFixed(3);
+					this.view.info.grade.value.innerText = response.info.grade;
 
 					for (let item of response.info.results)
 						this.addListItem(item);
@@ -1551,7 +1584,9 @@ const core = {
 
 			reset() {
 				this.loaded = false;
-				emptyNode(this.view.tbody);
+				emptyNode(this.view.table.tbody);
+				this.view.info.cpa.value.innerText = "---";
+				this.view.info.grade.value.innerText = "---";
 				this.screen.set({ subTitle: "" });
 			},
 
@@ -1586,25 +1621,66 @@ const core = {
 
 			addListItem({
 				subject,
-				tinChi,
+				credits,
 				classID,
 				teacher,
 				diemCC,
 				diemDK,
-				diemHK
+				diemHK,
+				average,
+				grade
 			} = {}) {
 				let row = makeTree("tr", "item", {
 					stt: { tag: "td", class: ["bold", "right"] },
 					subject: { tag: "td", text: subject },
-					tinChi: { tag: "td", class: "right", text: tinChi },
+					credits: { tag: "td", class: "right", text: credits },
 					classID: { tag: "td", class: ["bold", "right"], text: classID },
 					teacher: { tag: "td", text: teacher },
-					diemCC: { tag: "td", class: ["bold", "right"], text: diemCC ? diemCC.toFixed(2) : "" },
-					diemDK: { tag: "td", class: ["bold", "right"], text: diemDK ? diemDK.toFixed(2) : "" },
-					diemHK: { tag: "td", class: ["bold", "right"], text: diemHK ? diemHK.toFixed(2) : "" }
+
+					diemCC: {
+						tag: "td",
+						class: "right",
+						html: (typeof diemCC === "number")
+							? diemCC.toFixed(2)
+							: ((diemCC === "?")
+								? `<span title="Chưa Xác Nhận">?</span>`
+								: "")
+					},
+
+					diemDK: {
+						tag: "td",
+						class: "right",
+						html: (typeof diemDK === "number")
+							? diemDK.toFixed(2)
+							: ((diemDK === "?")
+								? `<span title="Chưa Xác Nhận">?</span>`
+								: "")
+					},
+
+					diemHK: {
+						tag: "td",
+						class: "right",
+						html: (typeof diemHK === "number")
+							? diemHK.toFixed(2)
+							: ((diemHK === "?")
+								? `<span title="Chưa Xác Nhận">?</span>`
+								: "")
+					},
+
+					average: { tag: "td", class: ["right", "bold"], text: average ? average.toFixed(2) : "" },
+					gradePoint: { tag: "td", class: ["right", "bold"], text: grade ? grade.point.toFixed(2) : "" },
+
+					gradeLetter: { tag: "td", class: "right", child: {
+						inner: {
+							tag: "span",
+							class: "generalTag",
+							data: { grade: grade ? grade.letter : "?" },
+							text: grade ? grade.letter : "?" }
+						}
+					},
 				});
 
-				this.view.tbody.appendChild(row);
+				this.view.table.tbody.appendChild(row);
 			}
 		},
 	}

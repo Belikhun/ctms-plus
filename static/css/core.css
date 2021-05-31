@@ -534,6 +534,13 @@ arr::before {
 	overflow: auto;
 }
 
+.resultsScreen > table::after {
+	content: "";
+	display: block;
+	width: 100%;
+	margin-bottom: 100px;
+}
+
 .resultsScreen > table > tbody > tr {
 	counter-increment: resultsTableNth;
 }

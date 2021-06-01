@@ -1,11 +1,12 @@
 $(function() {
 	$(window).scroll(function(event) {
 		var pos_body = $('html,body').scrollTop();
-		if(pos_body>800){
-			$('.back-to-top').addClass('show-back-page go-top');
+		console.log(pos_body);
+		if(pos_body>100){
+			$('.back-to-top').addClass('show-back-page go-top sticky');
 		}
 		else{
-			$('.back-to-top').removeClass('show-back-page go-top ');
+			$('.back-to-top').removeClass('show-back-page go-top sticky');
 
 		}
 	});

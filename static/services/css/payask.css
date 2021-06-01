@@ -25,7 +25,7 @@ p{
     font-size: 36px;
 }
 .pa-body{
-    padding: 16px 16px 0 16px;
+    padding: 16px 16px 0 ;
     font-size: 16px;
 }
 .pa-word{
@@ -151,4 +151,8 @@ p{
 }
 .pa-word:last-child{
     padding-bottom: 140px;
+}
+.sticky{
+    position: sticky;
+    position: -webkit-sticky;
 }

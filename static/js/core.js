@@ -1539,7 +1539,7 @@ const core = {
 									tip: { tag: "tip", title: "Điểm Trung Bình Hệ Số 4" }
 								}},
 	
-								gradeLetter: { tag: "th", class: "right", text: "Xếp Loại" }
+								gradeLetter: { tag: "th", class: "right" }
 							}}
 						}},
 	

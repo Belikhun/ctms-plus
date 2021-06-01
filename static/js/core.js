@@ -523,11 +523,21 @@ const core = {
 					shortAccess: "Truy Cập CTMS Ngắn Hạn"
 				},
 
+				price: {
+					basicAccess: "? occ ? ngày",
+					unverifiedScore: "16500 occ 150 ngày",
+					payAsk: "0 occ 30 ngày",
+					coupleCheckIn: "13419 occ 7 ngày",
+					shortAccess: "5968 occ 3 ngày"
+				},
+
 				Service: class {
 					constructor({
 						id = "sample",
 						name = "Sample Service",
-						time: timeData
+						price = "0 occ 0 ngày",
+						time: timeData,
+						panel
 					} = {}) {
 						if (timeData && timeData.from && timeData.to) {
 							this.container = makeTree("div", "infoCard", {
@@ -545,10 +555,16 @@ const core = {
 							this.container = makeTree("div", "infoCard", {
 								label: { tag: "t", class: "label", text: name },
 								buttons: { tag: "div", class: "buttons", child: {
-									serviceInfo: createButton("Thông Tin", { color: "blue", icon: "infoCircle", complex: true, disabled: true }),
-									buyService: createButton("MUA DỊCH VỤ", { color: "pink", icon: "shoppingCart", complex: true })
+									serviceInfo: createButton("Thông Tin", { color: "blue", icon: "infoCircle", complex: true }),
+									buyService: createButton(price.toUpperCase(), { color: "pink", icon: "shoppingCart", complex: true })
 								}}
 							});
+
+							if (panel)
+								this.container.buttons.serviceInfo.addEventListener("click", () => {
+									panel.content(`iframe:./static/services/${id.toLowerCase()}.html`);
+									panel.show();
+								});
 						}
 					}
 				},
@@ -584,7 +600,9 @@ const core = {
 							let s = new this.Service({
 								id: key,
 								name: this.name[key] || key,
-								time: data.info.services[key]
+								price: this.price[key] || "MUA",
+								time: data.info.services[key],
+								panel: this.panel
 							});
 
 							this.view.list.appendChild(s.container);

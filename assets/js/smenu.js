@@ -54,7 +54,7 @@ const smenu = {
 			{ type: "div", class: "panels", name: "panels", list: [
 				{ type: "div", class: "underlay", name: "underlay" }
 			]}
-		])
+		]);
 
 		tree.tree.id = container.id;
 		container.parentElement.replaceChild(tree.tree, container);
@@ -1100,19 +1100,25 @@ const smenu = {
 				emptyNode(this.container.main);
 				let re = null;
 	
-				if (typeof content === "object" && content.classList)
+				if (typeof content === "object" && content.classList) {
 					this.container.main.appendChild(content);
-				else if ((re = /iframe:(.+)/gm.exec(content)) !== null) {
+					resolve();
+				} else if ((re = /iframe:(.+)/gm.exec(content)) !== null) {
+					this.loading = true;
 					this.iframe = document.createElement("iframe");
 					this.iframe.src = re[1];
 					this.container.main.appendChild(this.iframe);
 
-					this.iframe.addEventListener("load", () => resolve());
+					this.iframe.addEventListener("load", () => {
+						this.loading = false;
+						resolve()
+					});
 					return;
-				} else
+				} else {
 					this.container.main.innerHTML = content;
+					resolve();
+				}
 				
-				resolve();
 				return;
 			});
 		}
@@ -1176,7 +1182,7 @@ const smenu = {
 			requestAnimationFrame(() => {
 				smenu.collapse();
 				this.container.classList.add("show");
-			})
+			});
 		}
 
 		hide(callShowMenu = true) {

@@ -1,7 +1,6 @@
 $(function() {
     $(window).scroll(function(event) {
         var pos_body = $('html,body').scrollTop();
-        console.log(pos_body);
         if (pos_body > 100) {
             $('.back-to-top').addClass('show-back-page go-top sticky');
         } else {

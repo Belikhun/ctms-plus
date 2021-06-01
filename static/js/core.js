@@ -1613,6 +1613,8 @@ const core = {
 			} = {}) {
 				let hours = time.getHours();
 				let dDays = daysBetween(time, new Date());
+				let dow = time.getDay() + 1;
+				dow = (dow === 1) ? "CN" : `T${dow}`;
 
 				let row = makeTree("tr", "item", {
 					status: { tag: "td", class: "right", child: {
@@ -1628,7 +1630,7 @@ const core = {
 						value: {
 							tag: "span",
 							class: "value",
-							text: `${pleft((hours >= 12) ? (hours - 12) : hours, 2)}:${pleft(time.getMinutes(), 2)}`
+							text: `${pleft((hours > 12) ? (hours - 12) : hours, 2)}:${pleft(time.getMinutes(), 2)}`
 						},
 
 						phase: {
@@ -1640,7 +1642,7 @@ const core = {
 
 					date: {
 						tag: "td",
-						html: `${pleft(time.getDate(), 2)}/${pleft(time.getMonth() + 1, 2)}/${time.getFullYear()} <b>(${dDays > 0 ? "+" : ""}${round(dDays, 1)})</b>`
+						html: `<b>${dow}</b> ${pleft(time.getDate(), 2)}/${pleft(time.getMonth() + 1, 2)}/${time.getFullYear()} <b>(${dDays > 0 ? "+" : ""}${round(dDays, 1)})</b>`
 					},
 
 					classroom: { tag: "td", class: ["right", "bold"], text: classroom },

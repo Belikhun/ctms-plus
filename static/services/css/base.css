@@ -70,3 +70,13 @@
 .pa-word:last-child {
     padding-bottom: 140px;
 }
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: lightgray;
+}
+
+::-webkit-scrollbar-thumb {
+    background: gray;
+    border-radius: 4px;
+}

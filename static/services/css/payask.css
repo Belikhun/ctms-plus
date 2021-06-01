@@ -1,83 +1,97 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-html{
-    font-family:"Open Sans", "Segoe UI", "Calibri", "Tahoma", "Geneva", "Verdana", "sans-serif";
+
+html {
+    font-family: "Open Sans", "Segoe UI", "Calibri", "Tahoma", "Geneva", "Verdana", "sans-serif";
     scroll-behavior: smooth;
 }
-body{
+
+body {
     background: #f0f0f0;
-    
 }
-p{
-    text-align:justify;
-    text-indent:24px;
+
+p {
+    text-align: justify;
+    text-indent: 24px;
 }
-.main{
+
+.main {
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
 }
-.pa-tittle{
+
+.pa-tittle {
     text-align: center;
     font-size: 36px;
 }
-.pa-body{
-    padding: 16px 16px 0 ;
+
+.pa-body {
+    padding: 16px 16px 0;
     font-size: 16px;
 }
-.pa-word{
+
+.pa-word {
     padding-top: 16px;
     line-height: 1.5rem;
 }
 
-.pa-list{
-
+.pa-list {
     color: #000;
 }
-.pa-list-inf{
+
+.pa-list-inf {
     margin-left: 40px;
     padding-top: 10px;
     line-height: 1.5rem;
     font-weight: 700;
 }
-.pa-list-child{
+
+.pa-list-child {
     margin-left: 16px;
     list-style-type: disc;
     list-style-position: outside;
     font-weight: 400;
 }
-.pa-list-child__inf{
+
+.pa-list-child__inf {
     margin-left: 16px;
-    
 }
-.pa-list-child__inf--more{
-    list-style-type: circle ;
+
+.pa-list-child__inf--more {
+    list-style-type: circle;
 }
-.pa-list-child__inf--more-ans{
+
+.pa-list-child__inf--more-ans {
     margin-left: 24px;
 }
-.pa-link{
+
+.pa-link {
     font-weight: 700;
     text-decoration: none;
 }
-.pa-link:hover{
+
+.pa-link:hover {
     color: var(--hover-link-color);
     text-decoration: underline;
 }
-.pa-link:active{
+
+.pa-link:active {
     text-decoration: underline;
     color: var(--active-link-color);
 }
-.pa-link:visited{
-    color: var(--active-link-color); 
+
+.pa-link:visited {
+    color: var(--active-link-color);
 }
+
 .back-to-top {
     width: 50px;
     height: 50px;
-    background: rgb(0,0,0,0.7);
+    background: rgb(0, 0, 0, 0.7);
     font-size: 35px;
     display: flex;
     text-align: center;
@@ -93,12 +107,13 @@ p{
     visibility: hidden;
     opacity: 0;
 }
-.show-back-page{
+
+.show-back-page {
     visibility: visible;
     opacity: 1;
 }
 
-.sticky{
+.sticky {
     position: sticky;
     position: -webkit-sticky;
 }

@@ -551,7 +551,7 @@ const api = {
 			time = new Date(time[5], parseInt(time[4]) - 1, time[3], time[1], time[2]);
 
 			list.push({
-				status: (time.getTime() / 1000 < curTime)
+				status: ((time.getTime() / 1000) < curTime)
 					? "ended"
 					: "coming",
 

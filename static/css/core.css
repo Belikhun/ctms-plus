@@ -181,7 +181,7 @@ arr::before {
 	--color-blue: rgb(166, 225, 252);
 	--color-yellow: rgb(253, 240, 141);
 	--color-red: rgb(255, 181, 201);
-	--color-pink: rgb(255, 198, 244);
+	--color-pink: rgb(255, 198, 250);
 }
 
 /*? ===================== MAIN ===================== */
@@ -537,33 +537,33 @@ arr::before {
 }
 
 .testsScreen > table > tbody > tr > td[key="status"] > .status[data-status="ended"] {
-	background-color: var(--color-yellow);
+	background-color: var(--color-red);
 }
 
 .testsScreen > table > tbody > tr > td[key="status"] > .status[data-status="coming"] {
-	background-color: var(--color-blue);
+	background-color: var(--color-green);
 }
 
 .testsScreen > table > tbody > tr > td[key="time"] > .phase {
-	min-width: 35px;
+	min-width: 15px;
 	text-align: center;
 	margin-left: 6px;
 }
 
 .testsScreen > table > tbody > tr > td[key="time"] > .phase[data-phase="am"] {
-	background-color: var(--color-green);
+	background-color: var(--color-blue);
 }
 
 .testsScreen > table > tbody > tr > td[key="time"] > .phase[data-phase="am"]::before {
-	content: "Sáng";
+	content: "AM";
 }
 
 .testsScreen > table > tbody > tr > td[key="time"] > .phase[data-phase="pm"] {
-	background-color: var(--color-pink);
+	background-color: var(--color-yellow);
 }
 
 .testsScreen > table > tbody > tr > td[key="time"] > .phase[data-phase="pm"]::before {
-	content: "Chiều";
+	content: "PM";
 }
 
 .testsScreen > table > tbody > tr > td[key="subject"] {

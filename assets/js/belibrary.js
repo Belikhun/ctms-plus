@@ -755,6 +755,16 @@ function getDateTimeValue(dateNode, timeNode) {
 	return time(new Date(`${dateNode.value}T${timeNode.value}`));
 }
 
+/**
+ * Return number of days between two dates
+ * @param	{Date}	start	Start date
+ * @param	{Date}	end		End date
+ * @returns {Number}
+ */
+function daysBetween(start, end) {
+	return (start.getTime() - end.getTime()) / (1000 * 3600 * 24);
+}
+
 function convertSize(bytes) {
 	let sizes = ["B", "KB", "MB", "GB", "TB"];
 	for (var i = 0; bytes >= 1024 && i < (sizes.length -1 ); i++)

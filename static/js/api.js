@@ -28,8 +28,23 @@ const api = {
 
 	__PATH: undefined,
 	__FORM: {},
+
+	/**
+	 * Store Current Viewstate
+	 * @type {String}
+	 */
 	__VIEWSTATE: undefined,
+
+	/**
+	 * Store Current Viewstate Generator
+	 * @type {String}
+	 */
 	__VIEWSTATEGENERATOR: undefined,
+
+	/**
+	 * Store Validator String to validate user event (idk)
+	 * @type {String}
+	 */
 	__EVENTVALIDATION: undefined,
 
 	responseHandlers: {},
@@ -188,9 +203,9 @@ const api = {
 			path: "/login.aspx",
 			method: "POST",
 			form: {
-				"ctl00$LeftCol$UserLogin1$txtUsername": username,
-				"ctl00$LeftCol$UserLogin1$txtPassword": md5(password),
-				"ctl00$LeftCol$UserLogin1$btnLogin": "Đăng nhập"
+				ctl00$LeftCol$UserLogin1$txtUsername: username,
+				ctl00$LeftCol$UserLogin1$txtPassword: md5(password),
+				ctl00$LeftCol$UserLogin1$btnLogin: "Đăng nhập"
 			}
 		});
 
@@ -421,8 +436,8 @@ const api = {
 					__VIEWSTATE: this.__SCHEDULE_VIEWSTATE,
 					__VIEWSTATEGENERATOR: this.__SCHEDULE_VIEWSTATEGENERATOR,
 					__EVENTVALIDATION: this.__SCHEDULE_EVENTVALIDATION,
-					"ctl00$LeftCol$Lichhoc1$txtNgaydautuan": `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`,
-					"ctl00$LeftCol$Lichhoc1$btnXemlich": "Xem lịch"
+					ctl00$LeftCol$Lichhoc1$txtNgaydautuan: `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`,
+					ctl00$LeftCol$Lichhoc1$btnXemlich: "Xem lịch"
 				}
 			});
 		else {
@@ -432,8 +447,8 @@ const api = {
 			});
 
 			this.__FORM = {
-				"ctl00$LeftCol$Lichhoc1$txtNgaydautuan": response.dom.getElementById("LeftCol_Lichhoc1_txtNgaydautuan").value,
-				"ctl00$LeftCol$Lichhoc1$btnXemlich": "Xem lịch"
+				ctl00$LeftCol$Lichhoc1$txtNgaydautuan: response.dom.getElementById("LeftCol_Lichhoc1_txtNgaydautuan").value,
+				ctl00$LeftCol$Lichhoc1$btnXemlich: "Xem lịch"
 			}
 		}
 
@@ -475,6 +490,83 @@ const api = {
 		}
 
 		this.__handleResponse("schedule", response);
+		return response;
+	},
+
+	// For current tests viewstate, we can use them if
+	// global viewstate is being changed by another api
+	// request
+	__TESTS_VIEWSTATE: undefined,
+	__TESTS_VIEWSTATEGENERATOR: undefined,
+	__TESTS_EVENTVALIDATION: undefined,
+
+	/**
+	 * API Lấy lịch thi
+	 * 
+	 * @param	{String}	type
+	 * Loại danh sách cần lấy. Chấp nhận:
+	 * + `all`:		Tất cả
+	 * + `ended`:	Đã thi/Đã kết thúc
+	 * + `coming`:	Sắp thi
+	 */
+	async tests(type) {
+		let option = {
+			all: "rbtnTatca",
+			ended: "rbtnDathi",
+			coming: "rbtnChuathi"
+		}[type]
+
+		// If viewstate for tests page haven't been set, that's mean
+		// we will have to make a prefetch request first in order
+		// to update current viewstate
+		if (!this.__TESTS_VIEWSTATE) {
+			clog("DEBG", "api.tests(): Starting prefetch request");
+			await this.request({ path: `/Lichthi.aspx` });
+
+			this.__TESTS_VIEWSTATE = this.__VIEWSTATE;
+			this.__TESTS_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
+			this.__TESTS_EVENTVALIDATION = this.__EVENTVALIDATION;
+		}
+
+		let response = await this.request({
+			path: `/Lichthi.aspx`,
+			method: "POST",
+			form: {
+				__VIEWSTATE: this.__TESTS_VIEWSTATE,
+				__VIEWSTATEGENERATOR: this.__TESTS_VIEWSTATEGENERATOR,
+				__EVENTVALIDATION: this.__TESTS_EVENTVALIDATION,
+				ctl00$LeftCol$Lichthi1$Tuychon: option,
+				ctl00$LeftCol$Lichthi1$btnHien: "   Hiện   "
+			}
+		});
+
+		let list = []
+		let curTime = time();
+		let rows = response.dom.querySelectorAll(`#leftcontent > table > tbody > tr:not(:first-child)`);
+		for (let row of rows) {
+			let time = row.children[1].innerText.trim();
+			time = /(\d+)\:(\d+) (\d+)\/(\d+)\/(\d+)/gm.exec(time);
+
+			/** @type {Date} */
+			time = new Date(time[5], parseInt(time[4]) - 1, time[3], time[1], time[2]);
+
+			list.push({
+				status: ((time.getTime() / 1000) < curTime)
+					? "ended"
+					: "coming",
+
+				time,
+				classroom: row.children[2].innerText.trim(),
+				subject: row.children[3].innerText.trim(),
+				listID: row.children[4].innerText.trim()
+			});
+		}
+
+		// Sort list by start time
+		list = list.sort((a, b) => b.time - a.time);
+		response.list = list;
+
+		this.__handleResponse("tests", response);
 		return response;
 	}
 }

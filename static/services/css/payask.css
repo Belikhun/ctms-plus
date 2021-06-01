@@ -7,6 +7,10 @@ html{
     font-family:"Open Sans", "Segoe UI", "Calibri", "Tahoma", "Geneva", "Verdana", "sans-serif";
     scroll-behavior: smooth;
 }
+body{
+    background: #f0f0f0;
+    
+}
 p{
     text-align:justify;
     text-indent:24px;
@@ -30,7 +34,7 @@ p{
 }
 
 .pa-list{
-    padding-bottom:24px;
+
     color: #000;
 }
 .pa-list-inf{
@@ -92,4 +96,59 @@ p{
 .show-back-page{
     visibility: visible;
     opacity: 1;
+}
+.go-top{
+    animation: go-top 1.5s forwards;
+    will-change: transform;
+}
+@-webkit-keyframes go-top{
+    from{
+        opacity: 0;
+        transform: translateY(10%);
+    }to{
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+.go-down{
+    animation: go-down 1s forwards;
+    will-change: transform;
+}
+@-webkit-keyframes go-down{
+    from{
+        opacity: 0;
+        transform: translateY(-10%);
+    }to{
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+.go-left{
+    animation: go-left 1.65s forwards;
+    will-change: transform;
+}
+@-webkit-keyframes go-left{
+    from{
+        opacity: 0;
+        transform: translateX(-10%);
+    }to{
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+.go-right{
+    animation: go-right 1s forwards;
+    will-change: transform;
+}
+@-webkit-keyframes go-right{
+    from{
+        opacity: 0;
+        transform: translateX(10%);
+    }to{
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+.pa-word:last-child{
+    padding-bottom: 140px;
 }

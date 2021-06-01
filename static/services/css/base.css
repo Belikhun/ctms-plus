@@ -1,0 +1,72 @@
+:root {
+    --hover-link-color: #5E70E0;
+    --active-link-color: #F01614;
+}
+
+.go-top {
+    animation: go-top 1.5s forwards;
+    will-change: transform;
+}
+
+@-webkit-keyframes go-top {
+    from {
+        opacity: 0;
+        transform: translateY(10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+
+.go-down {
+    animation: go-down 1s forwards;
+    will-change: transform;
+}
+
+@-webkit-keyframes go-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+
+.go-left {
+    animation: go-left 1.65s forwards;
+    will-change: transform;
+}
+
+@-webkit-keyframes go-left {
+    from {
+        opacity: 0;
+        transform: translateX(-10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+
+.go-right {
+    animation: go-right 1s forwards;
+    will-change: transform;
+}
+
+@-webkit-keyframes go-right {
+    from {
+        opacity: 0;
+        transform: translateX(10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+
+.pa-word:last-child {
+    padding-bottom: 140px;
+}

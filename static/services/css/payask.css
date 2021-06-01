@@ -93,17 +93,12 @@ p {
     height: 50px;
     background: rgb(0, 0, 0, 0.7);
     font-size: 35px;
-    display: flex;
-    text-align: center;
-    vertical-align: center;
-    justify-content: center;
-    align-items: center;
-    color: whitesmoke;
     position: fixed;
+    color: whitesmoke;
     left: 80%;
-    bottom: 20px;
+    border: none;
+    bottom: 10px;
     cursor: pointer;
-    margin-left: -20px;
     visibility: hidden;
     opacity: 0;
 }
@@ -116,4 +111,8 @@ p {
 .sticky {
     position: sticky;
     position: -webkit-sticky;
+}
+
+.pa-word:last-child {
+    padding-bottom: 10px;
 }

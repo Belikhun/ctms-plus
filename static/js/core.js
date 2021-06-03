@@ -552,11 +552,12 @@ const core = {
 								ended: "VỪA HẾT HẠN!"
 							});
 						} else {
+							// TODO: Enable buy services button after implementing buying
 							this.container = makeTree("div", "infoCard", {
 								label: { tag: "t", class: "label", text: name },
 								buttons: { tag: "div", class: "buttons", child: {
 									serviceInfo: createButton("Thông Tin", { color: "blue", icon: "infoCircle", complex: true }),
-									buyService: createButton(price.toUpperCase(), { color: "pink", icon: "shoppingCart", complex: true })
+									buyService: createButton(price.toUpperCase(), { color: "pink", icon: "shoppingCart", complex: true, disabled: true })
 								}}
 							});
 

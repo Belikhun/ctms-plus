@@ -403,6 +403,7 @@
 	width: 100%;
 	margin: 5px 0;
 	padding: 10px 20px;
+	border-radius: 5px;
 }
 
 /** COMPONENT: FOOTER **/

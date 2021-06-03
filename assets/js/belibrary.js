@@ -1510,6 +1510,12 @@ function triBg(element, {
 	const DARKCOLOR = ["brown", "dark", "darkRed", "darkGreen", "darkBlue"]
 	const LIGHTCOLOR = ["lightBlue"]
 
+	let getRandBright = (color) => DARKCOLOR.includes(color)
+		? randBetween(1.1, 1.3, false)
+		: (LIGHTCOLOR.includes(color)
+			? randBetween(0.96, 1.05, false)
+			: randBetween(0.9, 1.2, false))
+
 	let current = element.querySelector(":scope > .triBgContainer");
 
 	if (current)
@@ -1541,13 +1547,7 @@ function triBg(element, {
 		let randScale = randBetween(0.4, 2.0, false) * scale;
 		let width = 15 * randScale;
 		let height = 0.866 * (30 * randScale);
-
-		let randBright = DARKCOLOR.includes(color)
-			? randBetween(1.1, 1.3, false)
-			: LIGHTCOLOR.includes(color)
-				? randBetween(0.95, 1.05, false)
-				: randBetween(0.9, 1.2, false)
-
+		let randBright = getRandBright(color);
 		let randLeftPos = randBetween(0, 98, false);
 		let delay = randBetween(-speed / 2, speed / 2, false);
 
@@ -1568,10 +1568,7 @@ function triBg(element, {
 			element.dataset.triColor = color;
 
 			for (let triangle of container.childNodes) {
-				let randBright = DARKCOLOR.includes(color)
-					? randBetween(1.1, 1.3, false)
-					: randBetween(0.9, 1.2, false)
-
+				let randBright = getRandBright(color);
 				triangle.style.filter = `brightness(${randBright})`;
 			}
 		}

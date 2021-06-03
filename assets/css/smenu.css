@@ -373,6 +373,7 @@
 .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.select > .sq-selector {
 	width: 100%;
 	margin-top: 5px;
+	--background: white;
 }
 
 /** COMPONENT: SLIDER **/
@@ -1010,6 +1011,12 @@ body.dark .smenuContainer > .main > .wrapper > .smenu > .group > .child > .compo
 
 body.dark .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.choice > .choiceBox > icon.active {
 	background-color: var(--osc-color-blue);
+}
+
+/** COMPONENT: SELECT **/
+
+body.dark .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.select > .sq-selector {
+	--background: #242424;
 }
 
 /** COMPONENT: TEXT **/

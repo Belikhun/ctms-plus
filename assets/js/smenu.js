@@ -22,6 +22,7 @@ const smenu = {
 	containerHideTimeout: null,
 	mainHideTimeout: null,
 	activePanel: null,
+	align: "right",
 
 	showHandlers: [],
 	hideHandlers: [],
@@ -117,6 +118,7 @@ const smenu = {
 	},
 
 	setAlignment(align) {
+		this.align = align;
 		this.container.dataset.align = align;
 	},
 

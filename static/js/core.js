@@ -322,7 +322,7 @@ const core = {
 				}
 			});
 
-			this.menu.click.onClick(() => smenu.setAlignment("right"));
+			this.menu.click.onClick((active) => (active) ? smenu.setAlignment("right") : "");
 
 			navbar.insert(this.title, "left");
 			navbar.insert(this.menu, "right");
@@ -364,8 +364,8 @@ const core = {
 				description: `thay đổi cách ${APPNAME} hoạt động`
 			});
 
-			smenu.onShow(() => core.content.classList.add("parallax"));
-			smenu.onHide(() => core.content.classList.remove("parallax"));
+			smenu.onShow(() => core.content.classList.add("parallax", smenu.align));
+			smenu.onHide(() => core.content.classList.remove("parallax", smenu.align));
 
 			if (["beta", "indev", "debug", "test", "development"].includes(STATE)) {
 				new smenu.components.Note({

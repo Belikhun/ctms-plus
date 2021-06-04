@@ -116,6 +116,10 @@ const smenu = {
 		this.initialized = true;
 	},
 
+	setAlignment(align) {
+		this.container.dataset.align = align;
+	},
+
 	onShow(f) {
 		if (!f || typeof f !== "function")
 			throw { code: -1, description: "smenu.onShow(): not a valid function" }

@@ -21,6 +21,7 @@
 	overflow: hidden;
 	z-index: 100;
 
+	--main-size: 380px;
 	--background: rgba(241, 243, 245, 0.85);
 	--sidebar: white;
 	transition: background-color 0.6s ease-in-out;
@@ -46,7 +47,7 @@
 	right: 0;
 	width: auto;
 	min-height: 100%;
-	padding-left: 380px;
+	padding-left: var(--main-size);
 	float: right;
 
 	user-select: none;
@@ -69,7 +70,7 @@
 
 	top: 0;
 	left: 0;
-	width: 380px;
+	width: var(--main-size);
 	height: 100%;
 	transform: translateX(calc(100% + 60px));
 
@@ -285,6 +286,7 @@
 .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.note {
 	display: flex;
 	margin: 5px 0;
+	border-radius: 5px;
 }
 
 .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.note > .inner,
@@ -905,6 +907,77 @@
 		flex-shrink: 1;
 		width: auto;
 	}
+}
+
+/*? ================ LEFT ALIGNMENT ================ **/
+
+.smenuContainer[data-align="left"] > .main {
+	left: 0;
+	right: unset;
+	padding-left: unset;
+	padding-right: var(--main-size);
+	float: left;
+	order: 0;
+}
+
+.smenuContainer[data-align="left"] > .main > .wrapper {
+	left: unset;
+	right: 0;
+
+	transform: translateX(calc(-100% - 60px));
+}
+
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .title,
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .description,
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .title,
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .child > .title,
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .child,
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .component,
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .child > .component.text {
+	text-align: left;
+}
+
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .child::before {
+	left: -10px;
+	right: unset;
+}
+
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .child > .component::after {
+	left: -12px;
+	right: unset;
+}
+
+.smenuContainer[data-align="left"] > .main > .wrapper > .smenu > .group > .child > .component.button > .sq-btn > .left {
+	justify-content: flex-end;
+	margin: 0 0 0 10px;
+	order: 1;
+}
+
+.smenuContainer[data-align="left"] > .main > .navigator {
+	transform: translateX(-100%);
+}
+
+.smenuContainer[data-align="left"] > .main > .navigator > .button {
+	justify-content: flex-start;
+	text-align: left;
+}
+
+.smenuContainer[data-align="left"] > .main > .navigator > .button::before {
+	left: unset;
+	right: 0;
+}
+
+.smenuContainer[data-align="left"] > .main > .navigator > .button::after {
+	order: -1;
+}
+
+.smenuContainer[data-align="left"].show > .main > .wrapper,
+.smenuContainer[data-align="left"].show > .main > .navigator {
+	transform: unset;
+}
+
+.smenuContainer[data-align="left"] > .panels {
+	order: 1;
 }
 
 /** ============================ DARK MODE ============================ **/

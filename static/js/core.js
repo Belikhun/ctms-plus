@@ -309,12 +309,31 @@ const core = {
 			navbar.init(this.container);
 
 			set({ p: 20, d: "Adding Default Navigation Bar Modules" });
-			this.menu.click.setHandler((active) => (active) ? smenu.show() : smenu.hide());
 			smenu.onShow(() => this.menu.click.setActive(true));
 			smenu.onHide(() => this.menu.click.setActive(false));
 
+			this.menu.click.setHandler((active) => {
+				if (active) {
+					this.title.click.setActive(true);
+					smenu.show();
+				} else {
+					this.title.click.setActive(false);
+					smenu.hide();
+				}
+			});
+
+			this.menu.click.onClick(() => smenu.setAlignment("right"));
+
 			navbar.insert(this.title, "left");
 			navbar.insert(this.menu, "right");
+
+			// Set up title click event
+			this.title.click.setHandler((active) => {
+				if (active)
+					smenu.setAlignment("left");
+				
+				this.menu.click.active = active
+			});
 		},
 
 		switch: {

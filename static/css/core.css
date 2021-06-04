@@ -223,7 +223,7 @@ arr::before {
 	transform: translateX(-20px);
 }
 
-#content.parallax.left {
+#content[data-direction="left"].parallax {
 	transform: translateX(20px);
 }
 

@@ -309,19 +309,17 @@ const core = {
 			navbar.init(this.container);
 
 			set({ p: 20, d: "Adding Default Navigation Bar Modules" });
-			smenu.onShow(() => this.menu.click.setActive(true));
-			smenu.onHide(() => this.menu.click.setActive(false));
-
-			this.menu.click.setHandler((active) => {
-				if (active) {
-					this.title.click.setActive(true);
-					smenu.show();
-				} else {
-					this.title.click.setActive(false);
-					smenu.hide();
-				}
+			smenu.onShow(() => {
+				this.menu.click.setActive(true);
+				this.title.click.setActive(true);
 			});
 
+			smenu.onHide(() => {
+				this.menu.click.setActive(false);
+				this.title.click.setActive(false);
+			});
+
+			this.menu.click.setHandler((active) => (active) ? smenu.show() : smenu.hide());
 			this.menu.click.onClick((active) => (active) ? smenu.setAlignment("right") : "");
 
 			navbar.insert(this.title, "left");
@@ -364,8 +362,15 @@ const core = {
 				description: `thay đổi cách ${APPNAME} hoạt động`
 			});
 
-			smenu.onShow(() => core.content.classList.add("parallax", smenu.align));
-			smenu.onHide(() => core.content.classList.remove("parallax", smenu.align));
+			smenu.onShow(() => {
+				core.content.classList.add("parallax");
+				core.content.dataset.direction = smenu.align;
+			});
+
+			smenu.onHide(() => {
+				core.content.classList.remove("parallax");
+				core.content.dataset.direction = smenu.align;
+			});
 
 			if (["beta", "indev", "debug", "test", "development"].includes(STATE)) {
 				new smenu.components.Note({
@@ -634,270 +639,282 @@ const core = {
 					// TODO: Buying Services Implementation
 				}
 			},
+		},
 
-			server: {
-				group: smenu.Group.prototype,
+		server: {
+			group: smenu.Group.prototype,
 
-				init() {
-					this.group = new smenu.Group({ label: "máy chủ", icon: "server" });
-					let general = new smenu.Child({ label: "Chung" }, this.group);
+			init() {
+				this.group = new smenu.Group({ label: "máy chủ", icon: "server" });
+				let general = new smenu.Child({ label: "Chung" }, this.group);
 
-					let mwOptions = {}
-					let mwDefault = undefined;
+				let mwOptions = {}
+				let mwDefault = undefined;
 
-					for (let key of Object.keys(META.middleware)) {
-						mwOptions[key] = META.middleware[key].name;
+				for (let key of Object.keys(META.middleware)) {
+					mwOptions[key] = META.middleware[key].name;
 
-						if (META.middleware[key].default)
-							mwDefault = key;
+					if (META.middleware[key].default)
+						mwDefault = key;
+				}
+
+				let mwSelect = new smenu.components.Select({
+					label: "Middleware",
+					icon: "hive",
+					options: mwOptions,
+					defaultValue: mwDefault,
+					save: "server.middleware",
+					onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
+				}, general);
+			}
+		},
+
+		display: {
+			group: smenu.Group.prototype,
+
+			init() {
+				this.group = new smenu.Group({ label: "hiển thị", icon: "window" });
+
+				let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
+				
+				new smenu.components.Checkbox({
+					label: "Chế độ ban đêm",
+					color: "pink",
+					save: "display.nightmode",
+					defaultValue: false,
+					onChange: (v) => core.darkmode.set(v)
+				}, ux);
+
+				new smenu.components.Checkbox({
+					label: "Hoạt ảnh",
+					color: "blue",
+					save: "display.transition",
+					defaultValue: true,
+					onChange: (v) => document.body.classList[v ? "remove" : "add"]("disableTransition")
+				}, ux);
+
+				new smenu.components.Checkbox({
+					label: "Bảng cài đặt bên trái",
+					color: "blue",
+					save: "display.leftSmenu",
+					defaultValue: false,
+					onChange: (v) => {
+						core.navbar.menu.container.style.display = v ? "none" : null;
+						smenu.setAlignment(v ? "left" : "right");
+						core.content.dataset.direction = v ? "left" : "right";
 					}
+				}, ux);
 
-					let mwSelect = new smenu.components.Select({
-						label: "Middleware",
-						icon: "hive",
-						options: mwOptions,
-						defaultValue: mwDefault,
-						save: "server.middleware",
-						onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
-					}, general);
-				}
-			},
+				let other = new smenu.Child({ label: "Khác" }, this.group);
 
-			display: {
-				group: smenu.Group.prototype,
-	
-				init() {
-					this.group = new smenu.Group({ label: "hiển thị", icon: "window" });
-	
-					let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
-					
-					new smenu.components.Checkbox({
-						label: "Chế độ ban đêm",
-						color: "pink",
-						save: "display.nightmode",
-						defaultValue: false,
-						onChange: (v) => core.darkmode.set(v)
-					}, ux);
-	
-					new smenu.components.Checkbox({
-						label: "Hoạt ảnh",
-						color: "blue",
-						save: "display.transition",
-						defaultValue: true,
-						onChange: (v) => document.body.classList[v ? "remove" : "add"]("disableTransition")
-					}, ux);
-	
-					let other = new smenu.Child({ label: "Khác" }, this.group);
-	
-					new smenu.components.Checkbox({
-						label: "Thông báo",
-						color: "pink",
-						save: "display.notification",
-						defaultValue: false,
-						disabled: true
-					}, other);
-				}
-			},
+				new smenu.components.Checkbox({
+					label: "Thông báo",
+					color: "pink",
+					save: "display.notification",
+					defaultValue: false,
+					disabled: true
+				}, other);
+			}
+		},
 
-			sounds: {
-				group: smenu.Group.prototype,
-	
-				init() {
-					this.group = new smenu.Group({ label: "âm thanh", icon: "volume" });
-		
-					let status = new smenu.Child({ label: "Trạng Thái" }, this.group);
-					let loadDetail = new smenu.components.Text({ content: "Chưa khởi tạo âm thanh" });
-					status.insert(loadDetail, -3);
-	
-					core.sounds.attach(({ c } = {}) => {
-						if (typeof c === "string")
-							loadDetail.content = c
-					});
-	
-					let volume = new smenu.components.Slider({
-						label: "Âm lượng",
-						color: "blue",
-						save: "sounds.volume",
-						min: 0,
-						max: 100,
-						unit: "%",
-						defaultValue: 60
-					});
-	
-					status.insert(volume, -1);
-					volume.onInput((v) => {
-						sounds.volume = (v / 100);
-						volume.set({ color: (v >= 80) ? "red" : "blue" })
-					});
-		
-					let cat = new smenu.Child({ label: "Loại" }, this.group);
-					let mouseOver = new smenu.components.Checkbox({
-						label: "Mouse Over",
-						color: "blue",
-						save: "sounds.mouseOver",
-						defaultValue: true,
-						onChange: (v) => sounds.enable.mouseOver = v
-					}, cat);
-		
-					let btnClick = new smenu.components.Checkbox({
-						label: "Button Click/Toggle",
-						color: "blue",
-						save: "sounds.btnClick",
-						defaultValue: true,
-						onChange: (v) => sounds.enable.btnClick = v
-					}, cat);
-		
-					let panelToggle = new smenu.components.Checkbox({
-						label: "Panel Show/Hide",
-						color: "blue",
-						save: "sounds.panelToggle",
-						defaultValue: true,
-						onChange: (v) => sounds.enable.panelToggle = v
-					}, cat);
-		
-					let others = new smenu.components.Checkbox({
-						label: "Others",
-						color: "blue",
-						save: "sounds.others",
-						defaultValue: true,
-						onChange: (v) => sounds.enable.others = v
-					}, cat);
-		
-					let notification = new smenu.components.Checkbox({
-						label: "Notification",
-						color: "blue",
-						save: "sounds.notification",
-						defaultValue: true,
-						onChange: (v) => sounds.enable.notification = v
-					}, cat);
-		
-					let master = new smenu.components.Checkbox({
-						label: "Bật âm thanh",
-						color: "pink",
-						save: "sounds.master",
-						defaultValue: false,
-						onChange: async (v) => {
-							sounds.enable.master = v;
-							mouseOver.set({ disabled: !v });
-							btnClick.set({ disabled: !v });
-							panelToggle.set({ disabled: !v });
-							others.set({ disabled: !v });
-							notification.set({ disabled: !v });
-	
-							if (v)
-								sounds.soundToggle(sounds.sounds.checkOn);
-		
-							if (core.initialized && !sounds.initialized)
-								await core.sounds.init();
-						}
-					});
-	
-					status.insert(master, -2);
-				}
-			},
+		sounds: {
+			group: smenu.Group.prototype,
 
-			projectInfo: {
-				group: smenu.Group.prototype,
-				licensePanel: smenu.Panel.prototype,
+			init() {
+				this.group = new smenu.Group({ label: "âm thanh", icon: "volume" });
 	
-				async init() {
-					this.group = new smenu.Group({ label: "thông tin", icon: "info" });
-					let links = new smenu.Child({ label: "Liên Kết Ngoài" }, this.group);
-	
-					// Project Info View
-					let projectInfo = makeTree("div", "projectInfo", {
-						header: { tag: "div", class: "header", child: {
-							icon: new lazyload({ source: "./assets/img/icon.png", classes: "icon" })
-						}},
+				let status = new smenu.Child({ label: "Trạng Thái" }, this.group);
+				let loadDetail = new smenu.components.Text({ content: "Chưa khởi tạo âm thanh" });
+				status.insert(loadDetail, -3);
 
-						pTitle: { tag: "t", class: "title", text: APPNAME },
-						description: { tag: "t", class: "description", text: "The Next Generation Of CTMS" },
+				core.sounds.attach(({ c } = {}) => {
+					if (typeof c === "string")
+						loadDetail.content = c
+				});
 
-						note: createNote({
-							level: "info",
-							message: "CTMS+ không được hỗ trợ bởi OTSC hoặc các bên liên quan"
-						}),
+				let volume = new smenu.components.Slider({
+					label: "Âm lượng",
+					color: "blue",
+					save: "sounds.volume",
+					min: 0,
+					max: 100,
+					unit: "%",
+					defaultValue: 60
+				});
 
-						authorLabel: { tag: "t", class: "label", text: "Tác Giả" },
-						author: { tag: "span", class: "author" },
+				status.insert(volume, -1);
+				volume.onInput((v) => {
+					sounds.volume = (v / 100);
+					volume.set({ color: (v >= 80) ? "red" : "blue" })
+				});
+	
+				let cat = new smenu.Child({ label: "Loại" }, this.group);
+				let mouseOver = new smenu.components.Checkbox({
+					label: "Mouse Over",
+					color: "blue",
+					save: "sounds.mouseOver",
+					defaultValue: true,
+					onChange: (v) => sounds.enable.mouseOver = v
+				}, cat);
+	
+				let btnClick = new smenu.components.Checkbox({
+					label: "Button Click/Toggle",
+					color: "blue",
+					save: "sounds.btnClick",
+					defaultValue: true,
+					onChange: (v) => sounds.enable.btnClick = v
+				}, cat);
+	
+				let panelToggle = new smenu.components.Checkbox({
+					label: "Panel Show/Hide",
+					color: "blue",
+					save: "sounds.panelToggle",
+					defaultValue: true,
+					onChange: (v) => sounds.enable.panelToggle = v
+				}, cat);
+	
+				let others = new smenu.components.Checkbox({
+					label: "Others",
+					color: "blue",
+					save: "sounds.others",
+					defaultValue: true,
+					onChange: (v) => sounds.enable.others = v
+				}, cat);
+	
+				let notification = new smenu.components.Checkbox({
+					label: "Notification",
+					color: "blue",
+					save: "sounds.notification",
+					defaultValue: true,
+					onChange: (v) => sounds.enable.notification = v
+				}, cat);
+	
+				let master = new smenu.components.Checkbox({
+					label: "Bật âm thanh",
+					color: "pink",
+					save: "sounds.master",
+					defaultValue: false,
+					onChange: async (v) => {
+						sounds.enable.master = v;
+						mouseOver.set({ disabled: !v });
+						btnClick.set({ disabled: !v });
+						panelToggle.set({ disabled: !v });
+						others.set({ disabled: !v });
+						notification.set({ disabled: !v });
 
-						contributorLabel: { tag: "t", class: "label", child: {
-							content: { tag: "span", text: "Người Đóng Góp" },
-							tip: { tag: "tip", title: "Tên của bạn sẽ xuất hiện trong danh sách này nếu bạn có đóng góp cho dự án (bằng cách tạo commit hoặc pull request)" }
-						}},
+						if (v)
+							sounds.soundToggle(sounds.sounds.checkOn);
+	
+						if (core.initialized && !sounds.initialized)
+							await core.sounds.init();
+					}
+				});
 
-						contributors: { tag: "span", class: "contributor" },
-					});
+				status.insert(master, -2);
+			}
+		},
 
-					for (let username of Object.keys(META.author))
-						projectInfo.author.appendChild(makeTree("span", "item", {
-							avatar: new lazyload({ source: `https://github.com/${username}.png?size=80`, classes: "avatar" }),
-							aName: { tag: "a", target: "_blank", href: META.author[username].link, class: "name", text: META.author[username].name },
-							department: { tag: "t", class: "department", text: META.author[username].department },
-							aRole: { tag: "t", class: "role", text: META.author[username].role }
-						}));
-					
-					for (let username of Object.keys(META.contributors))
-						projectInfo.contributors.appendChild(makeTree("div", "item", {
-							avatar: new lazyload({ source: `https://github.com/${username}.png?size=40`, classes: "avatar" }),
-							username: { tag: "a", target: "_blank", href: `https://github.com/${username}`, class: "username", text: username },
-							contributions: { tag: "t", class: "contributions", text: META.contributors[username].contributions }
-						}));
+		projectInfo: {
+			group: smenu.Group.prototype,
+			licensePanel: smenu.Panel.prototype,
 
-					// Components
-					new smenu.components.Button({
-						label: "Báo Lỗi",
-						color: "pink",
-						icon: "externalLink",
-						complex: true,
-						onClick: () => window.open(REPORT_ERROR, "_blank")
-					}, links);
-					
-					new smenu.components.Button({
-						label: "Wiki",
-						color: "pink",
-						icon: "externalLink",
-						complex: true,
-						onClick: () => window.open(REPO_ADDRESS + "/wiki", "_blank")
-					}, links);
-					
-					new smenu.components.Button({
-						label: "Mã Nguồn",
-						color: "pink",
-						icon: "externalLink",
-						complex: true,
-						onClick: () => window.open(REPO_ADDRESS, "_blank")
-					}, links);
-	
-					let project = new smenu.Child({ label: "Dự Án" }, this.group);
-	
-					let detailsButton = new smenu.components.Button({
-						label: "Thông Tin",
-						color: "blue",
-						icon: "arrowLeft",
-						complex: true
-					}, project);
-	
-					(new smenu.Panel(projectInfo)).setToggler(detailsButton);
-	
-					let licenseButton = new smenu.components.Button({
-						label: "LICENSE",
-						color: "blue",
-						icon: "arrowLeft",
-						complex: true
-					}, project);
-	
-					this.licensePanel = new smenu.Panel(undefined, { size: "large" });
-					this.licensePanel.setToggler(licenseButton);
-					await this.licensePanel.content("iframe:./license.html");
-					core.darkmode.onToggle((enabled) => this.licensePanel.iframe.contentDocument.body.classList[enabled ? "add" : "remove"]("dark"));
-	
-					new smenu.components.Footer({
-						icon: "./assets/img/icon.png",
-						appName: APPNAME,
-						version: `${VERSION} - ${STATE}`
-					}, project);
-				}
+			async init() {
+				this.group = new smenu.Group({ label: "thông tin", icon: "info" });
+				let links = new smenu.Child({ label: "Liên Kết Ngoài" }, this.group);
+
+				// Project Info View
+				let projectInfo = makeTree("div", "projectInfo", {
+					header: { tag: "div", class: "header", child: {
+						icon: new lazyload({ source: "./assets/img/icon.png", classes: "icon" })
+					}},
+
+					pTitle: { tag: "t", class: "title", text: APPNAME },
+					description: { tag: "t", class: "description", text: "The Next Generation Of CTMS" },
+
+					note: createNote({
+						level: "info",
+						message: "CTMS+ không được hỗ trợ bởi OTSC hoặc các bên liên quan"
+					}),
+
+					authorLabel: { tag: "t", class: "label", text: "Tác Giả" },
+					author: { tag: "span", class: "author" },
+
+					contributorLabel: { tag: "t", class: "label", child: {
+						content: { tag: "span", text: "Người Đóng Góp" },
+						tip: { tag: "tip", title: "Tên của bạn sẽ xuất hiện trong danh sách này nếu bạn có đóng góp cho dự án (bằng cách tạo commit hoặc pull request)" }
+					}},
+
+					contributors: { tag: "span", class: "contributor" },
+				});
+
+				for (let username of Object.keys(META.author))
+					projectInfo.author.appendChild(makeTree("span", "item", {
+						avatar: new lazyload({ source: `https://github.com/${username}.png?size=80`, classes: "avatar" }),
+						aName: { tag: "a", target: "_blank", href: META.author[username].link, class: "name", text: META.author[username].name },
+						department: { tag: "t", class: "department", text: META.author[username].department },
+						aRole: { tag: "t", class: "role", text: META.author[username].role }
+					}));
+				
+				for (let username of Object.keys(META.contributors))
+					projectInfo.contributors.appendChild(makeTree("div", "item", {
+						avatar: new lazyload({ source: `https://github.com/${username}.png?size=40`, classes: "avatar" }),
+						username: { tag: "a", target: "_blank", href: `https://github.com/${username}`, class: "username", text: username },
+						contributions: { tag: "t", class: "contributions", text: META.contributors[username].contributions }
+					}));
+
+				// Components
+				new smenu.components.Button({
+					label: "Báo Lỗi",
+					color: "pink",
+					icon: "externalLink",
+					complex: true,
+					onClick: () => window.open(REPORT_ERROR, "_blank")
+				}, links);
+				
+				new smenu.components.Button({
+					label: "Wiki",
+					color: "pink",
+					icon: "externalLink",
+					complex: true,
+					onClick: () => window.open(REPO_ADDRESS + "/wiki", "_blank")
+				}, links);
+				
+				new smenu.components.Button({
+					label: "Mã Nguồn",
+					color: "pink",
+					icon: "externalLink",
+					complex: true,
+					onClick: () => window.open(REPO_ADDRESS, "_blank")
+				}, links);
+
+				let project = new smenu.Child({ label: "Dự Án" }, this.group);
+
+				let detailsButton = new smenu.components.Button({
+					label: "Thông Tin",
+					color: "blue",
+					icon: "arrowLeft",
+					complex: true
+				}, project);
+
+				(new smenu.Panel(projectInfo)).setToggler(detailsButton);
+
+				let licenseButton = new smenu.components.Button({
+					label: "LICENSE",
+					color: "blue",
+					icon: "arrowLeft",
+					complex: true
+				}, project);
+
+				this.licensePanel = new smenu.Panel(undefined, { size: "large" });
+				this.licensePanel.setToggler(licenseButton);
+				await this.licensePanel.content("iframe:./license.html");
+				core.darkmode.onToggle((enabled) => this.licensePanel.iframe.contentDocument.body.classList[enabled ? "add" : "remove"]("dark"));
+
+				new smenu.components.Footer({
+					icon: "./assets/img/icon.png",
+					appName: APPNAME,
+					version: `${VERSION} - ${STATE}`
+				}, project);
 			}
 		}
 	},

@@ -140,7 +140,7 @@ while True:
 			log("ERRR", "===========================================")
 			log("ERRR", "AN CRITICAL ERROR OCCURED AT INITIALIZATION")
 			log("ERRR", "{} → CODE: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTYELLOW_EX, code))
-			log("ERRR", "{} → DESC: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTRED_EX, code))
+			log("ERRR", "{} → DESC: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTRED_EX, description))
 			log("ERRR", "")
 			log("ERRR", "TEST FAILED")
 		else:

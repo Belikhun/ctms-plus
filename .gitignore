@@ -2,3 +2,4 @@ logs
 *.log
 *.pyc
 __pycache__
+playground.html

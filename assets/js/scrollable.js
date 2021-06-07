@@ -332,40 +332,49 @@ class Scrollable {
 		/** @type {HTMLElement} */
 		let t = this.content;
 
-		let r =  {
-			width: t.offsetWidth,
-			height: t.offsetHeight,
-			sWidth: t.scrollWidth + Math.abs(this.currentClampH),
-			sHeight: t.scrollHeight + Math.abs(this.currentClampV)
-		}
+		let clampHeight = Math.abs(this.currentClampV) * 3;
+		let vHeight = t.offsetHeight;
+		let cHeight = t.scrollHeight + clampHeight;
+		let sHeight = this.vBar.getBoundingClientRect().height;
+		let tHeight = (vHeight * sHeight) / cHeight;
+		let tTop = (t.scrollTop * sHeight) / cHeight;
 
-		let s = {
-			width: this.hBar.getBoundingClientRect().width,
-			height: this.vBar.getBoundingClientRect().height
-		}
-
-		let top = t.scrollTop;
-		let left = t.scrollLeft;
-		let width = r.sWidth - r.width - Math.abs(this.currentClampH);
-		let height = r.sHeight - r.height - Math.abs(this.currentClampV);
-		let tWidth = (r.width / r.sWidth) * s.width;
-		let tHeight = (r.height / r.sHeight) * s.height;
-
-		if (r.height < r.sHeight) {
+		if (cHeight > vHeight) {
 			clearTimeout(this.vHideTimeout);
 			this.vBar.classList.remove("hide", "none");
 			this.vBar.thumb.style.height = `${tHeight}px`;
-			this.vBar.thumb.style.top = `${(top / height) * (s.height - tHeight)}px`;
+
+			if (clampHeight > 0 && t.scrollTop > 0) {
+				this.vBar.thumb.style.top = `initial`;
+				this.vBar.thumb.style.bottom = `0`;
+			} else {
+				this.vBar.thumb.style.top = `${tTop}px`;
+				this.vBar.thumb.style.bottom = null;
+			}
 		} else {
 			this.vBar.classList.add("hide");
 			this.vHideTimeout = setTimeout(() => this.vBar.classList.add("none"), 1000);
 		}
 
-		if (r.width < r.sWidth) {
+		let clampWidth = Math.abs(this.currentClampH) * 3;
+		let vWidth = t.offsetWidth;
+		let cWidth = t.scrollWidth + clampWidth;
+		let sWidth = this.hBar.getBoundingClientRect().width;
+		let tWidth = (vWidth * sWidth) / cWidth;
+		let tLeft = (t.scrollLeft * sWidth) / cWidth;
+
+		if (cWidth > vWidth) {
 			clearTimeout(this.hHideTimeout);
 			this.hBar.classList.remove("hide", "none");
 			this.hBar.thumb.style.width = `${tWidth}px`;
-			this.hBar.thumb.style.left = `${(left / width) * (s.width - tWidth)}px`;
+
+			if (clampWidth > 0 && t.scrollLeft > 0) {
+				this.hBar.thumb.style.left = `initial`;
+				this.hBar.thumb.style.right = `0`;
+			} else {
+				this.hBar.thumb.style.left = `${tLeft}px`;
+				this.hBar.thumb.style.right = null;
+			}
 		} else {
 			this.hBar.classList.add("hide");
 			this.hHideTimeout = setTimeout(() => this.hBar.classList.add("none"), 1000);
@@ -535,7 +544,7 @@ class Scrollable {
 				this.content.clampValue = clampValue;
 			} else {
 				this.content.style.transform = null;
-				this.content.clampValue = 0;
+				this.currentClampH = this.currentClampV = this.content.clampValue = 0;
 				this.content[horizontal ? "scrollLeft" : "scrollTop"] = current;
 			}
 		});

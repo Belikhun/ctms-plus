@@ -174,6 +174,23 @@ const api = {
 			this.__LOGOUT_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
 		}
 
+		// Check for announcement
+		let ann = dom.content.getElementById("thongbao");
+		if (ann) {
+			await popup.show({
+				windowTitle: "Thông Báo",
+				title: "Thông Báo",
+				icon: "horn",
+				bgColor: "blue",
+				message: `api.request`,
+				description: `${method} ${path}`,
+				customNode: ann,
+				buttonList: {
+					close: { text: "ĐÓNG", color: "blue" }
+				}
+			});
+		}
+
 		let data = {
 			dom: dom.content,
 			c2m: start.tick() - response.runtime,

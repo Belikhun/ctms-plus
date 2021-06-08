@@ -617,6 +617,8 @@ const core = {
 						emptyNode(this.view.list);
 					});
 
+					core.account.onLogin(async () => await api.services());
+
 					api.onResponse("services", (data) => {
 						this.view.occCard.value.innerText = data.info.occ;
 						emptyNode(this.view.list);
@@ -1129,12 +1131,15 @@ const core = {
 				this.subWindow.loading = true;
 				this.subWindow.content = this.detailView;
 				this.background.setColor("navyBlue");
-				this.loginHandlers.forEach(f => f());
 				
-				await Promise.all([
-					api.results(),
-					api.services()
-				]);
+				let promises = []
+				this.loginHandlers.forEach(f => promises.push(f()));
+				
+				try {
+					await Promise.all(promises);
+				} catch(e) {
+					errorHandler(e);
+				}
 				
 				this.subWindow.loading = false;
 			}
@@ -1457,18 +1462,35 @@ const core = {
 					return;
 				}
 
-				if (!this.loaded) {
-					this.screen.loading = true;
-					this.screen.overlay({ show: false });
-					await api.schedule();
-					this.view.control.confirm.disabled = false;
-					this.screen.loading = false;
-				} else {
-					if (date) {
+				try {
+					if (!this.loaded) {
 						this.screen.loading = true;
-						await api.schedule(date);
+						this.screen.overlay({ show: false });
+						await api.schedule();
+						this.view.control.confirm.disabled = false;
 						this.screen.loading = false;
+					} else {
+						if (date) {
+							this.screen.loading = true;
+							await api.schedule(date);
+							this.screen.loading = false;
+						}
 					}
+				} catch(e) {
+					let error = parseException(e);
+
+					this.reset();
+					this.view.control.confirm.disabled = true;
+					this.screen.overlay({
+						icon: "bomb",
+						title: "Toang Rồi Ông Giáo Ạ!",
+						description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
+						buttons: {
+							login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
+						}
+					});
+
+					this.screen.loading = false;
 				}
 			},
 
@@ -1632,13 +1654,29 @@ const core = {
 				if (this.loading)
 					return false;
 
-				this.loading = true;
-				this.screen.loading = true;
+				try {
+					this.loading = true;
+					this.screen.loading = true;
+	
+					await api.tests();
+	
+					this.loading = false;
+					this.screen.loading = false;
+				} catch(e) {
+					let error = parseException(e);
 
-				await api.tests();
+					this.reset();
+					this.screen.overlay({
+						icon: "bomb",
+						title: "Toang Rồi Ông Giáo Ạ!",
+						description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
+						buttons: {
+							login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
+						}
+					});
 
-				this.loading = false;
-				this.screen.loading = false;
+					this.screen.loading = false;
+				}
 			},
 
 			addListItem({
@@ -1771,6 +1809,7 @@ const core = {
 
 				core.account.onLogout(() => this.onLogout());
 				this.screen.onReload(async () => await this.load());
+				core.account.onLogin(async () => await this.load());
 
 				api.onResponse("results", (response) => {
 					if (!this.loaded)
@@ -1818,9 +1857,25 @@ const core = {
 					return;
 				}
 
-				this.screen.loading = true;
-				await api.results();
-				this.screen.loading = false;
+				try {
+					this.screen.loading = true;
+					await api.results();
+					this.screen.loading = false;
+				} catch(e) {
+					let error = parseException(e);
+
+					this.reset();
+					this.screen.overlay({
+						icon: "bomb",
+						title: "Toang Rồi Ông Giáo Ạ!",
+						description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
+						buttons: {
+							login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
+						}
+					});
+
+					this.screen.loading = false;
+				}
 			},
 
 			addListItem({

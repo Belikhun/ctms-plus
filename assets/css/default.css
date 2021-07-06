@@ -847,6 +847,10 @@ icon[data-icon="lock"]::after {
 	content: "\f023";
 }
 
+icon[data-icon="play"]::after {
+	content: "\f04b";
+}
+
 /** ======================== NOTE ======================== **/
 
 .note {

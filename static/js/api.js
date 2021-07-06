@@ -77,7 +77,8 @@ const api = {
 		header = {},
 		target = "",
 		argument = "",
-		renewSession = false
+		renewSession = false,
+		ignoreAnnouncement = false
 	} = {}) {
 		if (method === "POST") {
 			this.__FORM = form || {}
@@ -175,20 +176,22 @@ const api = {
 		}
 
 		// Check for announcement
-		let ann = dom.content.getElementById("thongbao");
-		if (ann) {
-			await popup.show({
-				windowTitle: "Thông Báo",
-				title: "Thông Báo",
-				icon: "horn",
-				bgColor: "blue",
-				message: `api.request`,
-				description: `${method} ${path}`,
-				customNode: ann,
-				buttonList: {
-					close: { text: "ĐÓNG", color: "blue" }
-				}
-			});
+		if (!ignoreAnnouncement) {
+			let ann = dom.content.getElementById("thongbao");
+			if (ann) {
+				await popup.show({
+					windowTitle: "Thông Báo",
+					title: "Thông Báo",
+					icon: "horn",
+					bgColor: "blue",
+					message: `api.request`,
+					description: `${method} ${path}`,
+					customNode: ann,
+					buttonList: {
+						close: { text: "ĐÓNG", color: "blue" }
+					}
+				});
+			}
 		}
 
 		let data = {
@@ -253,8 +256,7 @@ const api = {
 			}
 		});
 
-		this.__LOGOUT_VIEWSTATE = undefined;
-		this.__LOGOUT_VIEWSTATEGENERATOR = undefined;
+		this.reset();
 		this.__handleResponse("logout", response);
 
 		return response;
@@ -585,5 +587,217 @@ const api = {
 
 		this.__handleResponse("tests", response);
 		return response;
+	},
+
+	// For current subscribe viewstate, we can use them if
+	// global viewstate is being changed by another api
+	// request
+	__SUBS_VIEWSTATE: undefined,
+	__SUBS_VIEWSTATEGENERATOR: undefined,
+	__SUBS_EVENTVALIDATION: undefined,
+	__SUBS_STUDENTID: undefined,
+
+	/**
+	 * API Đăng kí tín chỉ
+	 * 
+	 * @param	{String}	type
+	 * Loại danh sách cần lấy. Chấp nhận:
+	 * + `all`:		Tất cả
+	 * + `ended`:	Đã thi/Đã kết thúc
+	 * + `coming`:	Sắp thi
+	 */
+	async subscribe({
+		action = "getmodule",
+		classID
+	} = {}) {
+		/**
+		 * Parse Subscribe Entries
+		 * @param {HTMLTableElement} node
+		 */
+		const parseSubscribe = (node) => {
+			let rows = node.querySelectorAll(":scope > tbody > tr:not(:first-child)");
+			let items = []
+
+			for (let row of rows) {
+				let item = {
+					expired: false,
+					isFull: false,
+					classID: undefined,
+					subject: undefined,
+					teacher: undefined,
+					credits: undefined,
+					tuition: undefined,
+					minimum: undefined,
+					maximum: undefined,
+					subscribed: undefined,
+					schedule: [],
+					action: {
+						command: undefined,
+						classID: undefined,
+					},
+					date: {
+						start: undefined,
+						end: undefined,
+						cancel: undefined
+					}
+				}
+
+				// Parse first cell
+				let firstCell = row.children[0];
+				
+				if (firstCell.innerText.includes("Hết hạn ĐK"))
+					item.expired = true;
+
+				if (firstCell.innerText.includes("Hết chỉ tiêu"))
+					item.isFull = true;
+
+				let actionBtn = firstCell.querySelector(":scope > a[href]");
+				if (actionBtn) {
+					// Test subscribe button
+					let sub = /javascript:subcrible\((\d+)\, (\d+), (\d+)\)/gm.exec(actionBtn.href);
+					if (sub) {
+						item.action.command = "subscribe";
+						item.action.classID = parseInt(sub[1]);
+					}
+
+					// Test unsubscribe button
+					let unsub = /javascript:unSubcrible\((\d+)\,(\d+)\)/gm.exec(actionBtn.href);
+					if (unsub) {
+						item.action.command = "unsubscribe";
+						item.action.classID = parseInt(sub[1]);
+					}
+				}
+
+				item.classID = row.children[1].innerText.trim();
+				
+				// Parse basic data
+				let secondCell = /^(.+) \((\d+) tc\)[\n\s]+(.+)(?:[\n\s]+Học phí: (\d+)\*1000 \(đ\)|$)/gm
+					.exec(row.children[2].innerText.trim());
+				
+				if (secondCell) {
+					item.subject = secondCell[1];
+					item.credits = parseInt(secondCell[2]);
+					item.teacher = secondCell[3];
+					
+					if (secondCell[4])
+						item.tuition = parseInt(secondCell[4]) * 1000;
+				}
+
+				item.minimum = parseInt(row.children[3].innerText.trim().replace(" sv", ""));
+				item.maximum = parseInt(row.children[4].innerText.trim().replace(" sv", ""));
+				item.subscribed = parseInt(row.children[5].innerText.trim().replace(" sv", ""));
+
+				// Parse time window
+				let timeCell = [ ...row.children[6].innerText.trim()
+					.matchAll(/(\d+):(\d+) (\d+)\/(\d+)\/(\d+)/gm) ];
+
+				for (let i = 0, cell = timeCell[i]; i < timeCell.length; i++) {
+					let time = new Date("20" + cell[5], parseInt(cell[4]) - 1, cell[3], cell[1], cell[2]);
+
+					if (i === 0)
+						item.date.start = time;
+					else if (i === 1)
+						item.date.end = time;
+					else if (i === 2)
+						item.date.cancel = time;
+				}
+
+				let scheduleCell = row.children[7].querySelectorAll(`:scope > ul > li`);
+				for (let line of scheduleCell)
+					item.schedule.push(
+						line.innerText
+							.replaceAll("\n", "")
+							.replace(/\s\s+/g, " ")
+							.trim()
+					);
+
+				items.push(item);
+			}
+
+			return items;
+		}
+
+		// If viewstate for subscribe page haven't been set, that's mean
+		// we will have to make a prefetch request first in order
+		// to update current viewstate
+		if (!this.__SUBS_VIEWSTATE) {
+			clog("DEBG", "api.subscribe(): Starting prefetch request");
+			let response = await this.request({
+				path: `/DangkyLoptinchi.aspx`,
+				ignoreAnnouncement: true
+			});
+
+			this.__SUBS_VIEWSTATE = this.__VIEWSTATE;
+			this.__SUBS_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
+			this.__SUBS_EVENTVALIDATION = this.__EVENTVALIDATION;
+
+			// Get Student ID
+			let studentID = /"getmodule:" \+ (\d+)\;/gm.exec(response.response);
+			
+			if (!studentID)
+				throw { code: -1, description: `api.subscribe(): student id not found` }
+
+			this.__SUBS_STUDENTID = parseInt(studentID[1]);
+			clog("INFO", `api.subscribe(): Got student ID: ${this.__SUBS_STUDENTID}`);
+		}
+
+		let args;
+		switch (action) {
+			case "getmodule":
+				args = `${action}:${this.__SUBS_STUDENTID}`;
+				break;
+
+			case "subscribe":
+				args = `subcrible:${classID}:${this.__SUBS_STUDENTID}`;
+				break;
+
+			case "unsubscribe":
+				args = `unsubcrible:${classID}:${this.__SUBS_STUDENTID}`;
+				break;
+		
+			default:
+				throw { code: -1, description: `api.subscribe(): undefined command: ${command}` }
+		}
+
+		clog("DEBG", "api.subscribe(): args", args || "empty");
+		let response = await this.request({
+			path: "/DangkyLoptinchi.aspx",
+			method: "POST",
+			form: {
+				__CALLBACKID: "__Page",
+				__CALLBACKPARAM: args
+			}
+		});
+
+		let canSubscribe = response.dom.getElementById("dvLopChoDangky");
+		response.waiting = parseSubscribe(canSubscribe.children[1]);
+
+		let subscribed = response.dom.getElementById("dvLopVuaDangky");
+		response.subscribed = parseSubscribe(subscribed.children[1]);
+
+		this.__handleResponse("subscribe", response);
+		return response;
+	},
+
+	reset() {
+		this.__VIEWSTATE = undefined;
+		this.__VIEWSTATEGENERATOR = undefined;
+		this.__EVENTVALIDATION = undefined;
+
+		this.__LOGOUT_VIEWSTATE = undefined;
+		this.__LOGOUT_VIEWSTATEGENERATOR = undefined;
+
+		this.__SCHEDULE_VIEWSTATE = undefined;
+		this.__SCHEDULE_VIEWSTATEGENERATOR = undefined;
+		this.__SCHEDULE_EVENTVALIDATION = undefined;
+
+		this.__TESTS_VIEWSTATE = undefined;
+		this.__TESTS_VIEWSTATEGENERATOR = undefined;
+		this.__TESTS_EVENTVALIDATION = undefined;
+
+		this.__SUBS_VIEWSTATE = undefined;
+		this.__SUBS_VIEWSTATEGENERATOR = undefined;
+		this.__SUBS_EVENTVALIDATION = undefined;
+		this.__SUBS_STUDENTID = undefined;
 	}
 }

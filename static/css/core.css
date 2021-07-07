@@ -746,10 +746,6 @@ arr::before {
 	flex-grow: 1;
 }
 
-.subscribeScreen > .content > .item > .actions > .left > span {
-
-}
-
 .subscribeScreen > .content > .item > .actions > .left > span > .label {
 	font-weight: bold;
 }

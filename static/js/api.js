@@ -598,6 +598,119 @@ const api = {
 	__SUBS_STUDENTID: undefined,
 
 	/**
+	 * Parse Subscribe Entries
+	 * @param {HTMLTableElement} node
+	 */
+	parseSubscribe(node) {
+		let rows = node.querySelectorAll(":scope > tbody > tr:not(:first-child)");
+		let items = []
+
+		for (let row of rows) {
+			let item = {
+				expired: false,
+				isFull: false,
+				classID: undefined,
+				subject: undefined,
+				teacher: undefined,
+				credits: undefined,
+				tuition: undefined,
+				minimum: undefined,
+				maximum: undefined,
+				subscribed: undefined,
+				schedule: [],
+				classroom: [],
+				action: {
+					command: undefined,
+					classID: undefined,
+				},
+				date: {
+					start: undefined,
+					end: undefined,
+					cancel: undefined
+				}
+			}
+
+			// Parse first cell
+			let firstCell = row.children[0];
+			
+			if (firstCell.innerText.includes("Hết hạn ĐK"))
+				item.expired = true;
+
+			if (firstCell.innerText.includes("Hết chỉ tiêu"))
+				item.isFull = true;
+
+			let actionBtn = firstCell.querySelector(":scope > a[href]");
+			if (actionBtn) {
+				// Test subscribe button
+				let sub = /javascript:subcrible\((\d+)\, (\d+), (\d+)\)/gm.exec(actionBtn.href);
+				if (sub) {
+					item.action.command = "subscribe";
+					item.action.classID = parseInt(sub[1]);
+				}
+
+				// Test unsubscribe button
+				let unsub = /javascript:unSubcrible\((\d+)\,(\d+)\)/gm.exec(actionBtn.href);
+				if (unsub) {
+					item.action.command = "unsubscribe";
+					item.action.classID = parseInt(sub[1]);
+				}
+			}
+
+			item.classID = row.children[1].innerText.trim();
+			
+			// Parse basic data
+			let secondCell = /^(.+) \((\d+) tc\)[\n\s]+(.+)(?:[\n\s]+Học phí: (\d+)\*1000 \(đ\)|$)/gm
+				.exec(row.children[2].innerText.trim());
+			
+			if (secondCell) {
+				item.subject = secondCell[1];
+				item.credits = parseInt(secondCell[2]);
+				item.teacher = secondCell[3];
+				
+				if (secondCell[4])
+					item.tuition = parseInt(secondCell[4]) * 1000;
+			}
+
+			item.minimum = parseInt(row.children[3].innerText.trim().replace(" sv", ""));
+			item.maximum = parseInt(row.children[4].innerText.trim().replace(" sv", ""));
+			item.subscribed = parseInt(row.children[5].innerText.trim().replace(" sv", ""));
+
+			// Parse time window
+			let timeCell = [ ...row.children[6].innerText.trim()
+				.matchAll(/(\d+):(\d+) (\d+)\/(\d+)\/(\d+)/gm) ];
+
+			for (let i = 0, cell = timeCell[i]; i < timeCell.length; i++) {
+				let time = new Date("20" + cell[5], parseInt(cell[4]) - 1, cell[3], cell[1], cell[2]);
+
+				if (i === 0)
+					item.date.start = time;
+				else if (i === 1)
+					item.date.end = time;
+				else if (i === 2)
+					item.date.cancel = time;
+			}
+
+			let scheduleCell = row.children[7].querySelectorAll(`:scope > ul > li`);
+			for (let line of scheduleCell) {
+				let t = line.innerText
+					.replaceAll("\n", "")
+					.replace(/\s\s+/g, " ")
+					.trim();
+
+				let c = t.split(" - ")[1];
+				if (!item.classroom.includes(c))
+					item.classroom.push(c);
+
+				item.schedule.push(t);
+			}
+
+			items.push(item);
+		}
+
+		return items;
+	},
+
+	/**
 	 * API Đăng kí tín chỉ
 	 * 
 	 * @param	{String}	type
@@ -610,113 +723,6 @@ const api = {
 		action = "getmodule",
 		classID
 	} = {}) {
-		/**
-		 * Parse Subscribe Entries
-		 * @param {HTMLTableElement} node
-		 */
-		const parseSubscribe = (node) => {
-			let rows = node.querySelectorAll(":scope > tbody > tr:not(:first-child)");
-			let items = []
-
-			for (let row of rows) {
-				let item = {
-					expired: false,
-					isFull: false,
-					classID: undefined,
-					subject: undefined,
-					teacher: undefined,
-					credits: undefined,
-					tuition: undefined,
-					minimum: undefined,
-					maximum: undefined,
-					subscribed: undefined,
-					schedule: [],
-					action: {
-						command: undefined,
-						classID: undefined,
-					},
-					date: {
-						start: undefined,
-						end: undefined,
-						cancel: undefined
-					}
-				}
-
-				// Parse first cell
-				let firstCell = row.children[0];
-				
-				if (firstCell.innerText.includes("Hết hạn ĐK"))
-					item.expired = true;
-
-				if (firstCell.innerText.includes("Hết chỉ tiêu"))
-					item.isFull = true;
-
-				let actionBtn = firstCell.querySelector(":scope > a[href]");
-				if (actionBtn) {
-					// Test subscribe button
-					let sub = /javascript:subcrible\((\d+)\, (\d+), (\d+)\)/gm.exec(actionBtn.href);
-					if (sub) {
-						item.action.command = "subscribe";
-						item.action.classID = parseInt(sub[1]);
-					}
-
-					// Test unsubscribe button
-					let unsub = /javascript:unSubcrible\((\d+)\,(\d+)\)/gm.exec(actionBtn.href);
-					if (unsub) {
-						item.action.command = "unsubscribe";
-						item.action.classID = parseInt(sub[1]);
-					}
-				}
-
-				item.classID = row.children[1].innerText.trim();
-				
-				// Parse basic data
-				let secondCell = /^(.+) \((\d+) tc\)[\n\s]+(.+)(?:[\n\s]+Học phí: (\d+)\*1000 \(đ\)|$)/gm
-					.exec(row.children[2].innerText.trim());
-				
-				if (secondCell) {
-					item.subject = secondCell[1];
-					item.credits = parseInt(secondCell[2]);
-					item.teacher = secondCell[3];
-					
-					if (secondCell[4])
-						item.tuition = parseInt(secondCell[4]) * 1000;
-				}
-
-				item.minimum = parseInt(row.children[3].innerText.trim().replace(" sv", ""));
-				item.maximum = parseInt(row.children[4].innerText.trim().replace(" sv", ""));
-				item.subscribed = parseInt(row.children[5].innerText.trim().replace(" sv", ""));
-
-				// Parse time window
-				let timeCell = [ ...row.children[6].innerText.trim()
-					.matchAll(/(\d+):(\d+) (\d+)\/(\d+)\/(\d+)/gm) ];
-
-				for (let i = 0, cell = timeCell[i]; i < timeCell.length; i++) {
-					let time = new Date("20" + cell[5], parseInt(cell[4]) - 1, cell[3], cell[1], cell[2]);
-
-					if (i === 0)
-						item.date.start = time;
-					else if (i === 1)
-						item.date.end = time;
-					else if (i === 2)
-						item.date.cancel = time;
-				}
-
-				let scheduleCell = row.children[7].querySelectorAll(`:scope > ul > li`);
-				for (let line of scheduleCell)
-					item.schedule.push(
-						line.innerText
-							.replaceAll("\n", "")
-							.replace(/\s\s+/g, " ")
-							.trim()
-					);
-
-				items.push(item);
-			}
-
-			return items;
-		}
-
 		// If viewstate for subscribe page haven't been set, that's mean
 		// we will have to make a prefetch request first in order
 		// to update current viewstate
@@ -742,16 +748,20 @@ const api = {
 		}
 
 		let args;
+		let callID;
 		switch (action) {
 			case "getmodule":
+				callID = "__Page";
 				args = `${action}:${this.__SUBS_STUDENTID}`;
 				break;
 
 			case "subscribe":
+				callID = "ctl00$LeftCol$LoptinchiDangky1";
 				args = `subcrible:${classID}:${this.__SUBS_STUDENTID}`;
 				break;
 
 			case "unsubscribe":
+				callID = "ctl00$LeftCol$LoptinchiDangky1";
 				args = `unsubcrible:${classID}:${this.__SUBS_STUDENTID}`;
 				break;
 		
@@ -764,16 +774,29 @@ const api = {
 			path: "/DangkyLoptinchi.aspx",
 			method: "POST",
 			form: {
-				__CALLBACKID: "__Page",
-				__CALLBACKPARAM: args
+				__CALLBACKID: callID,
+				__CALLBACKPARAM: args,
+				__VIEWSTATE: this.__SUBS_VIEWSTATE,
+				__VIEWSTATEGENERATOR: this.__SUBS_VIEWSTATEGENERATOR,
+				__EVENTVALIDATION: this.__SUBS_EVENTVALIDATION,
 			}
 		});
 
-		let canSubscribe = response.dom.getElementById("dvLopChoDangky");
-		response.waiting = parseSubscribe(canSubscribe.children[1]);
+		let errorRe = /^(\d+)\|(.*)$/g.exec(response.response.trim());
 
-		let subscribed = response.dom.getElementById("dvLopVuaDangky");
-		response.subscribed = parseSubscribe(subscribed.children[1]);
+		if (errorRe && errorRe[2] === "")
+			throw { code: -1, description: `api.subscribe(${args}): got empty response, maybe subscribing has failed` }
+
+		if (errorRe && errorRe[2].includes("Lỗi:"))
+			throw { code: -1, description: `api.subscribe(${args}): ${errorRe[2]}` }
+
+		let tables = response.dom.querySelectorAll("table[border]");
+
+		if (tables && tables[0])
+			response.waiting = this.parseSubscribe(tables[0]);
+
+		if (tables && tables[1])
+			response.subscribed = this.parseSubscribe(tables[1]);
 
 		this.__handleResponse("subscribe", response);
 		return response;

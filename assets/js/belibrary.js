@@ -646,6 +646,20 @@ function parseTime(t = 0, {
 	}
 }
 
+/**
+ * Date to human readable time
+ * @param {Date} date 
+ */
+function humanReadableTime(date) {
+	let timeString = `${date.getHours()}:${pleft(date.getMinutes(), 2)}`;
+
+	if (date.getSeconds() > 0)
+		timeString += `:${pleft(date.getSeconds(), 2)}`;
+
+	let dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+	return `${timeString} ${dateString}`;
+}
+
 function formatTime(seconds, {
 	ended = "Đã kết thúc",
 	surfix = "",
@@ -1044,6 +1058,7 @@ class lazyload {
 		source,
 		classes,
 		tagName = "div",
+		spinner = "simpleSpinner",
 		doLoad = true
 	} = {}) {
 		/** @type {HTMLElement} */
@@ -1079,7 +1094,8 @@ class lazyload {
 
 		this.source = source;
 		this.spinner = document.createElement("div");
-		this.spinner.classList.add("simpleSpinner");
+		this.spinner.classList.add(spinner);
+		this.spinner.setAttribute("spinner", "true");
 		this.container.append(this.spinner);
 
 		if (doLoad)
@@ -2314,7 +2330,7 @@ function createButton(text, {
 	color = "blue",
 	element = "button",
 	type = "button",
-	style = "flat",
+	style = "default",
 	classes,
 	icon = null,
 	align = "left",
@@ -2360,7 +2376,21 @@ function createButton(text, {
 			button.insertBefore(textNode, button.firstChild);
 	}
 
-	if (complex)
+	let spinner = document.createElement("div");
+	spinner.classList.add("simpleSpinner");
+	button.appendChild(spinner);
+
+	button.loading = (loading) => {
+		if (loading) {
+			button.disabled = true;
+			button.dataset.loading = true;
+		} else {
+			button.disabled = false;
+			button.removeAttribute("data-loading");
+		}
+	}
+
+	if (complex && style !== "flat")
 		triBg(button, {
 			scale: 1.6,
 			speed: 8,

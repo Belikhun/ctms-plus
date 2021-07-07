@@ -242,7 +242,8 @@ arr::before {
 
 #content[data-screen="schedule"] > div.schedule,
 #content[data-screen="tests"] > div.tests,
-#content[data-screen="results"] > div.results {
+#content[data-screen="results"] > div.results,
+#content[data-screen="subscribe"] > div.subscribe {
 	display: flex;
 }
 
@@ -256,7 +257,7 @@ arr::before {
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 	font-size: 72px;
-	color: rgb(192, 192, 192);
+	color: rgb(175, 175, 175);
 }
 
 #content > div:empty::after,
@@ -270,7 +271,7 @@ arr::before {
 	font-weight: 600;
 	font-size: 14px;
 	text-align: center;
-	color: rgb(192, 192, 192);
+	color: rgb(145, 145, 145);
 }
 
 #content > div > .loading {
@@ -578,6 +579,215 @@ arr::before {
 	letter-spacing: .2px;
 }
 
+/** ==================== SCREEN.SUBSCRIBE ==================== */
+
+.subscribeScreen {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	width: 100%;
+	margin-bottom: 100px;
+}
+
+.subscribeScreen > .label {
+	margin: 30px 10px 10px;
+
+	font-family: Nunito;
+	font-size: 24px;
+	font-weight: 400;
+}
+
+.subscribeScreen > .content {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	min-height: 140px;
+}
+
+#content > div .subscribeScreen > .content.waiting.showEmpty:empty::before {
+	content: "\f2f6";
+}
+
+#content > div .subscribeScreen > .content.subscribed.showEmpty:empty::before {
+	content: "\f2f5";
+}
+
+#content > div .subscribeScreen > .content.showEmpty:empty::after {
+	content: "TRỐNG 😥";
+}
+
+.subscribeScreen > .content > .item {
+	display: flex;
+	flex-direction: column;
+
+	margin: 5px 10px;
+	padding: 10px 20px ;
+	border-radius: 12px;
+	background-color: white;
+}
+
+.subscribeScreen > .content > .item > .details {
+	display: flex;
+	flex-direction: row;
+}
+
+.subscribeScreen > .content > .item > .details > .left {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.subscribeScreen > .content > .item > .details > .left > .subject {
+	font-family: Nunito;
+	font-size: 22px;
+	font-weight: 800;
+}
+
+.subscribeScreen > .content > .item > .details > .left > .teacher {
+	font-family: Calibri;
+	font-size: 18px;
+	font-weight: bold;
+	line-height: 16px;
+}
+
+.subscribeScreen > .content > .item > .details > .left > .teacher::before {
+	content: "\f007";
+	margin-right: 5px;
+
+	font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.subscribeScreen > .content > .item > .details > .left > .status {
+	margin-top: 10px;
+}
+
+.subscribeScreen > .content > .item > .details > .left > .status > span {
+	margin-right: 5px;
+}
+
+.subscribeScreen > .content > .item > .details > .left > .status > .expired {
+	background-color: var(--color-yellow);
+}
+
+.subscribeScreen > .content > .item > .details > .left > .status > .full {
+	background-color: var(--color-red);
+}
+
+.subscribeScreen > .content > .item > .details > .left > .status > .notEnough {
+	background-color: var(--color-pink);
+}
+
+.subscribeScreen > .content > .item > .details > .right {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: flex-end;
+}
+
+.subscribeScreen > .content > .item > .details > .right > div {
+	display: flex;
+	flex-direction: row;
+}
+
+.subscribeScreen > .content > .item > .details > .right > .top {
+	margin-bottom: 10px;
+}
+
+.subscribeScreen > .content > .item > .details > .right > div > span {
+	margin-left: 20px;
+}
+
+.subscribeScreen > .content > .item > .details > .right > div > span > .label {
+    min-width: 50px;
+    padding-bottom: 2px;
+    border-bottom: 2px solid rgba(192, 192, 192, 0.6);
+
+	font-size: 13px;
+    font-weight: 700;
+	letter-spacing: .2px;
+    color: rgb(58, 58, 58);
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.subscribeScreen > .content > .item > .details > .right > div > span > .value {
+	margin-top: 5px;
+	font-family: Nunito;
+	font-size: 25px;
+	font-weight: 400;
+	line-height: 100%;
+}
+
+.subscribeScreen > .content > .item > .details > .right > .bottom > span > .value {
+	font-size: 20px;
+}
+
+.subscribeScreen > .content > .item > .actions {
+	display: flex;
+	flex-direction: row;
+
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.subscribeScreen > .content > .item > .actions > span {
+	display: flex;
+	flex-direction: row;
+}
+
+.subscribeScreen > .content > .item > .actions > .left {
+	flex-grow: 1;
+}
+
+.subscribeScreen > .content > .item > .actions > .left > span > .label {
+	font-weight: bold;
+}
+
+.subscribeScreen > .content > .item > .actions > .left > span > .value {
+	font-family: Nunito;
+	font-size: 25px;
+	font-weight: 400;
+}
+
+.subscribeScreen > .content > .item > .actions > .left > span > .value::after {
+	content: "đ";
+
+	margin-left: 5px;
+	font-size: 19px;
+	font-weight: bold;
+}
+
+.subscribeScreen > .content > .item > .actions > .right > button {
+	margin-left: 10px;
+}
+
+@media only screen and (max-width: 700px) {
+	.subscribeScreen > .content > .item > .details {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.subscribeScreen > .content > .item > .details > .left {
+		align-items: center;
+	}
+
+	.subscribeScreen > .content > .item > .details > .right {
+		justify-content: center;
+		margin-top: 20px;
+	}
+
+	.subscribeScreen > .content > .item > .details > .right > div > span:first-child {
+		margin-left: unset;
+	}
+}
+
 /** ==================== SCREEN.RESULTS ==================== */
 
 .resultsScreen {
@@ -598,7 +808,15 @@ arr::before {
 
 .resultsScreen > .info > .item {
 	flex-grow: 1;
-	margin: 10px;
+	margin: 10px 5px;
+}
+
+.resultsScreen > .info > .item:first-child {
+	margin-left: 10px;
+}
+
+.resultsScreen > .info > .item:last-child {
+	margin-right: 10px;
 }
 
 .resultsScreen > table {

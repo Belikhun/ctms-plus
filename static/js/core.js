@@ -189,6 +189,7 @@ const core = {
 				window.REPO_ADDRESS = response.link.repo;
 			} catch(e) {
 				this.log("WARN", "Could not fetch metadata file! Maybe it's missing?");
+				this.log("DEBG", e);
 			}
 		}
 	},
@@ -2020,7 +2021,13 @@ const core = {
 						}
 
 						this.itemList[classID].actions.right.toggle.loading(true);
-						await api.subscribe({ action: action.command, classID: action.classID });
+
+						try {
+							await api.subscribe({ action: action.command, classID: action.classID });
+						} catch(e) {
+							errorHandler(e);
+						}
+
 						this.itemList[classID].actions.right.toggle.loading(false);
 					});
 				}

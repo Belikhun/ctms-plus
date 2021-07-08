@@ -81,7 +81,7 @@ function myajax({
 
 		xhr.addEventListener("readystatechange", async function() {
 			if (this.readyState === this.DONE) {
-				if (this.status === 0) {
+				if (this.status === 0 && this.responseText === "") {
 					if (changeState === true)
 						__connection__.stateChange("offline");
 

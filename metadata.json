@@ -12,6 +12,7 @@
             "name": "DHS Middleware",
             "default": true
         },
+        
         "local": {
             "host": "http://localhost:80",
             "name": "localhost"

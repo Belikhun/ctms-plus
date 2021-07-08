@@ -20,16 +20,16 @@ CTMS+ hiện đang chạy trên các host sau:
 
 ### ☠ CTMS+ có đáng tin cậy không ?
 
-CTMS+ gửi trực tiếp request của bạn tới CTMS thông qua middleware. Middleware hoạt động như một **shipper** có nhiệm vụ gửi yêu cầu của bạn tới đích một cách hiệu quả. Middleware được sử dụng để vượt qua những giới hạn của trình duyệt, nhờ đó mà CTMS+ có thể truy xuất dữ liệu trực tiếp từ CTMS
+CTMS+ gửi trực tiếp request của bạn tới CTMS thông qua middleware. Middleware hoạt động như một **shipper** có nhiệm vụ gửi yêu cầu của bạn tới đích một cách hiệu quả. Middleware được sử dụng để vượt qua những giới hạn của trình duyệt, nhờ đó mà CTMS+ có thể truy xuất dữ liệu trực tiếp từ CTMS. Tuy nhiên Middleware không có tính năng thu thập thông tin hay dữ liệu của bạn khi được gửi, bạn có thể kiểm tra điều này bằng cách đọc mã nguồn của middleware.
 
-Mã nguồn của middleware có thể tìm thấy tại `/api/middleware.php` trong repo này.
+Mã nguồn của middleware có thể tìm thấy tại [`belivipro9x99/ctms-plus-middleware/api/middleware.php`](https://github.com/belivipro9x99/ctms-plus-middleware).
 
 ### 🧩 Cấu trúc repository
 
 Repo này chứa mã nguồn của `CTMS+` và `middleware API` được sử dụng để phục vụ cho `CTMS+`, bao gồm 3 nhánh chính:
 
  + 🌿 Branch `main`: Chứa mã nguồn của `CTMS+`. Mọi pull request sẽ được thực hiện tới branch này. Thay đổi trong branch này sẽ tự động chạy build của Github Action và merge vào branch `production`
- + 🌿 Branch `development`: Chứa mã nguồn với các tính năng đang trong thời gian hoàn thiện, các commit sẽ được thực hiện tại đây trước khi được nhập vào `main`
+ + 🌿 Branch `bug-*`, `feature-*`: Chứa mã nguồn với các tính năng đang trong thời gian hoàn thiện, các commit sẽ được thực hiện tại đây trước khi được nhập vào `main`
  + 🔮 Branch `production`: Chứa mã nguồn đã được thay đổi để phù hợp cho việc deploy site tới một host nào đó
 
 ### 😇 Đóng góp

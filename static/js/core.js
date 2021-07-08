@@ -665,7 +665,7 @@ const core = {
 					icon: "hive",
 					options: mwOptions,
 					defaultValue: mwDefault,
-					save: "server.middleware",
+					save: `server.middleware.${VERSION}`,
 					onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
 				}, general);
 			}

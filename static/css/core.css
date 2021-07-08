@@ -182,6 +182,7 @@ arr::before {
 	--color-yellow: rgb(253, 240, 141);
 	--color-red: rgb(255, 181, 201);
 	--color-pink: rgb(255, 198, 250);
+	--color-orange: rgb(255, 211, 190);
 }
 
 /*? ===================== MAIN ===================== */
@@ -667,11 +668,16 @@ arr::before {
 }
 
 .subscribeScreen > .content > .item > .details > .left > .status > span {
+	margin-top: 5px;
 	margin-right: 5px;
 }
 
 .subscribeScreen > .content > .item > .details > .left > .status > .expired {
 	background-color: var(--color-yellow);
+}
+
+.subscribeScreen > .content > .item > .details > .left > .status > .noCancel {
+	background-color: var(--color-orange);
 }
 
 .subscribeScreen > .content > .item > .details > .left > .status > .full {

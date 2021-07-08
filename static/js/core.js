@@ -1886,6 +1886,7 @@ const core = {
 								teacher: { tag: "t", class: "teacher", text: teacher },
 								status: { tag: "div", class: "status", child: {
 									expired: { tag: "span", class: ["generalTag", "expired"], text: "Hết Hạn ĐK" },
+									noCancel: { tag: "span", class: ["generalTag", "noCancel"], text: "Hết Hạn Hủy" },
 									full: { tag: "span", class: ["generalTag", "full"], text: "Hết Chỉ Tiêu" },
 									notEnough: { tag: "span", class: ["generalTag", "notEnough"], text: "Chưa Đạt Chỉ Tiêu" }
 								}}
@@ -2051,6 +2052,11 @@ const core = {
 				item.details.left.status.expired.style.display = expired ? null : "none";
 				item.details.left.status.full.style.display = isFull ? null : "none";
 				item.details.left.status.notEnough.style.display = (subscribed < minimum) ? null : "none";
+
+				if (date.cancel && time() > (date.cancel.getTime() / 1000))
+					item.details.left.status.noCancel.style.display = null;
+				else
+					item.details.left.status.noCancel.style.display = "none";
 
 				switch (type) {
 					case "waiting":

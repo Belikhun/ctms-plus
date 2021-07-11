@@ -1535,8 +1535,8 @@ const core = {
 				});
 
 				let nth = 0;
-				for (let row of rows)
-					item.table.tbody.appendChild(makeTree("tr", "row", {
+				for (let row of rows) {
+					let tableRow = makeTree("tr", "row", {
 						stt: { tag: "td", class: ["right", "bold"], text: ++nth },
 
 						status: { tag: "td", class: "status", child: {
@@ -1549,9 +1549,53 @@ const core = {
 						teacher: { tag: "td", text: row.teacher },
 						classID: { tag: "td", class: ["bold", "right"], text: row.classID },
 						listID: { tag: "td", class: ["bold", "right"], text: row.listID }
-					}));
+					});
+
+					if (typeof row.noteID === "number") {
+						let note = document.createElement("icon");
+						note.classList.add("openNote");
+						note.dataset.icon = "note";
+						note.dataset.id = row.noteID;
+						note.title = `Xem Ghi Chú ${row.noteID}`;
+						note.addEventListener("click", () => this.viewNote(row.noteID));
+
+						tableRow.subject.appendChild(note);
+					}
+
+					item.table.tbody.appendChild(tableRow);
+				}
 
 				this.view.list.appendChild(item);
+			},
+
+			async viewNote(id) {
+				this.screen.loading = true;
+				let response;
+
+				try {
+					response = await api.getNote(id);
+				} catch(e) {
+					errorHandler(e);
+					this.screen.loading = false;
+					return;
+				}
+
+				this.screen.loading = false;
+				let noteContent = document.createElement("div");
+				noteContent.classList.add("scheduleNoteContent");
+				noteContent.innerHTML = response.data.content;
+
+				await popup.show({
+					windowTitle: `Note ${id}`,
+					title: "Ghi Chú",
+					icon: "note",
+					message: "",
+					description: "",
+					customNode: noteContent,
+					buttonList: {
+						close: { text: "Đóng" }
+					}
+				});
 			}
 		},
 

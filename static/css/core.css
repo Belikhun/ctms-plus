@@ -185,6 +185,12 @@ arr::before {
 	--color-orange: rgb(255, 211, 190);
 }
 
+/** ===================== COMPONENT:scheduleNoteContent ===================== */
+
+.scheduleNoteContent > .w3-right {
+	float: right;
+}
+
 /*? ===================== MAIN ===================== */
 
 #container {
@@ -494,6 +500,11 @@ arr::before {
 	font-size: 15px;
 	font-weight: 700;
 	letter-spacing: .2px;
+}
+
+.scheduleScreen > .list > .item > .generalTable > tbody > tr > td[key="subject"] > .openNote {
+	margin-left: 5px;
+	cursor: pointer;
 }
 
 .scheduleScreen > .list > .item > .generalTable > thead > tr > th[key="classroom"],

@@ -27,7 +27,6 @@ const api = {
 	MIDDLEWARE: `http://localhost`,
 
 	__PATH: undefined,
-	__FORM: {},
 
 	/**
 	 * Store Current Viewstate
@@ -81,7 +80,6 @@ const api = {
 		ignoreAnnouncement = false
 	} = {}) {
 		if (method === "POST") {
-			this.__FORM = form || {}
 			form.__EVENTTARGET = target;
 			form.__EVENTARGUMENT = argument;
 
@@ -438,6 +436,7 @@ const api = {
 	__SCHEDULE_VIEWSTATE: undefined,
 	__SCHEDULE_VIEWSTATEGENERATOR: undefined,
 	__SCHEDULE_EVENTVALIDATION: undefined,
+	__SCHEDULE_DATE: undefined,
 
 	/**
 	 * Lấy lịch học với ngày đầu tuần (hoặc ngày trong tuần) cho trước
@@ -447,7 +446,9 @@ const api = {
 	async schedule(date) {
 		let response
 		
-		if (typeof date !== "undefined")
+		if (typeof date !== "undefined") {
+			this.__SCHEDULE_DATE = `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`;
+
 			response = await this.request({
 				path: "/Lichhoc.aspx",
 				method: "POST",
@@ -455,20 +456,17 @@ const api = {
 					__VIEWSTATE: this.__SCHEDULE_VIEWSTATE,
 					__VIEWSTATEGENERATOR: this.__SCHEDULE_VIEWSTATEGENERATOR,
 					__EVENTVALIDATION: this.__SCHEDULE_EVENTVALIDATION,
-					ctl00$LeftCol$Lichhoc1$txtNgaydautuan: `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`,
+					ctl00$LeftCol$Lichhoc1$txtNgaydautuan: this.__SCHEDULE_DATE,
 					ctl00$LeftCol$Lichhoc1$btnXemlich: "Xem lịch"
 				}
 			});
-		else {
+		} else {
 			response = await this.request({
 				path: "/Lichhoc.aspx",
 				method: "GET"
 			});
 
-			this.__FORM = {
-				ctl00$LeftCol$Lichhoc1$txtNgaydautuan: response.dom.getElementById("LeftCol_Lichhoc1_txtNgaydautuan").value,
-				ctl00$LeftCol$Lichhoc1$btnXemlich: "Xem lịch"
-			}
+			this.__SCHEDULE_DATE = response.dom.getElementById("LeftCol_Lichhoc1_txtNgaydautuan").value;
 		}
 
 		// Update current schedule viewstate
@@ -494,6 +492,13 @@ const api = {
 			for (let row of [ ...rows ]) {
 				let classCol = row.children[5].innerHTML.trim().split("<br>");
 
+				let noteID = null;
+				let note = row.children[6].querySelector(":scope > span > a[href]");
+				if (note && note.children[0] && note.children[0].title === "Đã có ghi chú") {
+					let noteRe = /javascript:getNote\((\d+)\);/gm.exec(note.href);
+					noteID = parseInt(noteRe[1]);
+				}
+
 				item.rows.push({
 					time: row.children[1].innerText.trim(),
 					classroom: row.children[2].innerText.trim(),
@@ -501,7 +506,8 @@ const api = {
 					teacher: row.children[4].innerText.trim(),
 					classID: classCol[0],
 					listID: classCol[1],
-					status: row.children[6].innerText.trim()
+					status: row.children[6].innerText.trim(),
+					noteID
 				});
 			}
 
@@ -510,6 +516,39 @@ const api = {
 
 		this.__handleResponse("schedule", response);
 		return response;
+	},
+
+	/**
+	 * Lấy ghi chú với id cho trước
+	 * 
+	 * @param	{Number} id	Note ID
+	 */
+	async getNote(id) {
+		if (!this.__SCHEDULE_DATE || !this.__SCHEDULE_EVENTVALIDATION)
+			throw { code: -1, description: `api.getNote(): a prefetch request to api.schedule() is required to use this api` }
+
+		let response = await this.request({
+			path: "/Lichhoc.aspx",
+			method: "POST",
+			form: {
+				__VIEWSTATE: this.__SCHEDULE_VIEWSTATE,
+				__VIEWSTATEGENERATOR: this.__SCHEDULE_VIEWSTATEGENERATOR,
+				__EVENTVALIDATION: this.__SCHEDULE_EVENTVALIDATION,
+				__CALLBACKID: "ctl00$LeftCol$Lichhoc1",
+				__CALLBACKPARAM: `get-note$${id}`,
+				ctl00$LeftCol$Lichhoc1$txtNgaydautuan: "2021-07-12"
+			}
+		});
+
+		// Remove strage string at the begining
+		let hashLength = parseInt(response.response.split("|")[0]);
+		let cleanRes = response.response
+			.replace(`${hashLength}|`, "")
+			.substring(hashLength);
+
+		response.data = { content: cleanRes }
+		this.__handleResponse("getNote", response);
+		return response;	
 	},
 
 	// For current tests viewstate, we can use them if

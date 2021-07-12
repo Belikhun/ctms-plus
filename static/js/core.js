@@ -581,8 +581,8 @@ const core = {
 							this.container = makeTree("div", "infoCard", {
 								label: { tag: "t", class: "label", text: name },
 								buttons: { tag: "div", class: "buttons", child: {
-									serviceInfo: createButton(undefined, { color: "blue", icon: "infoCircle", complex: true }),
-									buyService: createButton(price.toUpperCase(), { color: "pink", icon: "shoppingCart", complex: true, disabled: true })
+									serviceInfo: createButton(undefined, { color: "blue", icon: "infoCircle" }),
+									buyService: createButton(price.toUpperCase(), { color: "pink", icon: "shoppingCart", disabled: true })
 								}}
 							});
 

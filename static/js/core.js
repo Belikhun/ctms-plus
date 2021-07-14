@@ -164,6 +164,19 @@ const core = {
 		delete modulesList;
 	},
 
+	serviceWorker: {
+		init() {
+			if (!"serviceWorker" in navigator)
+				return false;
+
+			navigator.serviceWorker.register("/service-worker.js", {
+				scope: "/"
+			})
+				.then((res) => this.log("OKAY", "Service Worker registered", res))
+				.catch((e) => this.log("ERRR", e));
+		}
+	},
+
 	popup: {
 		priority: 0,
 		init: () => popup.init()

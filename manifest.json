@@ -1,0 +1,48 @@
+{
+	"short_name": "CTMS+",
+	"name": "CTMS Plus",
+	"description": "Xem Lịch Học, Kết Quả Học Tập và Đăng Kí Lớp Tín Chỉ với một trải nghiệm người dùng hoàn toàn mới!",
+	"icons": [
+		{
+			"src": "/assets/img/icon@16x16.png",
+			"type": "image/png",
+			"sizes": "16x16"
+		},
+		{
+			"src": "/assets/img/icon@32x32.png",
+			"type": "image/png",
+			"sizes": "32x32"
+		},
+		{
+			"src": "/assets/img/icon@64x64.png",
+			"type": "image/png",
+			"sizes": "64x64"
+		},
+		{
+			"src": "/assets/img/icon@128x128.png",
+			"type": "image/png",
+			"sizes": "128x128"
+		},
+		{
+			"src": "/assets/img/icon.png",
+			"type": "image/png",
+			"sizes": "734x734"
+		}
+	],
+	"start_url": "/index.html",
+	"background_color": "#44A7E9",
+	"theme_color": "#44A7E9",
+	"display": "standalone",
+	"scope": "/",
+	"shortcuts": [{
+		"name": "CTMS Plus",
+		"short_name": "CTMS+",
+		"description": "Open CTMS Plus",
+		"url": "/index.html",
+		"icons": [{
+			"src": "/assets/img/icon@128x128.png",
+			"type": "image/png",
+			"sizes": "128x128"
+		}]
+	}]
+}

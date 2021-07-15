@@ -173,6 +173,10 @@ const api = {
 			this.__LOGOUT_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
 		}
 
+		// Check for forced change password
+		if (dom.content.getElementById("LeftCol_UsersChangePassword1_lblUser"))
+			throw { code: -1, description: `api.request(): CTMS yêu cầu bạn thay đổi mật khẩu, vui lòng thực hiện hành động này trên trang chủ của CTMS` }
+
 		// Check for announcement
 		if (!ignoreAnnouncement) {
 			let ann = dom.content.getElementById("thongbao");

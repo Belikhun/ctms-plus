@@ -855,6 +855,10 @@ icon[data-icon="note"]::after {
 	content: "\f249";
 }
 
+icon[data-icon="print"]::after {
+	content: "\f02f";
+}
+
 /** ======================== NOTE ======================== **/
 
 .note {

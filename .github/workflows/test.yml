@@ -33,7 +33,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install colorama
-          pip install selenium
+          pip install selenium==4.0.0.b4
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: 🧭 Setting Up Chrome Driver ${{ matrix.chromedriver-version }}

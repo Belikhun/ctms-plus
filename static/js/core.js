@@ -1011,6 +1011,11 @@ const core = {
 					required: true
 				}),
 
+				autoLogin: createCheckbox({
+					label: "tự động đăng nhập",
+					value: false
+				}),
+
 				submitBtn: createButton("ĐĂNG NHẬP", {
 					color: "blue",
 					type: "submit",
@@ -1033,8 +1038,17 @@ const core = {
 			this.loginView.addEventListener("submit", () => {});
 			this.loginView.action = "javascript:void(0);";
 			this.loginView.dataset.active = "main";
-			this.loginView.addEventListener("submit", () => this.login());
 			this.loginView.note.group.style.display = "none";
+			this.loginView.addEventListener("submit", () => {
+				this.login({
+					username: this.loginView.username.input.value,
+					password: this.loginView.password.input.value
+				});
+			});
+
+			let autoLogin = localStorage.getItem("autoLogin.enabled");
+			if (autoLogin === "true")
+				this.loginView.autoLogin.input.checked = true;
 
 			this.detailView = makeTree("div", "userDetailView", {
 				label: { tag: "t", class: "label", text: "Đã Đăng Nhập" },
@@ -1097,8 +1111,23 @@ const core = {
 				this.detailView.userCard.top.info.email.innerText = response.info.email;
 			});
 
-			set({ p: 50, d: `Fetching Account Data` });
+			set({ p: 50, d: `Đang Kiểm Tra Phiên Làm Việc` });
 			await api.request();
+
+			if (!this.loggedIn) {
+				// This code will be executed if app started with
+				// no session / session expired
+				// Handle autologin here
+				let username = localStorage.getItem("autoLogin.username");
+				let password = localStorage.getItem("autoLogin.password");
+				let enabled = localStorage.getItem("autoLogin.enabled");
+	
+				if (enabled === "true" && username && password) {
+					this.log("DEBG", `Auto login enabled. Logging in to ${username}`);
+					set({ p: 50, d: `Đang Tự Động Đăng Nhập Vào CTMS` });
+					await this.login({ username, password });
+				}
+			}
 		},
 
 		onLogin(f) {
@@ -1169,14 +1198,28 @@ const core = {
 			this.detailView.tForm.content.innerText = response.info.tForm;
 		},
 
-		async login() {
+		async login({
+			username,
+			password
+		} = {}) {
+			if (!username || !password)
+				throw { code: -1, description: `Cannot login with an empty username or password` }
+
 			this.subWindow.loading = true;
 
+			let autoLogin = this.loginView.autoLogin.input.checked;
+			localStorage.setItem("autoLogin.enabled", autoLogin);
+
+			if (autoLogin) {
+				localStorage.setItem("autoLogin.username", username);
+				localStorage.setItem("autoLogin.password", password);
+			} else {
+				localStorage.removeItem("autoLogin.username");
+				localStorage.removeItem("autoLogin.password");
+			}
+
 			try {
-				await api.login({
-					username: this.loginView.username.input.value,
-					password: this.loginView.password.input.value
-				});
+				await api.login({ username, password });
 			} catch(e) {
 				let error = parseException(e);
 				this.loginView.note.group.style.display = null;
@@ -1184,6 +1227,9 @@ const core = {
 					level: "error",
 					message: `<pre class="break">${error.code} >>> ${error.description}</pre>`
 				});
+
+				if (autoLogin)
+					errorHandler(e);
 
 				this.subWindow.loading = false;
 			}

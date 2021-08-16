@@ -23,18 +23,6 @@ body.dark #content > div > .loading {
 	background-color: rgba(24, 24, 24, 0.8);
 }
 
-body.dark .generalTable > tbody > tr > td {
-	color: rgb(225, 225, 225);
-}
-
-body.dark .generalTable > tbody > tr:nth-child(2n + 1) > td {
-	background-color: rgba(38, 38, 38, 0.8);
-}
-
-body.dark .generalTable > tbody > tr:hover > td {
-	background-color: rgb(46, 46, 46);
-}
-
 body.dark .userDetailView > .userCard > .top > .info > .name {
 	color: white;
 }

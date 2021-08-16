@@ -26,7 +26,7 @@ const tooltip = {
 
 	init() {
 		this.container = document.createElement("div");
-		this.container.classList.add("tooltip", "hide");
+		this.container.classList.add("tooltip");
 		this.content = document.createElement("div");
 		this.content.classList.add("content");
 		this.content.setAttribute("style", "");

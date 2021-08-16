@@ -10,6 +10,7 @@ const tooltip = {
 	container: HTMLDivElement.prototype,
 	content: HTMLDivElement.prototype,
 	render: false,
+	throttle: true,
 	prevData: null,
 	nodeToShow: null,
 	hideTimeout: null,
@@ -23,36 +24,9 @@ const tooltip = {
 	__sizeOberving: false,
 	__backtrace: 1,
 
-	processor: {
-		/**
-		 * Build-in element's dataset value processor
-		 * 
-		 * @param	{HTMLElement}	target		Target element
-		 * @param	{String}		key			Key to get value from
-		 * @returns	{String|null}				Return value
-		 */
-		dataset: (target, key) => {
-			if (typeof target.dataset[key] === "string")
-				return target.dataset[key];
-
-			return null;
-		},
-
-		/**
-		 * Build-in element's attribute value processor
-		 * 
-		 * @param	{HTMLElement}	target		Target element
-		 * @param	{String}		key			Key to get value from
-		 * @returns	{String|null}				Return value
-		 */
-		attribute: (target, key) => {
-			return target.getAttribute(key);
-		}
-	},
-
 	init() {
 		this.container = document.createElement("div");
-		this.container.classList.add("tooltip", "hide");
+		this.container.classList.add("tooltip");
 		this.content = document.createElement("div");
 		this.content.classList.add("content");
 		this.content.setAttribute("style", "");
@@ -61,14 +35,23 @@ const tooltip = {
 		document.body.insertBefore(this.container, document.body.childNodes[0]);
 
 		//* EVENTS
-		new MutationObserver((mutationList) => {
-			for (let mutation of mutationList)
-				for (let child of mutation.addedNodes)
-					this.attachEvent(child);
-		}).observe(document, {
-			childList: true,
-			subtree: true
-		});
+		window.addEventListener("mousemove", e => {
+			//? THROTTLE MOUSE EVENT
+			if (!this.throttle) {
+				this.mouseMove(e);
+				return;
+			}
+
+			if (!this.__wait && !this.__handlingMouseEvent) {
+				this.__handlingMouseEvent = true;
+
+				this.mouseMove(e);
+				this.__wait = true;
+
+				setTimeout(() => this.__wait = false, 50);
+				this.__handlingMouseEvent = false;
+			}
+		}, { passive: true });
 
 		if (typeof ResizeObserver === "function") {
 			new ResizeObserver(() => {
@@ -82,12 +65,14 @@ const tooltip = {
 		//* BUILT IN HOOKS
 		this.addHook({
 			on: "dataset",
-			key: "tip"
+			key: "tip",
+			backtrace: 3
 		});
 
 		this.addHook({
 			on: "attribute",
-			key: "tooltip"
+			key: "tooltip",
+			backtrace: 3
 		});
 
 		this.addHook({
@@ -98,7 +83,8 @@ const tooltip = {
 				target.removeAttribute("title");
 
 				return value;
-			}
+			},
+			backtrace: 3
 		});
 
 		this.initialized = true;
@@ -109,6 +95,7 @@ const tooltip = {
 		key = null,
 		handler = ({ target, value }) => value,
 		priority = 1,
+		backtrace = 1,
 		noPadding = false
 	} = {}) {
 		if (typeof on !== "string" || !["dataset", "attribute"].includes(on))
@@ -126,48 +113,25 @@ const tooltip = {
 		if (typeof noPadding !== "boolean")
 			throw { code: -1, description: `tooltip.addHook(): \"noPadding\" is not a valid boolean` }
 
-		this.hooks.push({ on, key, handler, priority, noPadding });
+		this.hooks.push({ on, key, handler, priority, backtrace, noPadding });
 		this.hooks.sort((a, b) => (a.priority < b.priority) ? 1 : (a.priority > b.priority) ? -1 : 0);
 	},
 
-	/**
-	 * Try to get value from target with specified hook
-	 * 
-	 * @param	{HTMLElement}	target
-	 * @param	{Object}		hook
-	 * @returns	{String|null}
-	 */
-	getValue(target, hook) {
-		if (!target.style || !target.dataset)
-			throw { code: -1, description: `tooltip.getValue(): not a valid Element` }
+	__checkSameNode(node1, node2, depth = this.__backtrace) {
+		let check = 1;
 
-		if (typeof this.processor[hook.on] !== "function")
-			return null;
+		while (node1) {
+			if (check > depth)
+				return false;
 
-		return this.processor[hook.on](target);
-	},
+			if (node1.isSameNode(node2))
+				return true;
 
-	/**
-	 * Attach tooltip mouse event to Element (if possible)
-	 * @param {HTMLElement} target 
-	 */
-	attachEvent(target) {
-		// Check for hook that match current target
-		for (let hook of this.hooks) {
-			if (!this.getValue(target, hook))
-				continue;
-
-			target.addEventListener("mouseenter", () => {
-				let value = this.getValue(target, hook);
-				let showValue = item.handler({ target, value });
-
-				if (showValue) {
-					this.show(showValue, target, item.noPadding);
-				}
-			});
-
-			break;
+			check++;
+			node1 = node1.parentElement || null;
 		}
+
+		return false;
 	},
 
 	mouseMove(event) {

@@ -706,7 +706,7 @@ const api = {
 				let unsub = /javascript:unSubcrible\((\d+)\,(\d+)\)/gm.exec(actionBtn.href);
 				if (unsub) {
 					item.action.command = "unsubscribe";
-					item.action.classID = parseInt(sub[1]);
+					item.action.classID = parseInt(unsub[1]);
 				}
 			}
 

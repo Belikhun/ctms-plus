@@ -121,6 +121,17 @@ const api = {
 			if (error.data) {
 				error.c2m = start.tick() - error.data.runtime;
 				this.__handleResponse("error", error);
+
+				// Check maintain mode
+				if (error.data.status === 503 && error.data.data && error.data.data.response) {
+					let dom = document.createElement("template");
+					dom.innerHTML = error.data.data.response;
+
+					throw { code: -1, description: `api.request(): CTMS đang bảo trì!`, data: {
+						code: -1,
+						description: dom.content.querySelector("h1").innerText
+					}}
+				}
 	
 				throw error;
 			} else {

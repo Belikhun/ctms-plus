@@ -1124,7 +1124,7 @@ const core = {
 	
 				if (enabled === "true" && username && password) {
 					this.log("DEBG", `Auto login enabled. Logging in to ${username}`);
-					set({ p: 50, d: `Đang Tự Động Đăng Nhập Vào CTMS` });
+					set({ p: 80, d: `Đang Tự Động Đăng Nhập Vào CTMS` });
 					await this.login({ username, password });
 				}
 			}

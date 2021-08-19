@@ -2419,6 +2419,7 @@ function createButton(text, {
 	icon = null,
 	align = "left",
 	complex = false,
+	triangleCount = 16,
 	disabled = false
 } = {}) {
 	let button = document.createElement(element);
@@ -2479,7 +2480,7 @@ function createButton(text, {
 			scale: 1.6,
 			speed: 8,
 			color: color,
-			triangleCount: 16
+			triangleCount
 		});
 
 	if (typeof sounds === "object")

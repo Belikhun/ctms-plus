@@ -836,13 +836,20 @@ const api = {
 			}
 		});
 
-		let errorRe = /^(\d+)\|(.*)$/g.exec(response.response.trim());
+		// response: "eThere was an error in the callback.0|"
+		let errorRe1 = /^e(.+)(\d+)\|$/gm.exec(response.response.trim());
 
-		if (errorRe && errorRe[2] === "")
+		if (errorRe1)
+			throw { code: parseInt(errorRe1[2]), description: `api.subscribe(${args}): ${errorRe1[1]}` }
+
+		// Second pass of checking error response
+		let errorRe2 = /^(\d+)\|(.*)$/g.exec(response.response.trim());
+
+		if (errorRe2 && errorRe2[2] === "")
 			throw { code: -1, description: `api.subscribe(${args}): got empty response, maybe subscribing has failed` }
 
-		if (errorRe && errorRe[2].includes("Lỗi:"))
-			throw { code: -1, description: `api.subscribe(${args}): ${errorRe[2]}` }
+		if (errorRe2 && errorRe2[2].includes("Lỗi:"))
+			throw { code: -1, description: `api.subscribe(${args}): ${errorRe2[2]}` }
 
 		let tables = response.dom.querySelectorAll("table[border]");
 

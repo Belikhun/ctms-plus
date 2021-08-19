@@ -1884,14 +1884,20 @@ const core = {
 						this.screen.overlay({ show: false });
 
 					this.loaded = true;
-					emptyNode(this.view.waiting);
-					emptyNode(this.view.subscribed);
 
-					for (let item of response.waiting)
-						this.processListItem({ type: "waiting", ...item });
+					if (typeof response.waiting === "object" && response.waiting) {
+						emptyNode(this.view.waiting);
 
-					for (let item of response.subscribed)
-						this.processListItem({ type: "subscribed", ...item });
+						for (let item of response.waiting)
+							this.processListItem({ type: "waiting", ...item });
+					}
+
+					if (typeof response.subscribed === "object" && response.subscribed) {
+						emptyNode(this.view.subscribed);
+
+						for (let item of response.subscribed)
+							this.processListItem({ type: "subscribed", ...item });
+					}
 
 					this.screen.loading = false;
 				});

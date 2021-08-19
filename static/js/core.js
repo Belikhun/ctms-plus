@@ -2055,14 +2055,12 @@ const core = {
 							right: { tag: "span", class: "right", child: {
 								toggle: createButton("TOGGLE BUTTON", {
 									style: "round",
-									icon: "circle",
-									complex: true
+									icon: "circle"
 								}),
 
 								schedule: createButton("Lịch Học", {
 									style: "round",
-									icon: "table",
-									complex: true
+									icon: "table"
 								}),
 							}}
 						}}

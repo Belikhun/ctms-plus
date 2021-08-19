@@ -2140,6 +2140,12 @@ const core = {
 						}
 
 						this.itemList[classID].actions.right.toggle.loading(false);
+
+						try {
+							await api.subscribe({ action: "subscribed" });
+						} catch(e) {
+							errorHandler(e);
+						}
 					});
 				}
 

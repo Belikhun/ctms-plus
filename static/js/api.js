@@ -818,6 +818,11 @@ const api = {
 				callID = "ctl00$LeftCol$LoptinchiDangky1";
 				args = `unsubcrible:${classID}:${this.__SUBS_STUDENTID}`;
 				break;
+
+			case "subscribed":
+				callID = "ctl00$LeftCol$LoptinchiDangky1";
+				args = `list:${this.__SUBS_STUDENTID}`;
+				break;
 		
 			default:
 				throw { code: -1, description: `api.subscribe(): undefined command: ${command}` }

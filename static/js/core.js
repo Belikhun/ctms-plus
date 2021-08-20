@@ -733,6 +733,36 @@ const core = {
 			}
 		},
 
+		schedule: {
+			group: smenu.Group.prototype,
+
+			init() {
+				this.group = new smenu.Group({ label: "lịch học", icon: "calendarWeek" });
+
+				let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
+
+				new smenu.components.Checkbox({
+					label: "Tự động thay đổi kiểu hiển thị",
+					color: "pink",
+					save: "schedule.autoChangeRenderer",
+					defaultValue: true,
+					onChange: (v) => core.screen.schedule.setAutoChangeRenderer(v)
+				}, ux);
+
+				new smenu.components.Choice({
+					label: "Kiểu hiển thị mặc định",
+					color: "blue",
+					choice: {
+						table: { title: "Bảng", icon: "table" },
+						list: { title: "Danh Sách", icon: "list" }
+					},
+					save: "schedule.renderMode",
+					defaultValue: "table",
+					onChange: (v) => core.screen.schedule.setDefaultRenderMode(v)
+				}, ux);
+			}
+		},
+
 		sounds: {
 			group: smenu.Group.prototype,
 
@@ -1436,6 +1466,12 @@ const core = {
 
 			view: null,
 			loaded: false,
+			autoChangeRenderer: true,
+			defaultRenderMode: "table",
+			listRenderTrigger: 700,
+
+			currentRenderer: "table",
+			currentData: [],
 
 			async init() {
 				this.view = makeTree("div", "scheduleScreen", {
@@ -1481,13 +1517,19 @@ const core = {
 				core.account.onLogout(() => this.onLogout());
 				api.onResponse("schedule", (response) => {
 					this.loaded = true;
-					emptyNode(this.view.list);
 
 					if (response.date)
 						this.setInputNow(response.date);
 
-					for (let item of response.info)
-						this.renderList(item);
+					this.render(response.info);
+				});
+
+				// Event listener to update current render mode
+				window.addEventListener("resize", () => {
+					if (!this.autoChangeRenderer)
+						return;
+
+					this.render();
 				});
 
 				this.setInputNow();
@@ -1563,6 +1605,58 @@ const core = {
 
 			getInputDate() {
 				return new Date(this.view.control.dateInput.input.value);
+			},
+
+			setAutoChangeRenderer(enabled) {
+				this.autoChangeRenderer = enabled;
+
+				if (this.initialized)
+					this.render();
+			},
+
+			setDefaultRenderMode(mode) {
+				this.defaultRenderMode = mode;
+
+				if (this.initialized && !this.autoChangeRenderer)
+					this.render();
+			},
+
+			/**
+			 * Render schedule handler
+			 * @param 	{Array}		data
+			 */
+			render(data) {
+				let renderer = this.defaultRenderMode;
+				let newData = false;
+
+				if (typeof data === "object" && typeof data.length === "number") {
+					newData = true;
+					this.currentData = data;
+				} else
+					data = this.currentData;
+
+				if (this.autoChangeRenderer) {
+					if (window.innerWidth <= this.listRenderTrigger)
+						renderer = "list";
+					else
+						renderer = "table";
+				}
+
+				// Only re-render when render mode changed or we have
+				// updated data to render
+				if (this.currentRenderer !== renderer || newData) {
+					this.log("DEBG", `render(${renderer}): re-rendering`);
+					emptyNode(this.view.list);
+
+					for (let item of data) {
+						if (renderer === "table")
+							this.renderTable(item);
+						else
+							this.renderList(item);
+					}
+
+					this.currentRenderer = renderer;
+				}
 			},
 
 			renderTable({ time, rows = [] } = {}) {

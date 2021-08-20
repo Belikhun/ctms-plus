@@ -55,6 +55,29 @@ body.dark .component.ctmsStatus > .item.network > .nodes > .node > .status > .fa
 	color: rgb(255, 152, 183);
 }
 
+/** ==================== SCREEN.SCHEDULE ==================== */
+
+body.dark .scheduleScreen > .list > .listItem > .items::before {
+	background-color: rgb(46, 46, 46);
+}
+
+body.dark .scheduleScreen > .list > .listItem > .items > .item {
+	background-color: #242424;
+}
+
+body.dark .scheduleScreen > .list > .listItem > .items > .item::before {
+	background-color: #5a5a5a;
+}
+
+body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > t,
+body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > span::before {
+	color: rgb(214, 214, 214);
+}
+
+body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > t:empty::before {
+	color: rgb(85, 85, 85);
+}
+
 /** ===================== projectInfo ===================== */
 
 body.dark .projectInfo > .header {

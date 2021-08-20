@@ -1487,7 +1487,7 @@ const core = {
 						this.setInputNow(response.date);
 
 					for (let item of response.info)
-						this.addListItem(item);
+						this.renderList(item);
 				});
 
 				this.setInputNow();
@@ -1565,8 +1565,8 @@ const core = {
 				return new Date(this.view.control.dateInput.input.value);
 			},
 
-			addListItem({ time, rows = [] } = {}) {
-				let item = makeTree("div", "item", {
+			renderTable({ time, rows = [] } = {}) {
+				let item = makeTree("div", "tableItem", {
 					label: { tag: "t", class: "label", text: time },
 					table: { tag: "table", class: "generalTable", child: {
 						thead: { tag: "thead", child: {
@@ -1618,6 +1618,50 @@ const core = {
 				}
 
 				this.view.list.appendChild(item);
+			},
+
+			renderList({ time, rows = [] } = {}) {
+				let group = makeTree("div", "listItem", {
+					label: { tag: "t", class: "label", text: time },
+					items: { tag: "div", class: "items" }
+				});
+
+				for (let row of rows) {
+					let item = makeTree("div", "item", {
+						top: { tag: "div", class: "top", child: {
+							tag: { tag: "span", class: ["generalTag", "status"], data: { status: row.status }, text: row.status },
+							classroom: { tag: "t", class: "classroom", text: row.classroom },
+							time: { tag: "t", class: "time", html: row.time.replace("->", "<arr></arr>") },
+						}},
+
+						subject: { tag: "span", class: "subject", child: {
+							inner: { tag: "t", class: "inner", text: row.subject }
+						}},
+
+						teacher: { tag: "t", class: "teacher", text: row.teacher },
+
+						bottom: { tag: "div", class: "bottom", child: {
+							classID: { tag: "t", class: "classID", text: row.classID },
+							separator: { tag: "span" },
+							listID: { tag: "t", class: "listID", text: row.listID }
+						}}
+					});
+
+					if (typeof row.noteID === "number") {
+						let note = document.createElement("icon");
+						note.classList.add("openNote");
+						note.dataset.icon = "note";
+						note.dataset.id = row.noteID;
+						note.title = `Xem Ghi Chú ${row.noteID}`;
+						note.addEventListener("click", () => this.viewNote(row.noteID));
+
+						item.subject.appendChild(note);
+					}
+
+					group.items.appendChild(item);
+				}
+
+				this.view.list.appendChild(group);
 			},
 
 			async viewNote(id) {

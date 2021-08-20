@@ -1440,10 +1440,10 @@ const core = {
 			async init() {
 				this.view = makeTree("div", "scheduleScreen", {
 					control: { tag: "div", class: "control", child: {
-						weekInput: createInput({
-							type: "week",
-							id: "schedule.week",
-							label: "Tuần"
+						dateInput: createInput({
+							type: "date",
+							id: "schedule.date",
+							label: "Ngày Bắt Đầu"
 						}),
 
 						confirm: createButton("XEM LỊCH", {
@@ -1482,6 +1482,9 @@ const core = {
 				api.onResponse("schedule", (response) => {
 					this.loaded = true;
 					emptyNode(this.view.list);
+
+					if (response.date)
+						this.setInputNow(response.date);
 
 					for (let item of response.info)
 						this.addListItem(item);
@@ -1555,21 +1558,11 @@ const core = {
 			},
 
 			setInputNow(date = new Date()) {
-				this.view.control.weekInput.input.value = `${date.getUTCFullYear()}-W${date.getWeek()}`;
+				setDateTimeValue(this.view.control.dateInput.input, null, time(date));
 			},
 
 			getInputDate() {
-				let v = this.view.control.weekInput.input.value.split("-W");
-				let simple = new Date(parseInt(v[0]), 0, 1 + (parseInt(v[1]) - 1) * 7);
-				let dow = simple.getDay();
-				let ISOweekStart = simple;
-
-				if (dow <= 4)
-					ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-				else
-					ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-
-				return ISOweekStart;
+				return new Date(this.view.control.dateInput.input.value);
 			},
 
 			addListItem({ time, rows = [] } = {}) {

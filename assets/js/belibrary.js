@@ -837,10 +837,20 @@ function liveTime(element, start = time(new Date()), {
 	}, interval);
 }
 
+/**
+ * Set date and time input to a specified time
+ * @param	{HTMLInputElement}		dateNode	Date Input
+ * @param	{HTMLInputElement}		timeNode	Time Input
+ * @param	{Number}				value		UNIX Time
+ */
 function setDateTimeValue(dateNode, timeNode, value = time()) {
 	let date = new Date(value * 1000);
-	dateNode.value = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(i => pleft(i, 2)).join("-");
-	timeNode.value = [date.getHours(), date.getMinutes(), date.getSeconds()].map(i => pleft(i, 2)).join(":");
+
+	if (typeof dateNode === "object" && dateNode)
+		dateNode.value = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(i => pleft(i, 2)).join("-");
+
+	if (typeof timeNode === "object" && timeNode)
+		timeNode.value = [date.getHours(), date.getMinutes(), date.getSeconds()].map(i => pleft(i, 2)).join(":");
 }
 
 function getDateTimeValue(dateNode, timeNode) {
@@ -2022,6 +2032,8 @@ function createInput({
 
 	return {
 		group: container,
+
+		/** @type {HTMLInputElement} */
 		input: container.input,
 
 		set({

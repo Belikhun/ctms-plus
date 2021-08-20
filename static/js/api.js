@@ -489,8 +489,17 @@ const api = {
 		this.__SCHEDULE_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
 		this.__SCHEDULE_EVENTVALIDATION = this.__EVENTVALIDATION;
 
+		// Parse week start date displayed in the input
+		response.date = null;
+		let dateInput = response.dom.getElementById(`LeftCol_Lichhoc1_txtNgaydautuan`);
+		if (dateInput)
+			response.date = new Date(dateInput.value);
+
+		// Parse schedule table
+		// The loop from 0 to 8 is just to make sure we parse all table
+		// that exists on the page, unexpected behaviour may occured.
 		response.info = Array();
-		for (let i = 0; i < 7; i++) {
+		for (let i = 0; i <= 8; i++) {
 			let table = response.dom.getElementById(`LeftCol_Lichhoc1_rptrLichhoc_grvLichhoc_${i}`);
 
 			if (!table)

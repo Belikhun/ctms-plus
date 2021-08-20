@@ -78,6 +78,16 @@ body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > t:emp
 	color: rgb(85, 85, 85);
 }
 
+body.dark .subscribeScreen > .content > .item > .details > .right > div > span > .label {
+	color: rgb(170, 170, 170);
+}
+
+/** ==================== SCREEN.SUBSCRIBE ==================== */
+
+body.dark .subscribeScreen > .content > .item {
+	background-color: #242424;
+}
+
 /** ===================== projectInfo ===================== */
 
 body.dark .projectInfo > .header {

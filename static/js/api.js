@@ -733,15 +733,16 @@ const api = {
 			let timeCell = [ ...row.children[6].innerText.trim()
 				.matchAll(/(\d+):(\d+) (\d+)\/(\d+)\/(\d+)/gm) ];
 
-			for (let i = 0, cell = timeCell[i]; i < timeCell.length; i++) {
-				let time = new Date("20" + cell[5], parseInt(cell[4]) - 1, cell[3], cell[1], cell[2]);
+			for (let i = 0; i < timeCell.length; i++) {
+				let cell = timeCell[i];
+				let parsedTime = new Date("20" + cell[5], parseInt(cell[4]) - 1, cell[3], cell[1], cell[2]);
 
 				if (i === 0)
-					item.date.start = time;
+					item.date.start = parsedTime;
 				else if (i === 1)
-					item.date.end = time;
+					item.date.end = parsedTime;
 				else if (i === 2)
-					item.date.cancel = time;
+					item.date.cancel = parsedTime;
 			}
 
 			let scheduleCell = row.children[7].querySelectorAll(`:scope > ul > li`);

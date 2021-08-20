@@ -857,13 +857,20 @@ const api = {
 		if (errorRe2 && errorRe2[2].includes("Lỗi:"))
 			throw { code: -1, description: `api.subscribe(${args}): ${errorRe2[2]}` }
 
+		// Check for existing tables and determine table type
+		let haveCanSubscribe = response.response.includes("có thể đăng ký");
+		let haveSubscribed = response.response.includes("vừa đăng ký");
 		let tables = response.dom.querySelectorAll("table[border]");
 
-		if (tables && tables[0])
-			response.waiting = this.parseSubscribe(tables[0]);
+		clog("DEBG", "api.subscribe(): data", { haveCanSubscribe, haveSubscribed });
 
-		if (tables && tables[1])
+		if (haveCanSubscribe && haveSubscribed) {
+			response.waiting = this.parseSubscribe(tables[0]);
 			response.subscribed = this.parseSubscribe(tables[1]);
+		} else if (haveCanSubscribe)
+			response.waiting = this.parseSubscribe(tables[0]);
+		else if (haveSubscribed)
+			response.subscribed = this.parseSubscribe(tables[0]);
 
 		this.__handleResponse("subscribe", response);
 		return response;

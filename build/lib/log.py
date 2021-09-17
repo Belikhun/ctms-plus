@@ -16,8 +16,9 @@ import os
 
 screenlock = Semaphore(value = 1)
 
-#init
-init(autoreset=True)
+# Init
+stripOutput = False if os.getenv("CI") else True
+init(autoreset = True, strip = stripOutput)
 sticks = time.time()
 
 if (not os.path.isdir("logs/")):

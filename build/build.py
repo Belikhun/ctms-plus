@@ -5,9 +5,10 @@ from json.decoder import JSONDecodeError
 from lib import ehook
 from lib.log import log
 
-import colorama
+import os
+log("OKAY", "Imported: os")
+
 from colorama import Fore
-colorama.init()
 log("OKAY", "Imported: colorama")
 
 import requests
@@ -15,9 +16,6 @@ log("OKAY", "Imported: requests")
 
 import json
 log("OKAY", "Imported: json")
-
-import os
-log("OKAY", "Imported: os")
 
 import re
 log("OKAY", "Imported: re")

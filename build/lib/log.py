@@ -1,14 +1,14 @@
 #? |-----------------------------------------------------------------------------------------------|
 #? |  /tests/lib/log.py                                                                            |
 #? |                                                                                               |
-#? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+#? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 #? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 #? |-----------------------------------------------------------------------------------------------|
 
+from threading import Semaphore
 from colorama import init
 from colorama import Fore, Style
 from inspect import currentframe
-from threading import Semaphore
 import atexit
 import time
 import re
@@ -21,17 +21,11 @@ stripOutput = False if os.getenv("CI") else True
 init(autoreset = True, strip = stripOutput)
 sticks = time.time()
 
-if (not os.path.isdir("logs/")):
-	os.mkdir("logs/")
-
-logPath = f"logs/{(int)(sticks * 10000)}.log"
-
 def escape_ansi(line):
 	ansi_escape = re.compile(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]")
 	return ansi_escape.sub("", line)
 
-def log(level, *args, resetCursor = False):
-	screenlock.acquire()
+def log(level, *args):
 	level = level.upper()
 	ticks = time.time()
 	ltime = time.localtime(ticks)
@@ -86,15 +80,13 @@ def log(level, *args, resetCursor = False):
 		# thêm text vào output
 		out += "| {}{}".format(color, text)
 
-	print(out, end = "\r" if (resetCursor) else "\n")
-	with open(logPath, "a", encoding="utf-8") as f:
+	print(out)
+	with open("log.txt", "a", encoding="utf-8") as f:
 		print(escape_ansi(out), file=f)
 
-	screenlock.release()
-
 def logExitHandler():
-	log("INFO", "Program ended")
+	log("INFO", "Log ended.")
 
-open(logPath, "w").close()
+open("log.txt", "w").close()
 log("INFO", "Log started at " + time.asctime(time.localtime()))
 atexit.register(logExitHandler)

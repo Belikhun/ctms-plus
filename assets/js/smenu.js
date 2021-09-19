@@ -8,7 +8,7 @@
 /**
  * Settings Menu
  * 
- * @author	@belivipro9x99
+ * @author	@Belikhun
  * @version	v1.0
  * @license	MIT
  */

@@ -41,7 +41,7 @@ logStatus("Lấy Thông Tin Dự Án", 1, True)
 
 
 logStatus("Cập Nhật Danh Sách Người Đóng Góp", 0)
-contributors = requests.get("https://api.github.com/repos/belivipro9x99/ctms-plus/contributors")
+contributors = requests.get("https://api.github.com/repos/Belikhun/ctms-plus/contributors")
 contributorsData = contributors.json()
 
 if (contributors.status_code != 200):

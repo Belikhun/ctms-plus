@@ -1,9 +1,9 @@
 # CTMS+
 #### The Next Generation Of CTMS
 
-[![Check](https://img.shields.io/github/checks-status/belivipro9x99/ctms-plus/main?style=for-the-badge)](https://github.com/belivipro9x99/ctms-plus/actions/workflows/main.yml)
-[![Build](https://img.shields.io/github/workflow/status/belivipro9x99/ctms-plus/Build?style=for-the-badge)](https://github.com/belivipro9x99/ctms-plus/actions/workflows/main.yml)
-[![CodeFactor](https://www.codefactor.io/repository/github/belivipro9x99/ctms-plus/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/belivipro9x99/ctms-plus)
+[![Check](https://img.shields.io/github/checks-status/Belikhun/ctms-plus/main?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/main.yml)
+[![Build](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/Build?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/main.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/Belikhun/ctms-plus/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/Belikhun/ctms-plus)
 
 ---
 
@@ -16,13 +16,13 @@ CTMS+ là dự án phi lợi nhuận, không hề liên quan và không được
 CTMS+ hiện đang chạy trên các host sau:
  * Netlify: https://ctmsplus.netlify.com
  * Vercel: https://ctmsplus.vercel.app
- * Github Pages: https://belivipro9x99.github.io/ctms-plus/
+ * Github Pages: https://Belikhun.github.io/ctms-plus/
 
 ### ☠ CTMS+ có đáng tin cậy không ?
 
 CTMS+ gửi trực tiếp request của bạn tới CTMS thông qua middleware. Middleware hoạt động như một **shipper** có nhiệm vụ gửi yêu cầu của bạn tới đích một cách hiệu quả. Middleware được sử dụng để vượt qua những giới hạn của trình duyệt, nhờ đó mà CTMS+ có thể truy xuất dữ liệu trực tiếp từ CTMS. Tuy nhiên Middleware không có tính năng thu thập thông tin hay dữ liệu của bạn khi được gửi, bạn có thể kiểm tra điều này bằng cách đọc mã nguồn của middleware.
 
-Mã nguồn của middleware có thể tìm thấy tại [`belivipro9x99/ctms-plus-middleware/api/middleware.php`](https://github.com/belivipro9x99/ctms-plus-middleware).
+Mã nguồn của middleware có thể tìm thấy tại [`Belikhun/ctms-plus-middleware/api/middleware.php`](https://github.com/Belikhun/ctms-plus-middleware).
 
 ### 🧩 Cấu trúc repository
 
@@ -38,6 +38,6 @@ Repo này chứa mã nguồn của `CTMS+` và `middleware API` được sử d�
 
 Chúng mình không nhận tiền mặt làm hình thức đóng góp, thay vào đó chúng mình sẽ tiếp nhận công sức đóng góp của mọi người! Mọi đóng góp về code, ý tưởng hoặc góp ý đều được chào mừng!
 
-Nếu bạn có một ý tưởng, một tính năng mà bạn muốn thấy trong tương lai, hoặc gặp một lỗi nào đó khi dùng phần mềm, bạn có thể gửi nó bằng cách tạo một **[Bug Report](https://github.com/belivipro9x99/ctms-plus/issues/new?labels=bug%2C+help+wanted&template=bug_report.md)/[Feature Request](https://github.com/belivipro9x99/ctms-plus/issues/new?labels=enhancement&template=feature_request.md)** trong tab *Issues* của repo này.
+Nếu bạn có một ý tưởng, một tính năng mà bạn muốn thấy trong tương lai, hoặc gặp một lỗi nào đó khi dùng phần mềm, bạn có thể gửi nó bằng cách tạo một **[Bug Report](https://github.com/Belikhun/ctms-plus/issues/new?labels=bug%2C+help+wanted&template=bug_report.md)/[Feature Request](https://github.com/Belikhun/ctms-plus/issues/new?labels=enhancement&template=feature_request.md)** trong tab *Issues* của repo này.
 
 Nếu bạn muốn ủng hộ bằng cách viết code, hãy chắc chắn rằng bạn đã đọc qua [Contributing Guidelines](CONTRIBUTING.md) trước khi submit một pull request

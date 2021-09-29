@@ -668,6 +668,13 @@ const api = {
 		let rows = node.querySelectorAll(":scope > tbody > tr:not(:first-child)");
 		let items = []
 
+		// Determine if the action column (where status and subscribe button belong)
+		// is hidden, because of current student haven't paid all the required tuition
+		let checkNoAction = node.querySelector(":scope > tbody > tr:first-child > th:first-child");
+		let isNoAction = false;
+		if (checkNoAction.innerText.trim() === "Tên lớp")
+			isNoAction = true;
+
 		for (let row of rows) {
 			let item = {
 				expired: false,
@@ -693,37 +700,43 @@ const api = {
 				}
 			}
 
-			// Parse first cell
-			let firstCell = row.children[0];
-			
-			if (firstCell.innerText.includes("Hết hạn ĐK"))
-				item.expired = true;
+			// This is a hacky trick to shift column index in order
+			// to prevent duplicate code
+			let cellStart = isNoAction ? -1 : 0;
 
-			if (firstCell.innerText.includes("Hết chỉ tiêu"))
-				item.isFull = true;
-
-			let actionBtn = firstCell.querySelector(":scope > a[href]");
-			if (actionBtn) {
-				// Test subscribe button
-				let sub = /javascript:subcrible\((\d+)\, (\d+), (\d+)\)/gm.exec(actionBtn.href);
-				if (sub) {
-					item.action.command = "subscribe";
-					item.action.classID = parseInt(sub[1]);
-				}
-
-				// Test unsubscribe button
-				let unsub = /javascript:unSubcrible\((\d+)\,(\d+)\)/gm.exec(actionBtn.href);
-				if (unsub) {
-					item.action.command = "unsubscribe";
-					item.action.classID = parseInt(unsub[1]);
+			if (!isNoAction) {
+				// Parse first cell
+				let firstCell = row.children[0];
+				
+				if (firstCell.innerText.includes("Hết hạn ĐK"))
+					item.expired = true;
+	
+				if (firstCell.innerText.includes("Hết chỉ tiêu"))
+					item.isFull = true;
+	
+				let actionBtn = firstCell.querySelector(":scope > a[href]");
+				if (actionBtn) {
+					// Test subscribe button
+					let sub = /javascript:subcrible\((\d+)\, (\d+), (\d+)\)/gm.exec(actionBtn.href);
+					if (sub) {
+						item.action.command = "subscribe";
+						item.action.classID = parseInt(sub[1]);
+					}
+	
+					// Test unsubscribe button
+					let unsub = /javascript:unSubcrible\((\d+)\,(\d+)\)/gm.exec(actionBtn.href);
+					if (unsub) {
+						item.action.command = "unsubscribe";
+						item.action.classID = parseInt(unsub[1]);
+					}
 				}
 			}
 
-			item.classID = row.children[1].innerText.trim();
+			item.classID = row.children[cellStart + 1].innerText.trim();
 			
 			// Parse basic data
 			let secondCell = /^(.+) \((\d+) tc\)[\n\s]+(.+)(?:[\n\s]+Học phí: (\d+)\*1000 \(đ\)|$)/gm
-				.exec(row.children[2].innerText.trim());
+				.exec(row.children[cellStart + 2].innerText.trim());
 			
 			if (secondCell) {
 				item.subject = secondCell[1];
@@ -734,12 +747,12 @@ const api = {
 					item.tuition = parseInt(secondCell[4]) * 1000;
 			}
 
-			item.minimum = parseInt(row.children[3].innerText.trim().replace(" sv", ""));
-			item.maximum = parseInt(row.children[4].innerText.trim().replace(" sv", ""));
-			item.subscribed = parseInt(row.children[5].innerText.trim().replace(" sv", ""));
+			item.minimum = parseInt(row.children[cellStart + 3].innerText.trim().replace(" sv", ""));
+			item.maximum = parseInt(row.children[cellStart + 4].innerText.trim().replace(" sv", ""));
+			item.subscribed = parseInt(row.children[cellStart + 5].innerText.trim().replace(" sv", ""));
 
 			// Parse time window
-			let timeCell = [ ...row.children[6].innerText.trim()
+			let timeCell = [ ...row.children[cellStart + 6].innerText.trim()
 				.matchAll(/(\d+):(\d+) (\d+)\/(\d+)\/(\d+)/gm) ];
 
 			for (let i = 0; i < timeCell.length; i++) {
@@ -754,7 +767,7 @@ const api = {
 					item.date.cancel = parsedTime;
 			}
 
-			let scheduleCell = row.children[7].querySelectorAll(`:scope > ul > li`);
+			let scheduleCell = row.children[cellStart + 7].querySelectorAll(`:scope > ul > li`);
 			for (let line of scheduleCell) {
 				let t = line.innerText
 					.replaceAll("\n", "")
@@ -766,6 +779,16 @@ const api = {
 					item.classroom.push(c);
 
 				item.schedule.push(t);
+			}
+
+			// Subroute of parsing first cell, this code only run when no action
+			// available. We need to determine status by fetched data
+			if (isNoAction) {
+				if (time(item.date.end) < time())
+					item.expired = true;
+
+				if (item.subscribed >= item.maximum)
+					item.isFull = true;
 			}
 
 			items.push(item);

@@ -700,12 +700,19 @@ function parseTime(t = 0, {
 	msDigit = 3,
 	showPlus = false,
 	strVal = true,
+	calcDays = false
 } = {}) {
 	let d = showPlus ? "+" : "";
+	let days = 0;
 	
 	if (t < 0) {
 		t = -t;
 		d = "-";
+	}
+
+	if (calcDays) {
+		days = Math.floor(t / 86400);
+		t %= 86400;
 	}
 	
 	let h = Math.floor(t / 3600);
@@ -715,6 +722,7 @@ function parseTime(t = 0, {
 
 	return {
 		h, m, s, ms, d,
+		days,
 		str: (strVal)
 			? d + [h, m, s]
 				.map(v => v < 10 ? "0" + v : v)
@@ -843,7 +851,7 @@ function liveTime(element, start = time(new Date()), {
  * @param	{HTMLInputElement}		timeNode	Time Input
  * @param	{Number}				value		UNIX Time
  */
-function setDateTimeValue(dateNode, timeNode, value = time()) {
+ function setDateTimeValue(dateNode, timeNode, value = time()) {
 	let date = new Date(value * 1000);
 
 	if (typeof dateNode === "object" && dateNode)
@@ -2582,11 +2590,13 @@ function createImageInput({
 
 function createNote({
 	level = "info",
-	message = "Smaple Note"
+	message = "Smaple Note",
+	style = "flat"
 } = {}) {
 	let container = document.createElement("div");
 	container.classList.add("note");
 	container.dataset.level = level;
+	container.dataset.style = style;
 
 	let inner = document.createElement("span");
 	inner.classList.add("inner");
@@ -2603,6 +2613,51 @@ function createNote({
 
 			if (message)
 				inner.innerHTML = message;
+		}
+	}
+}
+
+/**
+ * Create Timer Element
+ * @param	{Number|Object}	time	Time in seconds or object from parseTime()
+ */
+function createTimer(time = 0, {
+	style = "normal"
+} = {}) {
+	let timer = document.createElement("timer");
+	timer.dataset.style = style;
+
+	let days = document.createElement("days");
+	let inner = document.createElement("span");
+	let ms = document.createElement("ms");
+
+	timer.append(days, inner, ms);
+
+	const set = ({
+		time,
+		style
+	}) => {
+		if (typeof time === "number")
+			time = parseTime(time);
+
+		if (typeof time === "object") {
+			days.innerText = (time.days != 0) ? `${time.d}${time.days}` : "";
+			inner.innerText = time.str;
+			ms.innerText = time.ms;
+		}
+
+		if (typeof style === "string")
+			timer.dataset.style = style;
+	}
+
+	set({ time, style });
+
+	return {
+		group: timer,
+		set,
+
+		toggleMs: (show) => {
+			ms.style.display = (show) ? null : "none";
 		}
 	}
 }
@@ -3058,14 +3113,61 @@ const __connection__ = {
 
 }
 
+const mouseCursor = {
+	/**
+	 * X Position of Mouse cursor in the screen
+	 * @type {Number}
+	 */
+	x: 0,
+
+	/**
+	 * Y Position of Mouse cursor in the screen
+	 * @type {Number}
+	 */
+	y: 0,
+
+	/**
+	 * The change amount in X coordinates between current position
+	 * and last position
+	 * @type {Number}
+	 */
+	deltaX: 0,
+
+	/**
+	 * The change amount in Y coordinates between current position
+	 * and last position
+	 * @type {Number}
+	 */
+	deltaY: 0,
+
+	/**
+	 * Current element under the cursor
+	 * @type {HTMLElement}
+	 */
+	target: null,
+
+	/**
+	 * Update Function
+	 * @param {MouseEvent} event 
+	 */
+	update(event) {
+		this.x = event.clientX;
+		this.y = event.clientY;
+		this.deltaX = event.movementX;
+		this.deltaY = event.movementY;
+	}
+}
+
 //? =================
 //?    SCRIPT INIT
 
 if (typeof document.__onclog === "undefined")
 	document.__onclog = (lv, t, m) => {}
 
+window.addEventListener("mousemove", (e) => mouseCursor.update(e), { passive: true });
+
 let sc = new StopClock();
-clog("info", "Log started at:", {
+clog("INFO", "Log started at:", {
 	color: flatc("green"),
 	text: (new Date()).toString()
 })

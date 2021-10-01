@@ -12,6 +12,11 @@
             "name": "DHS Middleware",
             "default": true
         },
+
+        "000WH": {
+            "host": "https://ctmsmw.000webhostapp.com",
+            "name": "000WebHost Middleware"
+        },
         
         "local": {
             "host": "http://localhost:80",

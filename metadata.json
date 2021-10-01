@@ -13,9 +13,9 @@
             "default": true
         },
 
-        "000WH": {
-            "host": "https://ctmsmw.000webhostapp.com",
-            "name": "000WebHost Middleware"
+        "heroku": {
+            "host": "https://ctmsmw.herokuapp.com/",
+            "name": "Heroku Middleware"
         },
         
         "local": {

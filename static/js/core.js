@@ -954,7 +954,10 @@ const core = {
 				this.licensePanel = new smenu.Panel(undefined, { size: "large" });
 				this.licensePanel.setToggler(licenseButton);
 				await this.licensePanel.content("iframe:./license.html");
-				core.darkmode.onToggle((enabled) => this.licensePanel.iframe.contentDocument.body.classList[enabled ? "add" : "remove"]("dark"));
+				core.darkmode.onToggle((enabled) => {
+					if (this.licensePanel.iframe.contentDocument)
+						this.licensePanel.iframe.contentDocument.body.classList[enabled ? "add" : "remove"]("dark");
+				});
 
 				new smenu.components.Footer({
 					icon: "./assets/img/icon.png",

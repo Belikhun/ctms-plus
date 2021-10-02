@@ -2356,6 +2356,7 @@ function createSlider({
 		{ type: "span", class: "rightTrack", name: "right" }
 	]);
 
+	let mouseDownTick = 0;
 	let o = container.obj;
 	o.dataset.color = color;
 	o.dataset.soundhover = true;
@@ -2370,6 +2371,10 @@ function createSlider({
 	o.input.value = value;
 
 	const update = (e) => {
+		mouseDownTick++;
+		if (mouseDownTick > 1)
+			o.classList.add("dragging");
+
 		let valP = (e.target.value - min) / (max - min);
 
 		o.thumb.style.left = `calc(20px + (100% - 40px) * ${valP})`;
@@ -2390,12 +2395,17 @@ function createSlider({
 	let inputHandlers = []
 	let changeHandlers = []
 
+	// Event train
 	o.input.addEventListener("input", (e) => {
 		inputHandlers.forEach(f => f(parseFloat(e.target.value), e));
 		update(e);
 	});
 
 	o.input.addEventListener("change", (e) => changeHandlers.forEach(f => f(parseFloat(e.target.value), e)));
+	o.addEventListener("mouseup", () => {
+		o.classList.remove("dragging");
+		mouseDownTick = 0;
+	});
 
 	return {
 		group: container.tree,

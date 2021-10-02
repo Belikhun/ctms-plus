@@ -684,6 +684,17 @@ function time(date = new Date()) {
 }
 
 /**
+ * Is date today??
+ * @param	{Date}	date
+ * @param	{Date}	today	Date to compare to
+ */
+function isToday(date, today = new Date()) {
+	return (date.getDate() === today.getDate() &&
+			date.getMonth() === today.getMonth() &&
+			date.getFullYear() === today.getFullYear())
+}
+
+/**
  * Get current Week in a year
  * @returns {Number}	Current Week
  */

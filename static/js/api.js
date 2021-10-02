@@ -459,7 +459,7 @@ const api = {
 	 * @param	{Date} date	Thời gian trong tuần cần xem
 	 */
 	async schedule(date) {
-		let response
+		let response;
 		
 		if (typeof date !== "undefined") {
 			this.__SCHEDULE_DATE = `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`;
@@ -510,7 +510,11 @@ const api = {
 				.replace(/\s\s+/g, " ")
 				.trim();
 
-			let item = { time, rows: [] }
+			let dateString = time.split(" ").pop();
+			let weekDay = time.replace(` ${dateString}`, "");
+			let timeToken = dateString.split("/");
+			let date = new Date(timeToken[2], timeToken[1] - 1, timeToken[0]);
+			let item = { time, date, dateString, weekDay, rows: [] }
 			let rows = table.querySelectorAll(`tbody > tr:not(:first-child)`);
 			
 			for (let row of [ ...rows ]) {
@@ -518,13 +522,20 @@ const api = {
 
 				let noteID = null;
 				let note = row.children[6].querySelector(":scope > span > a[href]");
+				let rowTime = row.children[1].innerText.trim().replace(" ->", " -> ").split(" -> ");
+				let timeStartToken = rowTime[0].split(":");
+				let timeEndToken = rowTime[1].split(":");
+				let startDate = new Date(timeToken[2], timeToken[1] - 1, timeToken[0], timeStartToken[0], timeStartToken[1]);
+				let endDate = new Date(timeToken[2], timeToken[1] - 1, timeToken[0], timeEndToken[0], timeEndToken[1]);
+
 				if (note && note.children[0] && note.children[0].title === "Đã có ghi chú") {
 					let noteRe = /javascript:getNote\((\d+)\);/gm.exec(note.href);
 					noteID = parseInt(noteRe[1]);
 				}
 
 				item.rows.push({
-					time: row.children[1].innerText.trim(),
+					time: rowTime,
+					date: [startDate, endDate],
 					classroom: row.children[2].innerText.trim(),
 					subject: row.children[3].innerText.trim(),
 					teacher: row.children[4].innerText.trim(),

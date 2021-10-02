@@ -1126,13 +1126,13 @@ const core = {
 			});
 
 			let userCardBG = triBg(this.detailView.userCard, {
-				color: "lightBlue",
+				color: "whitesmoke",
 				scale: 5,
 				speed: 64
 			});
 
 			set({ p: 30, d: `Attaching Listeners` });
-			core.darkmode.onToggle((dark) => userCardBG.setColor(dark ? "dark" : "lightBlue"));
+			core.darkmode.onToggle((dark) => userCardBG.setColor(dark ? "dark" : "whitesmoke"));
 			navbar.insert({ container }, "right");
 
 			// Attach response handlers
@@ -1649,116 +1649,151 @@ const core = {
 				// updated data to render
 				if (this.currentRenderer !== renderer || newData) {
 					this.log("DEBG", `render(${renderer}): re-rendering`);
-					emptyNode(this.view.list);
 
-					for (let item of data) {
-						if (renderer === "table")
-							this.renderTable(item);
-						else
-							this.renderList(item);
-					}
+					if (renderer === "table")
+						this.renderTable(data);
+					else
+						this.renderList(data);
 
 					this.currentRenderer = renderer;
 				}
 			},
 
-			renderTable({ time, rows = [] } = {}) {
-				let item = makeTree("div", "tableItem", {
-					label: { tag: "t", class: "label", text: time },
-					table: { tag: "table", class: "generalTable", child: {
-						thead: { tag: "thead", child: {
-							row: { tag: "tr", child: {
-								stt: { tag: "th", class: "right", text: "Thứ Tự" },
-								status: { tag: "th" },
-								subject: { tag: "th", text: "Môn Học" },
-								classroom: { tag: "th", text: "Lớp Học" },
-								time: { tag: "th", class: "bold", text: "Giờ" },
-								teacher: { tag: "th", text: "Giảng Viên" },
-								classID: { tag: "th", class: "right", text: "Mã Lớp" },
-								listID: { tag: "th", class: "right", text: "Mã DS Thi" },
-							}}
-						}},
+			renderTable(data) {
+				emptyNode(this.view.list);
 
-						tbody: { tag: "tbody" }
-					}}
-				});
-
-				let nth = 0;
-				for (let row of rows) {
-					let tableRow = makeTree("tr", "row", {
-						stt: { tag: "td", class: ["right", "bold"], text: ++nth },
-
-						status: { tag: "td", class: "status", child: {
-							inner: { tag: "span", class: "generalTag", data: { status: row.status }, text: row.status }
-						}},
-
-						subject: { tag: "td", text: row.subject },
-						classroom: { tag: "td", text: row.classroom },
-						time: { tag: "td", class: "bold", html: row.time.replace("->", "<arr></arr>") },
-						teacher: { tag: "td", text: row.teacher },
-						classID: { tag: "td", class: ["bold", "right"], text: row.classID },
-						listID: { tag: "td", class: ["bold", "right"], text: row.listID }
-					});
-
-					if (typeof row.noteID === "number") {
-						let note = document.createElement("icon");
-						note.classList.add("openNote");
-						note.dataset.icon = "note";
-						note.dataset.id = row.noteID;
-						note.title = `Xem Ghi Chú ${row.noteID}`;
-						note.addEventListener("click", () => this.viewNote(row.noteID));
-
-						tableRow.subject.appendChild(note);
-					}
-
-					item.table.tbody.appendChild(tableRow);
-				}
-
-				this.view.list.appendChild(item);
-			},
-
-			renderList({ time, rows = [] } = {}) {
-				let group = makeTree("div", "listItem", {
-					label: { tag: "t", class: "label", text: time },
-					items: { tag: "div", class: "items" }
-				});
-
-				for (let row of rows) {
-					let item = makeTree("div", "item", {
-						top: { tag: "div", class: "top", child: {
-							tag: { tag: "span", class: ["generalTag", "status"], data: { status: row.status }, text: row.status },
-							classroom: { tag: "t", class: "classroom", text: row.classroom },
-							time: { tag: "t", class: "time", html: row.time.replace("->", "<arr></arr>") },
-						}},
-
-						subject: { tag: "span", class: "subject", child: {
-							inner: { tag: "t", class: "inner", text: row.subject }
-						}},
-
-						teacher: { tag: "t", class: "teacher", text: row.teacher },
-
-						bottom: { tag: "div", class: "bottom", child: {
-							classID: { tag: "t", class: "classID", text: row.classID },
-							separator: { tag: "span" },
-							listID: { tag: "t", class: "listID", text: row.listID }
+				for (let { time, rows = [] } of data) {
+					let item = makeTree("div", "tableItem", {
+						label: { tag: "t", class: "label", text: time },
+						table: { tag: "table", class: "generalTable", child: {
+							thead: { tag: "thead", child: {
+								row: { tag: "tr", child: {
+									stt: { tag: "th", class: "right", text: "Thứ Tự" },
+									status: { tag: "th" },
+									subject: { tag: "th", text: "Môn Học" },
+									classroom: { tag: "th", text: "Lớp Học" },
+									time: { tag: "th", class: "bold", text: "Giờ" },
+									teacher: { tag: "th", text: "Giảng Viên" },
+									classID: { tag: "th", class: "right", text: "Mã Lớp" },
+									listID: { tag: "th", class: "right", text: "Mã DS Thi" },
+								}}
+							}},
+	
+							tbody: { tag: "tbody" }
 						}}
 					});
+	
+					let nth = 0;
+					for (let row of rows) {
+						let tableRow = makeTree("tr", "row", {
+							stt: { tag: "td", class: ["right", "bold"], text: ++nth },
+	
+							status: { tag: "td", class: "status", child: {
+								inner: { tag: "span", class: "generalTag", data: { status: row.status }, text: row.status }
+							}},
+	
+							subject: { tag: "td", text: row.subject },
+							classroom: { tag: "td", text: row.classroom },
+							time: { tag: "td", class: "bold", html: `${row.time[0]}<arr></arr>${row.time[1]}` },
+							teacher: { tag: "td", text: row.teacher },
+							classID: { tag: "td", class: ["bold", "right"], text: row.classID },
+							listID: { tag: "td", class: ["bold", "right"], text: row.listID }
+						});
+	
+						if (typeof row.noteID === "number") {
+							let note = document.createElement("icon");
+							note.classList.add("openNote");
+							note.dataset.icon = "note";
+							note.dataset.id = row.noteID;
+							note.title = `Xem Ghi Chú ${row.noteID}`;
+							note.addEventListener("click", () => this.viewNote(row.noteID));
+	
+							tableRow.subject.appendChild(note);
+						}
+	
+						item.table.tbody.appendChild(tableRow);
+					}
+	
+					this.view.list.appendChild(item);
+				}
+			},
 
-					if (typeof row.noteID === "number") {
-						let note = document.createElement("icon");
-						note.classList.add("openNote");
-						note.dataset.icon = "note";
-						note.dataset.id = row.noteID;
-						note.title = `Xem Ghi Chú ${row.noteID}`;
-						note.addEventListener("click", () => this.viewNote(row.noteID));
+			renderList(data) {
+				emptyNode(this.view.list);
+				let today = new Date();
+				let foundNextDay = false;
 
-						item.subject.appendChild(note);
+				for (let { time, date, dateString, weekDay, rows = [] } of data) {
+					let isItemToday = false;
+					let tags = {}
+		
+					// Is date today?
+					if (isToday(date, today)) {
+						tags.today = { tag: "span", class: ["generalTag", "today"], text: "Hôm Nay" }
+						isItemToday = true;
+					} else if (!foundNextDay && date > today) {
+						tags.next = { tag: "span", class: ["generalTag", "next"], text: "Sắp Tới" }
+						foundNextDay = true;
 					}
 
-					group.items.appendChild(item);
-				}
+					let group = makeTree("div", "listItem", {
+						label: { tag: "div", class: "label", child: {
+							inner: { tag: "t", class: "inner", html: `<b>${weekDay}</b> ${dateString}` },
+							tags: { tag: "span", class: "tags", child: tags }
+						}},
+		
+						items: { tag: "div", class: "items" }
+					});
 
-				this.view.list.appendChild(group);
+					if (isItemToday)
+						group.classList.add("today");
+					else if (date < today)
+						group.classList.add("passed");
+
+					for (let row of rows) {
+						let item = makeTree("div", "item", {
+							gradient: { tag: "div", class: "gradient", data: { status: row.status } },
+
+							top: { tag: "div", class: "top", child: {
+								tag: { tag: "span", class: ["generalTag", "status"], data: { status: row.status }, text: row.status },
+								classroom: { tag: "t", class: "classroom", text: row.classroom },
+								time: { tag: "t", class: "time", html: `${row.time[0]}<arr></arr>${row.time[1]}` },
+							}},
+		
+							subject: { tag: "span", class: "subject", child: {
+								inner: { tag: "t", class: "inner", text: row.subject }
+							}},
+		
+							teacher: { tag: "t", class: "teacher", text: row.teacher },
+		
+							bottom: { tag: "div", class: "bottom", child: {
+								classID: { tag: "t", class: "classID", text: row.classID },
+								separator: { tag: "span" },
+								listID: { tag: "t", class: "listID", text: row.listID }
+							}}
+						});
+
+						if (today > row.date[1])
+							item.classList.add("passed");
+						else if (today > row.date[0])
+							item.classList.add("inProgress");
+		
+						if (typeof row.noteID === "number") {
+							let note = document.createElement("icon");
+							note.classList.add("openNote");
+							note.dataset.icon = "note";
+							note.dataset.id = row.noteID;
+							note.title = `Xem Ghi Chú ${row.noteID}`;
+							note.addEventListener("click", () => this.viewNote(row.noteID));
+		
+							item.subject.appendChild(note);
+						}
+		
+						group.items.appendChild(item);
+					}
+		
+					this.view.list.appendChild(group);
+				}
 			},
 
 			async viewNote(id) {

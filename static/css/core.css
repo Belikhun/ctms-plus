@@ -636,7 +636,7 @@ arr::before {
 	height: 60%;
 	opacity: 0.4;
 
-	box-shadow: inset 0px 30px 45px -30px var(--color);
+	box-shadow: inset 0 30px 45px -30px var(--color);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item > .top {

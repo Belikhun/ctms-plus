@@ -9,13 +9,13 @@
     "middleware": {
         "DHS": {
             "host": "https://dealhuntersuite.com",
-            "name": "DHS Middleware"
+            "name": "DHS Middleware",
+            "default": true
         },
 
         "heroku": {
             "host": "https://ctmsmw.herokuapp.com/",
-            "name": "Heroku Middleware",
-            "default": true
+            "name": "Heroku Middleware"
         },
         
         "local": {

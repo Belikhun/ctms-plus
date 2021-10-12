@@ -372,77 +372,168 @@ arr::before {
 	display: block;
 	flex-grow: 1;
 
+	margin-top: 20px;
 	padding: 0 10px;
 	box-sizing: border-box;
 	overflow: auto;
+
+	--schedule-gray: rgba(112, 112, 112, 0.6);
+	--schedule-green: rgb(4, 151, 78);
+	--schedule-blue: rgb(15, 124, 197);
 }
 
-.scheduleScreen > .list > .tableItem {
-	margin-top: 20px;
-}
-
-.scheduleScreen > .list > .tableItem:last-child {
+.scheduleScreen > .list:last-child {
 	padding-bottom: 200px;
 }
 
-.scheduleScreen > .list > .tableItem > .label {
-	font-family: Nunito;
-	font-weight: 600;
-	font-size: 22px;
-	line-height: 38px;
+.scheduleScreen > .list > .generalTable > tbody > tr > td {
+	background-color: transparent;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > thead > tr > th[key="stt"],
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="stt"] {
+.scheduleScreen > .list > .generalTable > tbody > tr.odd > td {
+	background-color: rgba(250, 250, 250, 0.8);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > tr.row:hover > td {
+	background-color: rgb(226, 226, 226);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header:not(:first-child) > td {
+	padding-top: 40px;
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .state,
+.scheduleScreen > .list > .generalTable > tbody > .row > .state {
+	width: 40px;
+	padding-right: 5px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .state::before {
+	content: "\f017";
+	position: relative;
+	display: block;
+	margin-bottom: 2px;
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 19px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header.today > .state::before {
+	color: var(--schedule-blue);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header.passed > .state::before {
+	color: var(--schedule-green);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .inner {
+	font-family: Nunito;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 28px;
+	letter-spacing: .4px;
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .inner > b {
+	font-weight: 800;
+	letter-spacing: 0;
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .tags {
+	margin-left: 10px;
+	margin-bottom: 3px;
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .tags > .today {
+	background-color: var(--color-orange);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .tags > .next {
+	background-color: var(--color-pink);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .row > .state::before {
+	content: "\f192";
+	display: block;
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .row.passed > .state::before {
+	content: "\f058";
+	color: var(--schedule-green);
+}
+
+.scheduleScreen > .list > .generalTable > tbody > .row.inProgress > .state::before {
+	content: "\f304";
+	color: var(--schedule-blue);
+}
+
+.scheduleScreen > .list > .generalTable > thead > .row > th[key="stt"],
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="stt"] {
 	width: 20px;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > .status > span[data-status="Học"] {
+.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Học"] {
 	background-color: var(--color-green);
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > .status > span[data-status="Học trực tuyến"] {
+.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Học trực tuyến"] {
 	background-color: var(--color-blue);
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > .status > span[data-status="Nghỉ"] {
+.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Nghỉ"] {
 	background-color: var(--color-yellow);
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > .status > span[data-status="Thi"] {
+.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Thi"] {
 	background-color: var(--color-red);
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="status"] {
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="status"] {
 	width: 120px;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > thead > tr > th[key="subject"],
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="subject"] {
+.scheduleScreen > .list > .generalTable > thead > .row > th[key="subject"],
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="subject"] {
 	width: 320px;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="subject"] {
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="subject"] {
 	font-family: Nunito;
 	font-size: 15px;
 	font-weight: 700;
 	letter-spacing: .2px;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="subject"] > .openNote {
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="subject"] > .openNote {
 	margin-left: 5px;
 	cursor: pointer;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > thead > tr > th[key="classroom"],
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="classroom"] {
+.scheduleScreen > .list > .generalTable > thead > .row > th[key="classroom"],
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="classroom"] {
 	width: 60px;
 }
 
-.scheduleScreen > .list > .tableItem > .generalTable > thead > tr > th[key="classID"],
-.scheduleScreen > .list > .tableItem > .generalTable > thead > tr > th[key="listID"],
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="classID"],
-.scheduleScreen > .list > .tableItem > .generalTable > tbody > tr > td[key="listID"] {
+.scheduleScreen > .list > .generalTable > thead > .row > th[key="classID"],
+.scheduleScreen > .list > .generalTable > thead > .row > th[key="listID"],
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="classID"],
+.scheduleScreen > .list > .generalTable > tbody > .row > td[key="listID"] {
 	width: 120px;
 }
 
@@ -476,11 +567,15 @@ arr::before {
 	font-family: "Font Awesome 5 Free";
 	font-size: 16px;
 	font-weight: bold;
-	color: rgba(112, 112, 112, 0.6);
+	color: var(--schedule-gray);
+}
+
+.scheduleScreen > .list > .listItem.today > .label::after {
+	color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .listItem.passed > .label::after {
-	color: rgb(4, 151, 78);
+	color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .listItem > .label > .inner {
@@ -542,11 +637,11 @@ arr::before {
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.passed::before {
-	background-color: rgba(4, 151, 78, 0.5);
+	background-color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.inProgress::before {
-	background-color: rgba(15, 124, 197, 0.5);
+	background-color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item:last-child::before {
@@ -572,12 +667,12 @@ arr::before {
 
 .scheduleScreen > .list > .listItem > .items > .item.passed::after {
 	content: "\f058";
-	color: rgb(4, 151, 78);
+	color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.inProgress::after {
 	content: "\f304";
-	color: rgb(15, 124, 197);
+	color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item:last-child {

@@ -1661,32 +1661,64 @@ const core = {
 
 			renderTable(data) {
 				emptyNode(this.view.list);
+				let today = new Date();
+				let foundNextDay = false;
 
-				for (let { time, rows = [] } of data) {
-					let item = makeTree("div", "tableItem", {
-						label: { tag: "t", class: "label", text: time },
-						table: { tag: "table", class: "generalTable", child: {
-							thead: { tag: "thead", child: {
-								row: { tag: "tr", child: {
-									stt: { tag: "th", class: "right", text: "Thứ Tự" },
-									status: { tag: "th" },
-									subject: { tag: "th", text: "Môn Học" },
-									classroom: { tag: "th", text: "Lớp Học" },
-									time: { tag: "th", class: "bold", text: "Giờ" },
-									teacher: { tag: "th", text: "Giảng Viên" },
-									classID: { tag: "th", class: "right", text: "Mã Lớp" },
-									listID: { tag: "th", class: "right", text: "Mã DS Thi" },
-								}}
-							}},
-	
-							tbody: { tag: "tbody" }
+				let table = makeTree("table", "generalTable", {
+					thead: { tag: "thead", child: {
+						row: { tag: "tr", child: {
+							state: { tag: "th" },
+							stt: { tag: "th", class: "right", text: "Thứ Tự" },
+							status: { tag: "th" },
+							subject: { tag: "th", text: "Môn Học" },
+							classroom: { tag: "th", text: "Lớp Học" },
+							time: { tag: "th", class: "bold", text: "Giờ" },
+							teacher: { tag: "th", text: "Giảng Viên" },
+							classID: { tag: "th", class: "right", text: "Mã Lớp" },
+							listID: { tag: "th", class: "right", text: "Mã DS Thi" },
 						}}
+					}},
+
+					tbody: { tag: "tbody" }
+				});
+
+				for (let { time, date, dateString, weekDay, rows = [] } of data) {
+					let isItemToday = false;
+					let tags = {}
+		
+					// Is date today?
+					if (isToday(date, today)) {
+						tags.today = { tag: "span", class: ["generalTag", "today"], text: "Hôm Nay" }
+						isItemToday = true;
+					} else if (!foundNextDay && date > today) {
+						tags.next = { tag: "span", class: ["generalTag", "next"], text: "Sắp Tới" }
+						foundNextDay = true;
+					}
+
+					let header = makeTree("tr", "header", {
+						state: { tag: "td", class: "state" },
+						label: { tag: "td", class: "label", colSpan: 8, child: {
+							wrapper: { tag: "span", class: "wrapper", child: {
+								inner: { tag: "t", class: "inner", html: `<b>${weekDay}</b> ${dateString}` },
+								tags: { tag: "span", class: "tags", child: tags }
+							}}
+						}},
 					});
-	
+
+					if (isItemToday)
+						header.classList.add("today");
+					else if (date < today)
+						header.classList.add("passed");
+
+					table.tbody.appendChild(header);
 					let nth = 0;
+
 					for (let row of rows) {
-						let tableRow = makeTree("tr", "row", {
-							stt: { tag: "td", class: ["right", "bold"], text: ++nth },
+						nth++;
+
+						let tableRow = makeTree("tr", ["row", (nth % 2 === 0) ? "even" : "odd"], {
+							state: { tag: "td", class: "state" },
+							stt: { tag: "td", class: ["right", "bold"], text: nth },
 	
 							status: { tag: "td", class: "status", child: {
 								inner: { tag: "span", class: "generalTag", data: { status: row.status }, text: row.status }
@@ -1700,6 +1732,14 @@ const core = {
 							listID: { tag: "td", class: ["bold", "right"], text: row.listID }
 						});
 	
+						if (today > row.date[1]) {
+							tableRow.classList.add("passed");
+							tableRow.state.dataset.tip = "đã học xong";
+						} else if (today > row.date[0]) {
+							tableRow.classList.add("inProgress");
+							tableRow.state.dataset.tip = "đang học";
+						}
+
 						if (typeof row.noteID === "number") {
 							let note = document.createElement("icon");
 							note.classList.add("openNote");
@@ -1711,11 +1751,11 @@ const core = {
 							tableRow.subject.appendChild(note);
 						}
 	
-						item.table.tbody.appendChild(tableRow);
+						table.tbody.appendChild(tableRow);
 					}
-	
-					this.view.list.appendChild(item);
 				}
+
+				this.view.list.appendChild(table);
 			},
 
 			renderList(data) {

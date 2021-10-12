@@ -633,7 +633,7 @@ arr::before {
 	height: calc(100% + 10px);
 	transform: translateX(-18px);
 
-	background-color: rgb(202, 202, 202);
+	background-color: var(--schedule-gray);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.passed::before {
@@ -662,7 +662,7 @@ arr::before {
 	font-family: "Font Awesome 5 Free";
 	font-size: 16px;
 	font-weight: bold;
-	color: rgba(112, 112, 112, 0.6);
+	color: var(--schedule-gray);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.passed::after {

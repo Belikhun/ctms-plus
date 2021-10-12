@@ -58,15 +58,6 @@ body.dark .component.ctmsStatus > .item.network > .nodes > .node > .status > .fa
 /** ==================== SCREEN.SCHEDULE ==================== */
 
 body.dark .scheduleScreen > .list {
-	position: relative;
-	display: block;
-	flex-grow: 1;
-
-	margin-top: 20px;
-	padding: 0 10px;
-	box-sizing: border-box;
-	overflow: auto;
-
 	--schedule-gray: #5a5a5a;
 	--schedule-green: var(--color-green);
 	--schedule-blue: var(--color-blue);

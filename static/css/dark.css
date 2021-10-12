@@ -57,8 +57,31 @@ body.dark .component.ctmsStatus > .item.network > .nodes > .node > .status > .fa
 
 /** ==================== SCREEN.SCHEDULE ==================== */
 
-body.dark .scheduleScreen > .list > .listItem.passed > .label::after {
-	color: var(--color-green);
+body.dark .scheduleScreen > .list {
+	position: relative;
+	display: block;
+	flex-grow: 1;
+
+	margin-top: 20px;
+	padding: 0 10px;
+	box-sizing: border-box;
+	overflow: auto;
+
+	--schedule-gray: #5a5a5a;
+	--schedule-green: var(--color-green);
+	--schedule-blue: var(--color-blue);
+}
+
+body.dark .scheduleScreen > .list > .generalTable > tbody > tr > td {
+	background-color: transparent;
+}
+
+body.dark .scheduleScreen > .list > .generalTable > tbody > tr.odd > td {
+	background-color: rgba(38, 38, 38, 0.8);
+}
+
+body.dark .scheduleScreen > .list > .generalTable > tbody > tr.row:hover > td {
+	background-color: rgb(46, 46, 46);
 }
 
 body.dark .scheduleScreen > .list > .listItem > .items::before {
@@ -67,26 +90,6 @@ body.dark .scheduleScreen > .list > .listItem > .items::before {
 
 body.dark .scheduleScreen > .list > .listItem > .items > .item {
 	background-color: #242424;
-}
-
-body.dark .scheduleScreen > .list > .listItem > .items > .item::before {
-	background-color: #5a5a5a;
-}
-
-body.dark .scheduleScreen > .list > .listItem > .items > .item.passed::before {
-	background-color: rgba(147, 252, 173, 0.7);
-}
-
-body.dark .scheduleScreen > .list > .listItem > .items > .item.passed::after {
-	color: var(--color-green);
-}
-
-body.dark .scheduleScreen > .list > .listItem > .items > .item.inProgress::before {
-	background-color: rgba(166, 225, 252, 0.7);
-}
-
-body.dark .scheduleScreen > .list > .listItem > .items > .item.inProgress::after {
-	color: var(--color-blue);
 }
 
 body.dark .scheduleScreen > .list > .listItem > .items > .item > .gradient {

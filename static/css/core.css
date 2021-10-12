@@ -372,24 +372,18 @@ arr::before {
 	display: block;
 	flex-grow: 1;
 
+	margin-top: 20px;
 	padding: 0 10px;
 	box-sizing: border-box;
 	overflow: auto;
-}
 
-.scheduleScreen > .list {
-	margin-top: 20px;
+	--schedule-gray: rgba(112, 112, 112, 0.6);
+	--schedule-green: rgb(4, 151, 78);
+	--schedule-blue: rgb(15, 124, 197);
 }
 
 .scheduleScreen > .list:last-child {
 	padding-bottom: 200px;
-}
-
-.scheduleScreen > .list > .label {
-	font-family: Nunito;
-	font-weight: 600;
-	font-size: 22px;
-	line-height: 38px;
 }
 
 .scheduleScreen > .list > .generalTable > tbody > tr > td {
@@ -425,15 +419,15 @@ arr::before {
 	font-family: "Font Awesome 5 Free";
 	font-size: 19px;
 	font-weight: bold;
-	color: rgba(112, 112, 112, 0.6);
+	color: var(--schedule-gray);
 }
 
 .scheduleScreen > .list > .generalTable > tbody > .header.today > .state::before {
-	color: rgb(15, 124, 197);
+	color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .generalTable > tbody > .header.passed > .state::before {
-	color: rgb(4, 151, 78);
+	color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper {
@@ -476,17 +470,17 @@ arr::before {
 	font-family: "Font Awesome 5 Free";
 	font-size: 16px;
 	font-weight: bold;
-	color: rgba(112, 112, 112, 0.6);
+	color: var(--schedule-gray);
 }
 
 .scheduleScreen > .list > .generalTable > tbody > .row.passed > .state::before {
 	content: "\f058";
-	color: rgb(4, 151, 78);
+	color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .generalTable > tbody > .row.inProgress > .state::before {
 	content: "\f304";
-	color: rgb(15, 124, 197);
+	color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .generalTable > thead > .row > th[key="stt"],
@@ -573,15 +567,15 @@ arr::before {
 	font-family: "Font Awesome 5 Free";
 	font-size: 16px;
 	font-weight: bold;
-	color: rgba(112, 112, 112, 0.6);
+	color: var(--schedule-gray);
 }
 
 .scheduleScreen > .list > .listItem.today > .label::after {
-	color: rgb(15, 124, 197);
+	color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .listItem.passed > .label::after {
-	color: rgb(4, 151, 78);
+	color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .listItem > .label > .inner {
@@ -643,11 +637,11 @@ arr::before {
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.passed::before {
-	background-color: rgba(4, 151, 78, 0.5);
+	background-color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.inProgress::before {
-	background-color: rgba(15, 124, 197, 0.5);
+	background-color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item:last-child::before {
@@ -673,12 +667,12 @@ arr::before {
 
 .scheduleScreen > .list > .listItem > .items > .item.passed::after {
 	content: "\f058";
-	color: rgb(4, 151, 78);
+	color: var(--schedule-green);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item.inProgress::after {
 	content: "\f304";
-	color: rgb(15, 124, 197);
+	color: var(--schedule-blue);
 }
 
 .scheduleScreen > .list > .listItem > .items > .item:last-child {

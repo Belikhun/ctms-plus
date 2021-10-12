@@ -2269,7 +2269,7 @@ const core = {
 									triangleCount: 2
 								}),
 
-								schedule: createButton("Lịch Học", {
+								schedule: createButton(undefined, {
 									style: "round",
 									icon: "table",
 									complex: true,
@@ -2377,7 +2377,7 @@ const core = {
 
 				if (typeof tuition === "number") {
 					item.actions.left.tuition.style.display = null;
-					item.actions.left.tuition.value.innerText = Intl.NumberFormat("vi-VN").format(tuition);
+					item.actions.left.tuition.value.innerText = Intl.NumberFormat("vi-VN").format(tuition * credits);
 				} else {
 					item.actions.left.tuition.style.display = "none";
 				}

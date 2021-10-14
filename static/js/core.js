@@ -613,6 +613,21 @@ const core = {
 						label: "Dịch Vụ"
 					}, this.super.group);
 
+					let autoload = new smenu.components.Checkbox({
+						label: "Tự động tải thông tin",
+						color: "pink",
+						save: "ctms.services.autoload",
+						defaultValue: false
+					}, this.child);
+
+					let reload = new smenu.components.Button({
+						label: "tải thông tin dịch vụ",
+						color: "red",
+						complex: true,
+						disabled: true,
+						onClick: async () => await api.services()
+					}, this.child);
+
 					this.panel = new smenu.Panel(undefined, { size: "large" });
 
 					this.view = makeTree("div", ["component", "ctmsServices"], {
@@ -627,13 +642,25 @@ const core = {
 					this.child.insert(this.view);
 
 					core.account.onLogout(() => {
+						reload.set({ label: "tải thông tin dịch vụ", color: "red", disabled: true });
 						this.view.occCard.value.innerText = "X occ";
 						emptyNode(this.view.list);
 					});
 
-					core.account.onLogin(async () => await api.services());
+					core.account.onLogin(async () => {
+						if (autoload.checkbox.input.checked) {
+							reload.button.loading(true);
+							await api.services();
+							reload.button.loading(false);
+						} else {
+							// When logged in and user does not want to automatically load
+							// services data, re-enable the button so user can load it if they want.
+							reload.set({ disabled: false });
+						}
+					});
 
 					api.onResponse("services", (data) => {
+						reload.set({ label: "làm mới", color: "blue" });
 						this.view.occCard.value.innerText = data.info.occ;
 						emptyNode(this.view.list);
 
@@ -918,14 +945,6 @@ const core = {
 				}, links);
 				
 				new smenu.components.Button({
-					label: "Wiki",
-					color: "pink",
-					icon: "externalLink",
-					complex: true,
-					onClick: () => window.open(REPO_ADDRESS + "/wiki", "_blank")
-				}, links);
-				
-				new smenu.components.Button({
 					label: "Mã Nguồn",
 					color: "pink",
 					icon: "externalLink",
@@ -1078,6 +1097,12 @@ const core = {
 					username: this.loginView.username.input.value,
 					password: this.loginView.password.input.value
 				});
+			});
+
+			// Add event for autologin change to automatically
+			// save value without submitting the form
+			this.loginView.autoLogin.input.addEventListener("input", (e) => {
+				localStorage.setItem("autoLogin.enabled", e.target.checked);
 			});
 
 			let autoLogin = localStorage.getItem("autoLogin.enabled");

@@ -1158,12 +1158,6 @@ const core = {
 					set({ p: 80, d: `Đang Tự Động Đăng Nhập Vào CTMS` });
 					await this.login({ username, password });
 				}
-			} else {
-				// Session is still valid, get username value from storage
-				let username = localStorage.getItem("session.username");
-
-				if (username)
-					this.updateEmail(username);
 			}
 		},
 
@@ -1209,6 +1203,10 @@ const core = {
 			} else if (this.loggedIn === false) {
 				this.log("OKAY", "User Signed In");
 				this.loggedIn = true;
+
+				let username = localStorage.getItem("session.username");
+				if (username)
+					this.updateEmail(username);
 
 				this.subWindow.loading = true;
 				this.subWindow.content = this.detailView;

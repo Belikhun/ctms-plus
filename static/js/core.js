@@ -973,6 +973,7 @@ const core = {
 
 		loggedIn: false,
 		background: null,
+		email: undefined,
 
 		/** @type {HTMLElement} */
 		nameNode: null,
@@ -1139,10 +1140,7 @@ const core = {
 			this.detailView.signoutBtn.addEventListener("click", () => this.logout());
 			api.onResponse("global", (response) => this.check(response));
 			api.onResponse("results", (response) => this.updateInfo(response));
-			api.onResponse("services", (response) => {
-				this.avatarNode.src = this.detailView.userCard.top.avatar.src = `https://www.gravatar.com/avatar/${md5(response.info.email)}?s=80`;
-				this.detailView.userCard.top.info.email.innerText = response.info.email;
-			});
+			api.onResponse("services", (response) => this.updateEmail(response.info.email));
 
 			set({ p: 50, d: `Đang Kiểm Tra Phiên Làm Việc` });
 			await api.request();
@@ -1160,6 +1158,12 @@ const core = {
 					set({ p: 80, d: `Đang Tự Động Đăng Nhập Vào CTMS` });
 					await this.login({ username, password });
 				}
+			} else {
+				// Session is still valid, get username value from storage
+				let username = localStorage.getItem("session.username");
+
+				if (username)
+					this.updateEmail(username);
 			}
 		},
 
@@ -1180,6 +1184,8 @@ const core = {
 		async check(response) {
 			if (response.dom.getElementById("LeftCol_UserLogin1_pnlLogin")) {
 				this.loggedIn = false;
+				this.email = undefined;
+				
 				this.nameNode.innerText = "Khách";
 				this.avatarNode.src = this.detailView.userCard.top.avatar.src = "./assets/img/guest.png";
 				this.detailView.userCard.top.info.email.innerText = "";
@@ -1231,6 +1237,16 @@ const core = {
 			this.detailView.tForm.content.innerText = response.info.tForm;
 		},
 
+		updateEmail(email) {
+			// Check email to prevent avatar reloading
+			if (email === this.email)
+				return;
+
+			this.avatarNode.src = this.detailView.userCard.top.avatar.src = `https://www.gravatar.com/avatar/${md5(email)}?s=160`;
+			this.detailView.userCard.top.info.email.innerText = email;
+			this.email = email;
+		},
+
 		async login({
 			username,
 			password
@@ -1253,6 +1269,7 @@ const core = {
 
 			try {
 				await api.login({ username, password });
+				this.updateEmail(username);
 			} catch(e) {
 				let error = parseException(e);
 				this.loginView.note.group.style.display = null;
@@ -1274,7 +1291,6 @@ const core = {
 
 			try {
 				await api.logout();
-				//localStorage.setItem("session", "");
 				await api.request();
 			} catch(error) {
 				errorHandler(error);
@@ -2497,11 +2513,50 @@ const core = {
 
 				core.account.onLogout(() => this.onLogout());
 				this.screen.onReload(async () => await this.load());
-				core.account.onLogin(async () => await this.load());
+
+				this.screen.onShow(async () => {
+					if (this.loaded)
+						return;
+
+					await this.load();
+				});
+
+				core.account.onLogin(async () => {
+					let resultCache = localStorage.getItem("cache.account");
+					let needUpdate = true;
+
+					if (resultCache) {
+						/** @type {Object} */
+						resultCache = JSON.parse(resultCache);
+	
+						// Check cache validity, if current logged in user data
+						// has been cached, we don't need to fetch this api anymore.
+						if (resultCache.email === core.account.email) {
+							this.log("INFO", "Account data has been cached, we don't need to fetch it again.");
+							core.account.updateInfo({ info: resultCache });
+							this.screen.loading = false;
+							needUpdate = false;
+						}
+					}
+
+					if (needUpdate)
+						await this.load();
+				});
 
 				api.onResponse("results", (response) => {
 					if (!this.loaded)
 						this.screen.overlay({ show: false });
+	
+					// Cache user info for applying in the future
+					localStorage.setItem("cache.account", JSON.stringify({
+						email: core.account.email,
+						name: response.info.name,
+						studentID: response.info.studentID,
+						birthday: response.info.birthday,
+						classroom: response.info.classroom,
+						department: response.info.department,
+						tForm: response.info.tForm,
+					}));
 
 					this.loaded = true;
 					emptyNode(this.view.table.tbody);

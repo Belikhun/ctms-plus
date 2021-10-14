@@ -155,7 +155,8 @@ const api = {
 				throw { code: -1, description: `Phiên làm việc hết hạn hoặc bạn không có quyền truy cập chức năng này!` }
 
 			clog("WARN", `api.request(): session expired! requesting new session`);
-			localStorage.setItem("session", "");
+			localStorage.removeItem("session");
+			localStorage.removeItem("session.username");
 			return await this.request(arguments[0]);
 		}
 
@@ -242,6 +243,7 @@ const api = {
 			}
 		});
 
+		localStorage.setItem("session.username", username);
 		this.__handleResponse("login", response);
 		return response;
 	},

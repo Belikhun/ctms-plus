@@ -34,16 +34,16 @@ class Splash {
 				classes: "icon"
 			}),
 
-			titleNode: { tag: "t", class: "title", text: name },
 			phase: { tag: "t", class: "phase", text: "Phase 0/0: Init Splash" },
-			detail: { tag: "div", class: "detail", child: {
-				module: { tag: "t", class: "module", text: "splash" },
-				status: { tag: "t", class: "status", text: "Building Up Splash Screen" }
-			}},
-
-			error: { tag: "t", class: "error" },
+			
 			progress: { tag: "div", class: ["progressBar", "light"], child: {
-				bar: { tag: "div", class: "bar" }
+				bar: { tag: "div", class: "bar" },
+				error: { tag: "t", class: "error" },
+
+				detail: { tag: "div", class: "detail", child: {
+					module: { tag: "t", class: "module", text: "splash" },
+					status: { tag: "t", class: "status", text: "Building Up Splash Screen" }
+				}}
 			}}
 		});
 
@@ -56,13 +56,13 @@ class Splash {
 		this.phase = this.splash.phase;
 
 		/** @type {HTMLElement} */
-		this.module = this.splash.detail.module;
+		this.module = this.splash.progress.detail.module;
 
 		/** @type {HTMLElement} */
-		this.status = this.splash.detail.status;
+		this.status = this.splash.progress.detail.status;
 
 		/** @type {HTMLElement} */
-		this.error = this.splash.error;
+		this.error = this.splash.progress.error;
 
 		this.bar.dataset.color = "pink";
 		this.bar.dataset.blink = "grow";
@@ -129,6 +129,7 @@ class Splash {
 		this.phase.innerText = "Phase 2/3: Script Initialization";
 		this.bar.style.width = `30%`;
 		this.bar.dataset.color = "blue";
+		this.bar.removeAttribute("data-blink");
 
 		let _mp = 1 / this.onInitHandlers.length;
 		for (let i = 0; i < this.onInitHandlers.length; i++) {
@@ -181,10 +182,11 @@ class Splash {
 	async panic(error, stop = true) {
 		let e = parseException(error);
 
+		this.splash.classList.add("errored");
 		this.status.innerText = "LỖI ĐÃ XẢY RA!";
 		this.error.innerText = `[${e.code}] >>> ${e.description}`;
 		this.bar.dataset.color = "red";
-		this.bar.dataset.blink = "fade";
+		this.bar.dataset.blink = "grow";
 		cookie.set("splashInitSuccess", false, 1);
 		clog("ERRR", error);
 

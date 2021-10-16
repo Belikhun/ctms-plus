@@ -494,8 +494,10 @@ const api = {
 		// Parse week start date displayed in the input
 		response.date = null;
 		let dateInput = response.dom.getElementById(`LeftCol_Lichhoc1_txtNgaydautuan`);
-		if (dateInput)
-			response.date = new Date(dateInput.value);
+		if (dateInput) {
+			dateInput = dateInput.value.split("-");
+			response.date = new Date(dateInput[0], dateInput[1] - 1, dateInput[2], 0, 0, 0);
+		}
 
 		// Parse schedule table
 		// The loop from 0 to 8 is just to make sure we parse all table

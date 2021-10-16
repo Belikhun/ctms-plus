@@ -993,6 +993,7 @@ const core = {
 		loggedIn: false,
 		background: null,
 		email: undefined,
+		userInfo: undefined,
 
 		/** @type {HTMLElement} */
 		nameNode: null,
@@ -1204,6 +1205,7 @@ const core = {
 			if (response.dom.getElementById("LeftCol_UserLogin1_pnlLogin")) {
 				this.loggedIn = false;
 				this.email = undefined;
+				this.userInfo = undefined;
 				
 				this.nameNode.innerText = "Khách";
 				this.avatarNode.src = this.detailView.userCard.top.avatar.src = "./assets/img/guest.png";
@@ -1251,6 +1253,7 @@ const core = {
 		},
 
 		updateInfo(response) {
+			this.userInfo = response.info;
 			this.nameNode.innerText = response.info.name;
 			this.detailView.userCard.top.info.name.innerText = response.info.name;
 			this.detailView.userCard.top.info.studentID.innerText = response.info.studentID;
@@ -1339,6 +1342,7 @@ const core = {
 			} = {}) {
 				this.id = id;
 				this.showing = false;
+				this.overlayShowing = false;
 				this.reloadHandlers = []
 				this.showHandlers = []
 				this.hideHandlers = []
@@ -1457,9 +1461,11 @@ const core = {
 			} = {}) {
 				if (!show) {
 					this.view.overlay.style.display = "none";
+					this.overlayShowing = false;
 					return;
 				}
 
+				this.overlayShowing = true;
 				this.view.overlay.style.display = null;
 				this.view.overlay.icon.dataset.icon = icon;
 				this.view.overlay.oTitle.innerText = title;
@@ -1504,13 +1510,14 @@ const core = {
 
 		schedule: {
 			/** @type {core.screen.Screen} */
-			screen: null,
+			screen: undefined,
 
 			view: null,
 			loaded: false,
 			autoChangeRenderer: true,
 			defaultRenderMode: "table",
 			listRenderTrigger: 700,
+			haveCacheData: false,
 
 			currentRenderer: "table",
 			currentData: [],
@@ -1546,7 +1553,7 @@ const core = {
 
 				this.screen.view.header.reload.style.display = "none";
 				this.screen.content = this.view;
-				this.screen.loading = true;
+				this.setLoading(true);
 				this.screen.onShow(() => this.load());
 				new Scrollable(this.view, { content: this.view.list });
 
@@ -1556,13 +1563,35 @@ const core = {
 						this.load();
 				});
 
-				core.account.onLogout(() => this.onLogout());
-				api.onResponse("schedule", (response) => {
-					this.loaded = true;
+				core.account.onLogout(() => {
+					if (!this.haveCacheData)
+						this.onLogout()
+				});
 
+				api.onResponse("schedule", (response) => {
 					if (response.date)
 						this.setInputNow(response.date);
 
+					// Check schedule data is current week or next week, first response
+					// always return current week data, so we can use this.loaded to
+					// determine is current data is from first request.
+					if (!this.loaded) {
+						this.log("INFO", `Updating schedule cache for`, {
+							text: core.account.userInfo.name,
+							color: oscColor("blue")
+						});
+
+						// Update schedule cache
+						localStorage.setItem("cache.schedule", JSON.stringify({
+							name: core.account.userInfo.name,
+							date: response.date,
+							stored: new Date(),
+							info: response.info
+						}));
+					}
+
+					
+					this.loaded = true;
 					this.render(response.info);
 				});
 
@@ -1574,6 +1603,53 @@ const core = {
 					this.render();
 				});
 
+				let cacheRaw = localStorage.getItem("cache.schedule");
+				if (cacheRaw) {
+					try {
+						/** @type {Object} */
+						let cache = JSON.parse(cacheRaw);
+						this.haveCacheData = true;
+	
+						// Convert date string back to date object
+						cache.stored = new Date(cache.stored);
+						cache.date = new Date(cache.date);
+	
+						for (let item of cache.info) {
+							item.date = new Date(item.date);
+	
+							for (let row of item.rows) {
+								row.date[0] = new Date(row.date[0]);
+								row.date[1] = new Date(row.date[1]);
+							}
+						}
+	
+						this.render(cache.info);
+	
+						// Render notice for user
+						let note = createNote({
+							level: "warning",
+							style: "round",
+							message: `
+								Đây là dữ liệu lịch học của tuần từ ngày
+								<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
+								của tài khoản <b>${cache.name}</b>.<br>
+								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể không chính xác!<br>
+							`
+						});
+	
+						note.group.style.marginBottom = "30px";
+						this.view.list.insertBefore(note.group, this.view.list.firstChild);
+						this.view.control.confirm.disabled = true;
+						this.screen.overlay({ show: false });
+	
+						// Switch to button loading indicator because we have just
+						// hided the screen loading overlay
+						this.setLoading(true);
+					} catch(e) {
+						this.log("WARN", "Loading cache data failed! Ignoring cache for now...", e);
+					}
+				}
+
 				this.setInputNow();
 				this.screen.show();
 			},
@@ -1582,6 +1658,16 @@ const core = {
 				this.loaded = false;
 				emptyNode(this.view.list);
 				this.setInputNow();
+			},
+
+			setLoading(loading = false) {
+				if (this.screen.overlayShowing) {
+					this.screen.loading = loading;
+					this.view.control.confirm.loading(false);
+				} else {
+					this.screen.loading = false;
+					this.view.control.confirm.loading(loading);
+				}
 			},
 
 			onLogout() {
@@ -1596,7 +1682,7 @@ const core = {
 					}
 				});
 
-				this.screen.loading = false;
+				this.setLoading(false);
 			},
 
 			/**
@@ -1605,22 +1691,25 @@ const core = {
 			 */
 			async load(date) {
 				if (!core.account.loggedIn) {
-					this.onLogout();
+					if (!this.haveCacheData)
+						this.onLogout();
+					
 					return;
 				}
 
 				try {
 					if (!this.loaded) {
-						this.screen.loading = true;
+						this.haveCacheData = false;
+						this.setLoading(true);
 						this.screen.overlay({ show: false });
 						await api.schedule();
 						this.view.control.confirm.disabled = false;
-						this.screen.loading = false;
+						this.setLoading(false);
 					} else {
 						if (date) {
-							this.screen.loading = true;
+							this.setLoading(true);
 							await api.schedule(date);
-							this.screen.loading = false;
+							this.setLoading(false);
 						}
 					}
 				} catch(e) {
@@ -1637,7 +1726,7 @@ const core = {
 						}
 					});
 
-					this.screen.loading = false;
+					this.setLoading(false);
 				}
 			},
 

@@ -135,6 +135,7 @@
 .splash.errored > .progressBar > .detail {
     bottom: 10px;
     right: 60px;
+    width: auto;
     max-width: 40vw;
     transform: unset;
 }
@@ -195,7 +196,15 @@
 }
 
 body.dark .splash::before {
-	box-shadow: inset 0 -150px 50px -100px rgba(36, 36, 36, 0.7);
+	box-shadow: inset 0 -150px 50px -100px rgba(36, 36, 36);
+}
+
+body.dark .splash > .progressBar > .detail > .module {
+    color: white;
+}
+
+body.dark .splash > .progressBar > .detail > .status {
+    color: white;
 }
 
 body.dark .splash > .error {

@@ -67,6 +67,22 @@ const api = {
 		this.responseHandlers[type].forEach(f => f(data));
 	},
 
+	/**
+	 * Perform a HTTP request through middleware
+	 * 
+	 * @typedef		APIResponse
+	 * @type		{Object}
+	 * @property	{String}			path		Request Path
+	 * @property	{DocumentFragment}	dom			DOM Object
+	 * @property	{Number}			c2m			Time taken client -> middleware
+	 * @property	{Number}			time		Total processing time in middleware
+	 * @property	{Object[]}			headers		Response header from target
+	 * @property	{Object[]}			sentHeaders	Headers sent to target
+	 * @property	{String}			response	Raw response
+	 * @property	{String}			session		Session
+	 * 
+	 * @returns		{Promise<APIResponse>}		API Response Object
+	 */
 	async request({
 		path = "",
 		method = "GET",
@@ -209,6 +225,7 @@ const api = {
 		}
 
 		let data = {
+			path,
 			dom: dom.content,
 			c2m: start.tick() - response.runtime,
 			...response.data
@@ -221,10 +238,10 @@ const api = {
 	/**
 	 * Đăng nhập vào CTMS với tài khoản và mật khẩu được đưa vào
 	 * 
-	 * @param	{Object} param0
-	 * Bao gồm 2 giá trị
-	 *  + **String** `username`: Tên người dùng/email
-	 *  + **String** `password`: Mật khẩu
+	 * @param		{Object}		credentials
+	 * @param		{String}		credentials.username		Tên người dùng/email
+	 * @param		{String}		credentials.password		Mật khẩu
+	 * @returns		{APIResponse}
 	 */
 	async login({
 		username,
@@ -447,6 +464,138 @@ const api = {
 		return response;
 	},
 
+	// For current home page viewstate, we can use them if
+	// global viewstate is being changed by another api
+	// request
+	__HOME_VIEWSTATE: undefined,
+	__HOME_VIEWSTATEGENERATOR: undefined,
+	__HOME_EVENTVALIDATION: undefined,
+	__HOME_DATE: undefined,
+
+	/**
+	 * Lấy dữ liệu của trang chủ CTMS, trang này bao gồm lịch học chung của toàn khoa
+	 * 
+	 * @param		{Date}					date	Thời gian trong tuần cần xem
+	 * @return		{Promise<APIResponse & Home>}
+	 */
+	async home(date) {
+		/** @type {APIResponse & Home} */
+		let response;
+
+		if (typeof date !== "undefined") {
+			this.__HOME_DATE = `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`;
+
+			response = await this.request({
+				path: "/index.aspx",
+				method: "POST",
+				form: {
+					__VIEWSTATE: this.__HOME_VIEWSTATE,
+					__VIEWSTATEGENERATOR: this.__HOME_VIEWSTATEGENERATOR,
+					__EVENTVALIDATION: this.__HOME_EVENTVALIDATION,
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$ddlCosoDaotao": 0,
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$cboKhunggio": 0,
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$txtNgaydautuan": this.__HOME_DATE,
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$btnOK": "Xem thời khóa biểu",
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$ddlKhunggio2": 1,
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$txtNgay2": "",
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$txtTongsoBuoihoc": "",
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$txtKhoangcach": 7,
+					"ctl00$LeftCol$ThoikhoabieuWeekView1$txtNgay4Edit": ""
+				}
+			});
+		} else {
+			response = await this.request({
+				path: "/index.aspx",
+				method: "GET"
+			});
+		}
+
+		// Update current home viewstate
+		this.__HOME_VIEWSTATE = this.__VIEWSTATE;
+		this.__HOME_VIEWSTATEGENERATOR = this.__VIEWSTATEGENERATOR;
+		this.__HOME_EVENTVALIDATION = this.__EVENTVALIDATION;
+
+		// Parse week start date displayed in the input
+		response.date = null;
+		let dateInput = response.dom.getElementById(`LeftCol_ThoikhoabieuWeekView1_txtNgaydautuan`);
+		if (dateInput) {
+			dateInput = dateInput.value.split("-");
+			response.date = new Date(dateInput[0], dateInput[1] - 1, dateInput[2], 0, 0, 0);
+		}
+
+		// Get main table DOM Object
+		let table = response.dom.getElementById("LeftCol_ThoikhoabieuWeekView1_grvThoikhoabieu");
+
+		/** @type {ScheduleWeekRow[]} */
+		let info = Array();
+
+		// Parse first row to get current week's day
+		let header = [ ...table.querySelectorAll(`:scope > tbody > tr:first-child > th`) ];
+		header.shift();
+
+		for (let column of header) {
+			/** @type {String[]} */
+			let tokens = /([^0-9]+)(\d+\/\d+\/\d+)/gm.exec(column.innerText.trim());
+
+			// Invalid format, we will skip it for now.
+			// Valid format for example: Thứ hai01/11/2021
+			if (!tokens)
+				continue;
+
+			let timeToken = tokens[2].split("/");
+			let date = new Date(timeToken[2], timeToken[1] - 1, timeToken[0]);
+
+			info.push({
+				dateString: tokens[1],
+				weekDay: tokens[2],
+				date,
+				time: `${tokens[1]} ${tokens[2]}`,
+				rows: Array()
+			});
+		}
+
+		// Parse each row to get schedule data, row contains subjects for each classroom
+		let classroomRows = table.querySelectorAll(`:scope > tbody > tr:not(:first-child)`);
+
+		for (let classroomRow of classroomRows) {
+			let classroom = classroomRow.children[0].innerText.trim();
+
+			for (let i = 1; i < classroomRow.children.length; i++) {
+				if (typeof info[i - 1] === "undefined")
+					continue;
+
+				let timeToken = info[i - 1].weekDay.split("/");
+				let cell = classroomRow.children[i];
+				let subjects = cell.querySelectorAll(`:scope > table`);
+
+				for (let subject of subjects) {
+					let tokens = subject.querySelectorAll(`:scope > tbody > tr > td`);
+					let rowTime = tokens[0].innerText.trim().replace(" ->", " -> ").split(" -> ");
+					let timeStartToken = rowTime[0].split(":");
+					let timeEndToken = rowTime[1].split(":");
+					let startDate = new Date(timeToken[2], timeToken[1] - 1, timeToken[0], timeStartToken[0], timeStartToken[1]);
+					let endDate = new Date(timeToken[2], timeToken[1] - 1, timeToken[0], timeEndToken[0], timeEndToken[1]);
+
+					info[i - 1].rows.push({
+						time: rowTime,
+						date: [startDate, endDate],
+						classroom,
+						subject: `${tokens[1].children[0].title} (${tokens[1].innerText.trim()})`,
+						teacher: tokens[2].innerText.trim(),
+						classID: tokens[3].innerText.trim(),
+						status: tokens[4].innerText.trim(),
+						listID: null,
+						noteID: null
+					});
+				}
+				
+			}
+		}
+
+		this.__handleResponse("home", response);
+		return response;
+	},
+
 	// For current schedule viewstate, we can use them if
 	// global viewstate is being changed by another api
 	// request
@@ -458,9 +607,11 @@ const api = {
 	/**
 	 * Lấy lịch học với ngày đầu tuần (hoặc ngày trong tuần) cho trước
 	 * 
-	 * @param	{Date} date	Thời gian trong tuần cần xem
+	 * @param		{Date}					date	Thời gian trong tuần cần xem
+	 * @returns		{Promise<APIResponse & Schedule>}
 	 */
 	async schedule(date) {
+		/** @type {APIResponse & Schedule} */
 		let response;
 		
 		if (typeof date !== "undefined") {
@@ -931,6 +1082,11 @@ const api = {
 		this.__LOGOUT_VIEWSTATE = undefined;
 		this.__LOGOUT_VIEWSTATEGENERATOR = undefined;
 
+		this.__HOME_VIEWSTATE = undefined;
+		this.__HOME_VIEWSTATEGENERATOR = undefined;
+		this.__HOME_EVENTVALIDATION = undefined;
+		this.__HOME_DATE = undefined;
+
 		this.__SCHEDULE_VIEWSTATE = undefined;
 		this.__SCHEDULE_VIEWSTATEGENERATOR = undefined;
 		this.__SCHEDULE_EVENTVALIDATION = undefined;
@@ -945,3 +1101,47 @@ const api = {
 		this.__SUBS_STUDENTID = undefined;
 	}
 }
+
+//* ============= OBJECT DEFINITION =============
+
+/**
+ * Schedule object
+ * @typedef		Schedule
+ * @type		{Object}
+ * @property	{Date}					date	Schedule start date, will be the first day of that week.
+ * @property	{ScheduleWeekRow[]}		info	Contain each day of week
+ */
+
+/**
+ * Schedule subject object
+ * @typedef		ScheduleSubject
+ * @type		{Object}
+ * @property	{String[]}		time
+ * @property	{Date[]}		date
+ * @property	{String}		classroom
+ * @property	{String}		subject
+ * @property	{String}		teacher
+ * @property	{String}		classID
+ * @property	{String}		listID
+ * @property	{String}		status
+ * @property	{String}		noteID
+ */
+
+/**
+ * Schedule week row object
+ * @typedef		ScheduleWeekRow
+ * @type		{Object}
+ * @property	{String[]}				time
+ * @property	{Date[]}				date
+ * @property	{String}				dateString
+ * @property	{String}				weekDay
+ * @property	{ScheduleSubject[]}		rows
+ */
+
+/**
+ * Home object
+ * @typedef		Home
+ * @type		{Object}
+ * @property	{Date}					date	Schedule start date, will be the first day of that week.
+ * @property	{ScheduleWeekRow[]}		info	Contain each day of week
+ */

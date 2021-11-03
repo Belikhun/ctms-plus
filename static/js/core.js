@@ -1388,7 +1388,15 @@ const core = {
 			this.logoutHandlers.push(f);
 		},
 
+		/**
+		 * Check for login state from other requests.
+		 * @param	{APIResponse}	response
+		 */
 		async check(response) {
+			// Skip check for page that don't require login
+			if (response.path.includes("index.aspx"))
+				return;
+
 			if (response.dom.getElementById("LeftCol_UserLogin1_pnlLogin")) {
 				this.loggedIn = false;
 				this.email = undefined;
@@ -1519,7 +1527,8 @@ const core = {
 		priority: 3,
 
 		init() {
-			
+			api.home();
+			return false;
 		},
 
 		home: {

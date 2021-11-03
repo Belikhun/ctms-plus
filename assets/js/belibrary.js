@@ -2361,6 +2361,80 @@ function createSelectInput({
 	}
 }
 
+function createChoiceInput({
+	color,
+	choice,
+	value
+} = {}) {
+	let container = document.createElement("div");
+	container.classList.add("sq-choice");
+
+	let choiceNodes = {}
+	let activeNode = null;
+	let activeValue = null;
+	let changeHandlers = []
+
+	const setValue = (value) => {
+		if (value === activeValue)
+			return;
+
+		if (!choiceNodes[value])
+			return;
+
+		if (activeNode)
+			activeNode.classList.remove("active");
+
+		choiceNodes[value].classList.add("active");
+		activeValue = value;
+		activeNode = choiceNodes[value];
+		changeHandlers.forEach(f => f(value));
+	}
+
+	const set = ({
+		color,
+		choice,
+		value
+	} = {}) => {
+		if (typeof color === "string")
+			container.dataset.color = color;
+
+		if (typeof choice === "object") {
+			choiceNodes = {}
+			activeNode = null;
+			activeValue = null;
+
+			for (let key of Object.keys(choice)) {
+				let node = document.createElement("icon");
+				node.dataset.icon = choice[key].icon || "circle";
+				
+				if (typeof choice[key].title === "string")
+					node.title = choice[key].title;
+
+				container.appendChild(node);
+				choiceNodes[key] = node;
+				node.addEventListener("click", () => setValue(key));
+			}
+		}
+
+		if (typeof value !== "undefined")
+			setValue(value);
+	}
+
+	set({ color, choice, value });
+
+	return {
+		container,
+		set,
+
+		onChange(f) {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createChoiceInput().onChange(): not a valid function` }
+
+			changeHandlers.push(f);
+		}
+	}
+}
+
 function createSlider({
 	color = "pink",
 	value = 0,

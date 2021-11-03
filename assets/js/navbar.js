@@ -316,6 +316,7 @@ const navbar = {
 		}
 
 		/**
+		 * Set Clickable Button State
 		 * @param {Boolean}		active
 		 */
 		set active(active) {
@@ -328,6 +329,14 @@ const navbar = {
 			});
 		}
 
+		/**
+		 * Get Clickable Button State
+		 * @return {Boolean}
+		 */
+		get active() {
+			return this.container.classList.contains("active");
+		}
+
 		show() {
 			this.active = true;
 		}
@@ -336,11 +345,19 @@ const navbar = {
 			this.active = false;
 		}
 
+		/**
+		 * Set Active State Without Triggering Event Handlers
+		 * @param	{Boolean}	active
+		 */
 		setActive(active) {
 			this.container.classList[active ? "add" : "remove"]("active")
 		}
 
-		toggle(isActive = this.container.classList.contains("active")) {
+		/**
+		 * Toogle Active State
+		 * @param	{Boolean}	isActive
+		 */
+		toggle(isActive = this.active) {
 			this.active = !isActive;
 		}
 	},
@@ -466,16 +483,23 @@ const navbar = {
 				let navtip = new navbar.Tooltip(button, (arguments && arguments[0] && arguments[0].tooltip) ? arguments[0].tooltip : {})
 				let click = new navbar.Clickable(button, { onlyActive: true });
 
-				click.setHandler((a) => {
-					if (a) {
-						if (currentActive && currentActive.id !== button.dataset.id) {
-							currentActive.click.active = false;
-							currentActive = null;
-						}
-	
-						indicator.style.left = button.offsetLeft + "px";
-						currentActive = { id: button.dataset.id, click }
+				/**
+				 * Update current active button without triggering
+				 * event handlers
+				 */
+				const update = () => {
+					if (currentActive && currentActive.id !== button.dataset.id) {
+						currentActive.click.active = false;
+						currentActive = null;
 					}
+
+					indicator.style.left = button.offsetLeft + "px";
+					currentActive = { id: button.dataset.id, click }
+				}
+
+				click.setHandler((a) => {
+					if (a)
+						update();
 				});
 
 				container.appendChild(button);
@@ -483,7 +507,8 @@ const navbar = {
 				return {
 					button,
 					navtip,
-					click
+					click,
+					update
 				}
 			},
 

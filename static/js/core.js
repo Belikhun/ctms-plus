@@ -10,6 +10,193 @@ var VERSION = "0.1";
 var STATE = "local";
 
 /**
+ * Screen class, used to construct new screen
+ * 
+ * @author		Belikhun
+ * @version		1.0
+ */
+class CoreScreen {
+	constructor({
+		id = "sample",
+		icon = "circle",
+		title = "sample screen",
+		description = "this is a sample screen description",
+		subTitle = "",
+		applyScrollable = true
+	} = {}) {
+		this.id = id;
+		this.showing = false;
+		this.overlayShowing = false;
+		this.reloadHandlers = []
+		this.showHandlers = []
+		this.hideHandlers = []
+
+		this.button = core.navbar.switch.component.button({
+			icon,
+			tooltip: {
+				title,
+				description
+			}
+		});
+
+		this.view = makeTree("div", ["screen", id], {
+			loading: { tag: "div", class: "loading", child: {
+				spinner: { tag: "span", class: "spinner" }
+			}},
+
+			overlay: { tag: "div", class: "overlay", child: {
+				icon: { tag: "icon" },
+				oTitle: { tag: "t", class: "title" },
+				description: { tag: "t", class: "description" },
+				buttons: { tag: "div", class: "buttons" }
+			}},
+
+			header: { tag: "div", class: "header", child: {
+				icon: { tag: "icon", data: { icon } },
+				detail: { tag: "span", class: "detail", child: {
+					sTitle: { tag: "t", class: "title", text: title },
+					subTitle: { tag: "t", class: "subTitle", html: subTitle }
+				}},
+
+				reload: createButton("TẢI LẠI", {
+					style: "round",
+					icon: "reload",
+					complex: true
+				})
+			}},
+
+			content: { tag: "div", class: "content" }
+		});
+
+		if (applyScrollable)
+			new Scrollable(this.view, { content: this.view.content });
+
+		this.view.header.reload.addEventListener("click", async () => {
+			this.view.header.reload.disabled = true;
+
+			try {
+				for (let f of this.reloadHandlers)
+					await f();
+			} catch(error) {
+				errorHandler(error);
+			}
+
+			this.view.header.reload.disabled = false;
+		});
+
+		this.view.overlay.style.display = "none";
+		core.screen.container.appendChild(this.view);
+		this.button.click.setHandler((a) => a ? this.__show() : this.__hide());
+	}
+
+	show() {
+		this.button.click.active = true;
+	}
+
+	__show() {
+		this.showing = true;
+		core.screen.container.dataset.screen = this.id;
+		this.showHandlers.forEach(f => f());
+	}
+
+	onShow(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `CoreScreen(${this.id}).onShow(): not a valid function` }
+
+		this.showHandlers.push(f);
+	}
+
+	hide() {
+		this.button.click.active = false;
+	}
+
+	__hide() {
+		this.showing = false;
+		this.hideHandlers.forEach(f => f());
+	}
+
+	onHide(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `CoreScreen(${this.id}).onHide(): not a valid function` }
+
+		this.hideHandlers.push(f);
+	}
+
+	onReload(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `CoreScreen(${this.id}).onReload(): not a valid function` }
+
+		this.reloadHandlers.push(f);
+	}
+
+	set({
+		icon,
+		title,
+		subTitle
+	} = {}) {
+		if (typeof icon === "string")
+			this.view.header.icon.dataset.icon = icon;
+
+		if (typeof title === "string")
+			this.view.header.detail.sTitle.innerText = title;
+
+		if (typeof subTitle === "string")
+			this.view.header.detail.subTitle.innerHTML = subTitle;
+	}
+
+	overlay({
+		show = true,
+		icon = "circle",
+		title = "Screen Overlay Example",
+		description = " This is an example of screen overlay, which is immortal 😇",
+		buttons = {}
+	} = {}) {
+		if (!show) {
+			this.view.overlay.style.display = "none";
+			this.overlayShowing = false;
+			return;
+		}
+
+		this.overlayShowing = true;
+		this.view.overlay.style.display = null;
+		this.view.overlay.icon.dataset.icon = icon;
+		this.view.overlay.oTitle.innerText = title;
+		this.view.overlay.description.innerHTML = description;
+		
+		emptyNode(this.view.overlay.buttons);
+		for (let key of Object.keys(buttons)) {
+			let b = createButton(buttons[key].text, {
+				color: buttons[key].color || "blue",
+				style: "round",
+				icon: buttons[key].icon,
+				complex: true
+			});
+
+			if (typeof buttons[key].onClick === "function")
+				b.addEventListener("click", () => buttons[key].onClick());
+
+			this.view.overlay.buttons.appendChild(b);
+		}
+	}
+
+	/** @param {Boolean} loading */
+	set loading(loading) {
+		this.view.loading.classList[loading ? "add" : "remove"]("show");
+	}
+
+	/** @param {String|HTMLElement} content */
+	set content(content) {
+		this.view.overlay.style.display = "none";
+		emptyNode(this.view.content);
+
+		if (typeof content === "object" && content.classList)
+			this.view.content.appendChild(content);
+		else
+			this.view.content.innerHTML = content;
+	}
+}
+
+/**
  * This object contains CTMS+ core modules and will be
  * initialized after every resources on the page is loaded
  * 
@@ -1331,185 +1518,27 @@ const core = {
 		container: $("#content"),
 		priority: 3,
 
-		Screen: class {
-			constructor({
-				id = "sample",
-				icon = "circle",
-				title = "sample screen",
-				description = "this is a sample screen description",
-				subTitle = "",
-				applyScrollable = true
-			} = {}) {
-				this.id = id;
-				this.showing = false;
-				this.overlayShowing = false;
-				this.reloadHandlers = []
-				this.showHandlers = []
-				this.hideHandlers = []
-
-				this.button = core.navbar.switch.component.button({
-					icon,
-					tooltip: {
-						title,
-						description
-					}
-				});
-
-				this.view = makeTree("div", ["screen", id], {
-					loading: { tag: "div", class: "loading", child: {
-						spinner: { tag: "span", class: "spinner" }
-					}},
-
-					overlay: { tag: "div", class: "overlay", child: {
-						icon: { tag: "icon" },
-						oTitle: { tag: "t", class: "title" },
-						description: { tag: "t", class: "description" },
-						buttons: { tag: "div", class: "buttons" }
-					}},
-
-					header: { tag: "div", class: "header", child: {
-						icon: { tag: "icon", data: { icon } },
-						detail: { tag: "span", class: "detail", child: {
-							sTitle: { tag: "t", class: "title", text: title },
-							subTitle: { tag: "t", class: "subTitle", html: subTitle }
-						}},
-
-						reload: createButton("TẢI LẠI", {
-							style: "round",
-							icon: "reload",
-							complex: true
-						})
-					}},
-
-					content: { tag: "div", class: "content" }
-				});
-
-				if (applyScrollable)
-					new Scrollable(this.view, { content: this.view.content });
-
-				this.view.header.reload.addEventListener("click", async () => {
-					this.view.header.reload.disabled = true;
-
-					try {
-						for (let f of this.reloadHandlers)
-							await f();
-					} catch(error) {
-						errorHandler(error);
-					}
-
-					this.view.header.reload.disabled = false;
-				});
-
-				this.view.overlay.style.display = "none";
-				core.screen.container.appendChild(this.view);
-				this.button.click.setHandler((a) => a ? this.show() : this.hide());
-			}
-
-			show() {
-				this.showing = true;
-				core.screen.container.dataset.screen = this.id;
-				this.showHandlers.forEach(f => f());
-			}
-
-			onShow(f) {
-				if (typeof f !== "function")
-					throw { code: -1, description: `core.screen.Screen(${this.id}).onShow(): not a valid function` }
-	
-				this.showHandlers.push(f);
-			}
-
-			hide() {
-				this.showing = false;
-				this.hideHandlers.forEach(f => f());
-			}
-
-			onHide(f) {
-				if (typeof f !== "function")
-					throw { code: -1, description: `core.screen.Screen(${this.id}).onHide(): not a valid function` }
-	
-				this.hideHandlers.push(f);
-			}
-
-			onReload(f) {
-				if (typeof f !== "function")
-					throw { code: -1, description: `core.screen.Screen(${this.id}).onReload(): not a valid function` }
-	
-				this.reloadHandlers.push(f);
-			}
-
-			set({
-				icon,
-				title,
-				subTitle
-			} = {}) {
-				if (typeof icon === "string")
-					this.view.header.icon.dataset.icon = icon;
-
-				if (typeof title === "string")
-					this.view.header.detail.sTitle.innerText = title;
-
-				if (typeof subTitle === "string")
-					this.view.header.detail.subTitle.innerHTML = subTitle;
-			}
-
-			overlay({
-				show = true,
-				icon = "circle",
-				title = "Screen Overlay Example",
-				description = " This is an example of screen overlay, which is immortal 😇",
-				buttons = {}
-			} = {}) {
-				if (!show) {
-					this.view.overlay.style.display = "none";
-					this.overlayShowing = false;
-					return;
-				}
-
-				this.overlayShowing = true;
-				this.view.overlay.style.display = null;
-				this.view.overlay.icon.dataset.icon = icon;
-				this.view.overlay.oTitle.innerText = title;
-				this.view.overlay.description.innerHTML = description;
-				
-				emptyNode(this.view.overlay.buttons);
-				for (let key of Object.keys(buttons)) {
-					let b = createButton(buttons[key].text, {
-						color: buttons[key].color || "blue",
-						style: "round",
-						icon: buttons[key].icon,
-						complex: true
-					});
-
-					if (typeof buttons[key].onClick === "function")
-						b.addEventListener("click", () => buttons[key].onClick());
-
-					this.view.overlay.buttons.appendChild(b);
-				}
-			}
-
-			/** @param {Boolean} loading */
-			set loading(loading) {
-				this.view.loading.classList[loading ? "add" : "remove"]("show");
-			}
-
-			/** @param {String|HTMLElement} content */
-			set content(content) {
-				this.view.overlay.style.display = "none";
-				emptyNode(this.view.content);
-
-				if (typeof content === "object" && content.classList)
-					this.view.content.appendChild(content);
-				else
-					this.view.content.innerHTML = content;
-			}
-		},
-
 		init() {
 			
 		},
 
+		home: {
+			/** @type {CoreScreen} */
+			screen: undefined,
+
+			async init() {
+				this.screen = new CoreScreen({
+					id: "home",
+					icon: "home",
+					title: "trang chủ",
+					description: "trang chủ của CTMS",
+					applyScrollable: false
+				});
+			}
+		},
+
 		schedule: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: undefined,
 
 			view: null,
@@ -1543,7 +1572,7 @@ const core = {
 					list: { tag: "div", class: ["list", "showEmpty"] }
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "schedule",
 					icon: "calendarWeek",
 					title: "lịch học",
@@ -1996,7 +2025,7 @@ const core = {
 		},
 
 		tests: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: null,
 
 			view: null,
@@ -2021,7 +2050,7 @@ const core = {
 					}}
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "tests",
 					icon: "pencil",
 					title: "lịch thi",
@@ -2171,7 +2200,7 @@ const core = {
 		},
 
 		subscribe: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: null,
 
 			view: null,
@@ -2188,7 +2217,7 @@ const core = {
 					subscribed: { tag: "div", class: ["content", "showEmpty", "subscribed"] }
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "subscribe",
 					icon: "play",
 					title: "đăng kí lớp",
@@ -2546,7 +2575,7 @@ const core = {
 		},
 
 		results: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: null,
 
 			view: null,
@@ -2609,7 +2638,7 @@ const core = {
 					}}
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "results",
 					icon: "poll",
 					title: "kết quả học tập",

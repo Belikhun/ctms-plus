@@ -57,6 +57,10 @@ body.dark .component.ctmsStatus > .item.network > .nodes > .node > .status > .fa
 
 /** ==================== SCREEN.HOME ==================== */
 
+body.dark .homeScreenTitle > span.active {
+	color: white;
+}
+
 body.dark .homeScreen > .control > .sq-selector {
 	--background: rgb(46, 46, 46);
 }

@@ -1744,7 +1744,6 @@ const core = {
 					});
 
 					this.loaded = true;
-					this.loading = false;
 					this.render(response.info);
 				});
 
@@ -1840,6 +1839,8 @@ const core = {
 			},
 
 			setLoading(loading = false) {
+				this.loading = loading;
+
 				if (this.screen.overlayShowing) {
 					this.screen.loading = loading;
 					this.view.control.confirm.loading(false);
@@ -1856,7 +1857,6 @@ const core = {
 			async load(date) {
 				try {
 					if (!this.loaded) {
-						this.loading = true;
 						this.setLoading(true);
 						this.screen.overlay({ show: false });
 						await api.home();
@@ -1864,7 +1864,6 @@ const core = {
 						this.setLoading(false);
 					} else {
 						if (date) {
-							this.loading = true;
 							this.setLoading(true);
 							await api.home(date);
 							this.setLoading(false);
@@ -1884,7 +1883,6 @@ const core = {
 						}
 					});
 
-					this.loading = false;
 					this.setLoading(false);
 				}
 			},
@@ -2142,17 +2140,23 @@ const core = {
 									<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
 									của tài khoản <b>${cache.name}</b>.<br>
 									Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai!<br>
+									Hãy <a href="javascript:core.account.subWindow.show()">đăng nhập</a> để cập nhật dữ liệu!
 								`
 							});
 		
 							note.group.style.marginBottom = "30px";
 							this.view.list.insertBefore(note.group, this.view.list.firstChild);
-							this.view.control.confirm.disabled = true;
 							this.screen.overlay({ show: false });
 		
-							// Switch to button loading indicator because we have just
-							// hided the screen loading overlay
-							this.setLoading(true);
+							let autoLogin = localStorage.getItem("autoLogin.enabled");
+							if (autoLogin === "true") {
+								// Switch to button loading indicator because we have just
+								// hided the screen loading overlay
+								this.setLoading(true);
+							} else {
+								this.setLoading(false);
+								this.view.control.confirm.disabled = true;
+							}
 						}
 					} catch(e) {
 						this.log("WARN", "Loading cache data failed! Ignoring cache for now...", e);

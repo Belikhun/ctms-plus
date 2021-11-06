@@ -911,6 +911,10 @@ icon[data-icon="print"]::after {
 	color: #343434;
 }
 
+.note > .inner.inner > a {
+	color: rgb(21, 76, 255);
+}
+
 .note.info,
 .note[data-level="info"] {
     background-color: #ffffff;

@@ -2361,6 +2361,30 @@ function createSelectInput({
 	}
 }
 
+/**
+ * Check current agent is a mobile phone?
+ * @returns {Boolean}
+ */
+function checkAgentMobile() {
+	if (typeof navigator.userAgentData === "object"
+		&& typeof navigator.userAgentData.mobile === "boolean")
+		return navigator.userAgentData.mobile;
+
+	// Borrowed from Stack Overflow
+	// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+	const toMatch = Array(
+		/Android/i,
+		/webOS/i,
+		/iPhone/i,
+		/iPad/i,
+		/iPod/i,
+		/BlackBerry/i,
+		/Windows Phone/i
+	);
+		
+	return toMatch.some((i) => navigator.userAgent.match(i));
+}
+
 function createChoiceInput({
 	color,
 	choice,

@@ -297,6 +297,10 @@ arr::before {
 	z-index: 2;
 }
 
+#content > div > .header > icon {
+	min-width: 45px;
+}
+
 #content > div > .header > icon::after {
 	font-size: 38px;
 }
@@ -404,6 +408,7 @@ arr::before {
 	font-family: Nunito;
 	font-size: 32px;
 	font-weight: 900;
+	text-align: center;
 	margin-bottom: 5px;
 }
 
@@ -485,7 +490,7 @@ arr::before {
 	tab-size: 4;
 	text-transform: uppercase;
 
-	box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
+	box-shadow: rgba(33, 35, 38, 0.1) 0 10px 10px -10px;
 	resize: none;
 }
 

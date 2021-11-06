@@ -1650,6 +1650,22 @@ const core = {
 					onClick: () => this.showClassIDEditor()
 				}, settingsChild);
 
+				// Attach to subscribe API to update Class ID list
+				api.onResponse("subscribe", (data) => {
+					let classIDs = this.getClassID();
+
+					/** @type {SubscribeEntry} */
+					let item;
+
+					for (item of data.subscribed)
+						if (!classIDs.includes(item.classID)) {
+							this.log("DEBG", `updateClassID: new class ID from subscribe: ${item.classID}`);
+							classIDs.push(item.classID);
+						}
+
+					this.saveClassID(classIDs);
+				});
+
 				this.screen = new CoreScreen({
 					id: "home",
 					icon: "home",
@@ -1694,6 +1710,7 @@ const core = {
 			},
 
 			/**
+			 * Get Class ID List
 			 * @returns {Array<String>}
 			 */
 			getClassID() {
@@ -1706,6 +1723,17 @@ const core = {
 					return storage.split("||");
 			},
 
+			/**
+			 * Save Class ID List
+			 * @param {String[]} ids 
+			 */
+			saveClassID(ids) {
+				localStorage.setItem("home.classID", ids.join("||"));
+
+				if (this.activeScreen === "my")
+					this.render(undefined, { force: true });
+			},
+
 			async showClassIDEditor() {
 				let editor = document.createElement("textarea");
 				editor.classList.add("classIDInput", "flatInput");
@@ -1715,7 +1743,7 @@ const core = {
 					windowTitle: `Trang Chủ`,
 					title: "Sửa Danh Sách Mã Lớp",
 					message: "Nhập các mã lớp mà bạn đang theo học, mỗi mã nằm trên một dòng",
-					description: `Danh sách mã lớp cũng sẽ được tự động cập nhật nếu bạn vào trang <b>Đăng Kí<b> của CTMS+`,
+					description: `Danh sách mã lớp cũng sẽ được tự động cập nhật nếu bạn vào trang <b>Đăng Kí</b> của CTMS+`,
 					icon: "pencil",
 					bgColor: "blue",
 					customNode: editor,
@@ -1725,18 +1753,14 @@ const core = {
 					}
 				});
 
-				let values = editor.value
-					.toUpperCase()
-					.split("\n")
-					.filter((i) => i.length > 0)
-					.join("||");
-
 				if (command === "save") {
-					localStorage.setItem("home.classID", values);
-					this.log("DEBG", "showClassIDEditor(): manually saved class ID list");
+					let values = editor.value
+						.toUpperCase()
+						.split("\n")
+						.filter((i) => i.length > 0);
 
-					if (this.activeScreen === "my")
-						this.render(undefined, { force: true });
+					this.saveClassID(values);
+					this.log("DEBG", "showClassIDEditor(): manually saved class ID list");
 				}
 			},
 
@@ -1748,10 +1772,12 @@ const core = {
 					this.title.home.classList.add("active");
 					this.title.my.classList.remove("active");
 					this.currentScreen = "home";
+					this.screen.set({ icon: "home" });
 				} else {
 					this.title.my.classList.add("active");
 					this.title.home.classList.remove("active");
 					this.currentScreen = "my";
+					this.screen.set({ icon: "userPortrait" });
 				}
 
 				this.render();
@@ -1777,7 +1803,7 @@ const core = {
 			 * @param {Date} date 
 			 * @returns
 			 */
-			 async load(date) {
+			async load(date) {
 				try {
 					if (!this.loaded) {
 						this.setLoading(true);
@@ -2090,9 +2116,10 @@ const core = {
 				this.screen.overlay({
 					icon: "exclamation",
 					title: "Yêu Cầu Đăng Nhập",
-					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này!`,
+					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này! Hoặc bạn <b>có thể</b> xem lịch học mà không cần đăng nhập.`,
 					buttons: {
-						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true }
+						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true },
+						viewHome: { text: "Xem Lịch Học", icon: "table", color: "purple", onClick: () => core.screen.home.screen.show() }
 					}
 				});
 

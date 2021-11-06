@@ -693,6 +693,10 @@ icon[data-icon="userLock"]::after {
 	content: "\f502";
 }
 
+icon[data-icon="userPortrait"]::after {
+	content: "\f007";
+}
+
 icon[data-icon="logout"]::after {
 	content: "\f2f5";
 }

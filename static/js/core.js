@@ -1548,11 +1548,7 @@ const core = {
 		container: $("#content"),
 		priority: 3,
 
-		init() {
-			this.home.log = (l, m) => clog(l, m);
-			this.home.init();
-			return false;
-		},
+		init() {},
 
 		home: {
 			/** @type {CoreScreen} */

@@ -982,7 +982,10 @@ const core = {
 					color: "pink",
 					save: "schedule.autoChangeRenderer",
 					defaultValue: true,
-					onChange: (v) => core.screen.schedule.setAutoChangeRenderer(v)
+					onChange: (v) => {
+						core.screen.home.setAutoChangeRenderer(v)
+						core.screen.schedule.setAutoChangeRenderer(v);
+					}
 				}, ux);
 
 				new smenu.components.Choice({
@@ -994,7 +997,10 @@ const core = {
 					},
 					save: "schedule.renderMode",
 					defaultValue: "table",
-					onChange: (v) => core.screen.schedule.setDefaultRenderMode(v)
+					onChange: (v) => {
+						core.screen.home.setDefaultRenderMode(v);
+						core.screen.schedule.setDefaultRenderMode(v);
+					}
 				}, ux);
 			}
 		},
@@ -1706,7 +1712,6 @@ const core = {
 				});
 
 				this.setInputNow();
-				this.screen.show();
 			},
 
 			/**

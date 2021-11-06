@@ -442,26 +442,63 @@ arr::before {
 	align-items: center;
 	justify-content: space-between;
 
-	padding: 0 10px;
+	padding: 10px;
 	overflow: visible;
 	background-color: var(--global-background);
-	z-index: 1;
+	z-index: 3;
 }
 
 .homeScreen > .control > .sq-input {
-	margin: 10px 0;
+	margin: 0;
 }
 
 .homeScreen > .control > .sq-btn {
 	margin-left: 10px;
 }
 
-.homeScreen > .control > .sq-choice {
-	margin-right: 50px;
+.homeScreen > .control > .sq-selector {
+	--background: rgb(255, 255, 255);
+
+	height: 100%;
+	min-width: 200px;
+	margin-left: 10px;
+
+	box-shadow: rgba(33, 35, 38, 0.1) 0 10px 10px -10px;
 }
 
-.homeScreen > .control > .sq-choice > icon {
-	min-width: 80px;
+.homeScreen > .control > .separator {
+	flex-shrink: 0;
+	display: inline-block;
+	width: 2px;
+	height: 100%;
+	margin-left: 10px;
+
+	background-color: rgba(194, 194, 194, 0.8);
+}
+
+.homeScreen > .control:not([data-screen="home"]) > .sq-selector,
+.homeScreen > .control:not([data-screen="home"]) > .separator[key="separatorLine2"] {
+	display: none;
+}
+
+@media only screen and (max-width: 700px) {
+	.homeScreen > .control[data-screen="home"] {
+		padding-bottom: 50px;
+	}
+
+	.homeScreen > .control > .separator {
+		display: none;
+	}
+
+	.homeScreen > .control > .sq-selector {
+		position: absolute;
+
+		bottom: 0;
+		left: 10px;
+		right: 10px;
+		height: auto;
+		margin-left: unset;
+	}
 }
 
 .homeScreen > .list {

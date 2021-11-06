@@ -1570,8 +1570,12 @@ const core = {
 			emptyClassIDsNotice: null,
 
 			loaded: false,
+			loading: false,
 			activeScreen: null,
 			currentScreen: null,
+
+			activeWeekday: null,
+			currentWeekday: null,
 
 			autoChangeRenderer: true,
 			defaultRenderMode: "table",
@@ -1595,6 +1599,22 @@ const core = {
 							complex: true,
 							disabled: true
 						}),
+
+						separatorLine1: {
+							tag: "div",
+							class: "separator"
+						},
+
+						homeDate: createSelectInput({
+							icon: "table",
+							color: "blue",
+							fixed: true
+						}),
+
+						separatorLine2: {
+							tag: "div",
+							class: "separator"
+						},
 
 						edit: createButton(undefined, {
 							icon: "pencil",
@@ -1695,11 +1715,36 @@ const core = {
 				this.emptyClassIDsNotice.buttons.edit.addEventListener("click", () => this.showClassIDEditor());
 				this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => {});
 
+				this.view.control.homeDate.onChange((value) => {
+					this.currentWeekday = value;
+					this.log("DEBG", "Change Weekday:", value, `(loading: ${this.loading})`);
+
+					if (!this.loading)
+						this.render();
+				});
+
 				api.onResponse("home", (response) => {
 					if (response.date)
 						this.setInputNow(response.date);
 					
+					// Update weekday selector options
+					let options = { all: "Toàn Bộ" }
+					let defaultValue = null;
+
+					for (let item of response.info) {
+						options[item.weekDay] = item.weekDay;
+
+						if (!defaultValue || isToday(item.date))
+							defaultValue = item.weekDay;
+					}
+
+					this.view.control.homeDate.set({
+						options,
+						value: defaultValue
+					});
+
 					this.loaded = true;
+					this.loading = false;
 					this.render(response.info);
 				});
 
@@ -1729,7 +1774,7 @@ const core = {
 			},
 
 			/**
-			 * Save Class ID List
+			 * Save Clas ID List
 			 * @param {String[]} ids 
 			 */
 			saveClassID(ids) {
@@ -1811,6 +1856,7 @@ const core = {
 			async load(date) {
 				try {
 					if (!this.loaded) {
+						this.loading = true;
 						this.setLoading(true);
 						this.screen.overlay({ show: false });
 						await api.home();
@@ -1818,6 +1864,7 @@ const core = {
 						this.setLoading(false);
 					} else {
 						if (date) {
+							this.loading = true;
 							this.setLoading(true);
 							await api.home(date);
 							this.setLoading(false);
@@ -1837,6 +1884,7 @@ const core = {
 						}
 					});
 
+					this.loading = false;
 					this.setLoading(false);
 				}
 			},
@@ -1889,9 +1937,15 @@ const core = {
 						renderer = "table";
 				}
 
+				let needUpdate = force
+					|| this.currentRenderer !== renderer
+					|| newData
+					|| this.activeScreen !== this.currentScreen
+					|| this.activeWeekday !== this.currentWeekday;
+
 				// Only re-render when render mode changed or we have
 				// updated data to render
-				if (force || this.currentRenderer !== renderer || newData || this.activeScreen !== this.currentScreen) {
+				if (needUpdate) {
 					this.log("DEBG", `render(${renderer}): re-rendering`, `(force: ${force})`);
 					emptyNode(this.view.list);
 
@@ -1941,6 +1995,10 @@ const core = {
 						renderData = data;
 					}
 
+					// In home screen, we filter to only display selected date
+					if (this.currentScreen === "home" && this.currentWeekday !== "all")
+						renderData = renderData.filter((i) => i.weekDay === this.currentWeekday);
+
 					if (renderer === "table")
 						this.view.list.appendChild(core.screen.schedule.renderTable(renderData));
 					else
@@ -1948,6 +2006,9 @@ const core = {
 
 					this.currentRenderer = renderer;
 					this.activeScreen = this.currentScreen;
+					this.activeWeekday = this.currentWeekday;
+					this.view.control.dataset.render = renderer;
+					this.view.control.dataset.screen = this.currentScreen;
 				}
 			}
 		},
@@ -2058,38 +2119,41 @@ const core = {
 						// Convert date string back to date object
 						cache.stored = new Date(cache.stored);
 						cache.date = new Date(cache.date);
-	
-						for (let item of cache.info) {
-							item.date = new Date(item.date);
-	
-							for (let row of item.rows) {
-								row.date[0] = new Date(row.date[0]);
-								row.date[1] = new Date(row.date[1]);
+
+						// Validate cache age (7 days)
+						if (time(cache.date) >= time() - 604800) {
+							for (let item of cache.info) {
+								item.date = new Date(item.date);
+		
+								for (let row of item.rows) {
+									row.date[0] = new Date(row.date[0]);
+									row.date[1] = new Date(row.date[1]);
+								}
 							}
+		
+							this.render(cache.info);
+		
+							// Render notice for user
+							let note = createNote({
+								level: "warning",
+								style: "round",
+								message: `
+									Đây là dữ liệu lịch học của tuần từ ngày
+									<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
+									của tài khoản <b>${cache.name}</b>.<br>
+									Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai!<br>
+								`
+							});
+		
+							note.group.style.marginBottom = "30px";
+							this.view.list.insertBefore(note.group, this.view.list.firstChild);
+							this.view.control.confirm.disabled = true;
+							this.screen.overlay({ show: false });
+		
+							// Switch to button loading indicator because we have just
+							// hided the screen loading overlay
+							this.setLoading(true);
 						}
-	
-						this.render(cache.info);
-	
-						// Render notice for user
-						let note = createNote({
-							level: "warning",
-							style: "round",
-							message: `
-								Đây là dữ liệu lịch học của tuần từ ngày
-								<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
-								của tài khoản <b>${cache.name}</b>.<br>
-								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể không chính xác!<br>
-							`
-						});
-	
-						note.group.style.marginBottom = "30px";
-						this.view.list.insertBefore(note.group, this.view.list.firstChild);
-						this.view.control.confirm.disabled = true;
-						this.screen.overlay({ show: false });
-	
-						// Switch to button loading indicator because we have just
-						// hided the screen loading overlay
-						this.setLoading(true);
 					} catch(e) {
 						this.log("WARN", "Loading cache data failed! Ignoring cache for now...", e);
 					}

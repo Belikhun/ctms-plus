@@ -55,6 +55,16 @@ body.dark .component.ctmsStatus > .item.network > .nodes > .node > .status > .fa
 	color: rgb(255, 152, 183);
 }
 
+/** ==================== SCREEN.HOME ==================== */
+
+body.dark .homeScreen > .control > .sq-selector {
+	--background: rgb(46, 46, 46);
+}
+
+body.dark .homeScreen > .control > .separator {
+	background-color: rgba(84, 84, 84, 0.8);
+}
+
 /** ==================== SCREEN.SCHEDULE ==================== */
 
 body.dark .scheduleTable,

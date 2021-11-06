@@ -580,8 +580,10 @@ body.dark ::-webkit-calendar-picker-indicator {
     position: relative;
     display: flex;
     flex-direction: row;
+    align-items: center;
 
     width: 100%;
+    height: 100%;
     padding: 10px;
     box-sizing: border-box;
     border-radius: 6px;
@@ -598,6 +600,11 @@ body.dark ::-webkit-calendar-picker-indicator {
 
 .sq-selector > .current > .icon {
     margin-right: 10px;
+}
+
+.sq-selector > .current:hover > .icon::after,
+.sq-selector.show > .current > .icon::after {
+    color: white;
 }
 
 .sq-selector > .current > .value {
@@ -648,7 +655,7 @@ body.dark ::-webkit-calendar-picker-indicator {
 
 .sq-selector.fixed > .select {
     position: absolute;
-    z-index: 1;
+    z-index: 999;
 }
 
 .sq-selector > .select > .list {

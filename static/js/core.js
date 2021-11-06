@@ -409,6 +409,10 @@ const core = {
 				window.STATE = response.branch;
 				window.REPORT_ERROR = response.link.report;
 				window.REPO_ADDRESS = response.link.repo;
+				window.DEBUG = (META.branch === "development");
+
+				if (DEBUG)
+					this.log("INFO", "Development Mode Enabled. Detailed logs will be printed in verbose level.");
 			} catch(e) {
 				this.log("WARN", "Could not fetch metadata file! Maybe it's missing?");
 				this.log("DEBG", e);
@@ -1713,7 +1717,7 @@ const core = {
 				this.view.control.edit.addEventListener("click", () => this.showClassIDEditor());
 				this.view.control.confirm.addEventListener("click", () => this.load(this.getInputDate()));
 				this.emptyClassIDsNotice.buttons.edit.addEventListener("click", () => this.showClassIDEditor());
-				this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => {});
+				this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => window.open(META.link.classIDHelp, "_blank"));
 
 				this.view.control.homeDate.onChange((value) => {
 					this.currentWeekday = value;

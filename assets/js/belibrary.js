@@ -2852,7 +2852,16 @@ const cookie = {
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
+/**
+ * Log to console, with sparkles!
+ * @param {String}				level	Log level
+ * @param  {...String|Object}	args	Log info
+ */
 function clog(level, ...args) {
+	// We only want to log DEBG level in development mode
+	if (level.toUpperCase() === "DEBG" && !(typeof DEBUG === "boolean" && DEBUG === true))
+		return;
+
 	const font = "Consolas";
 	const size = "12";
 	let date = new Date();

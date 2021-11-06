@@ -57,42 +57,43 @@ body.dark .component.ctmsStatus > .item.network > .nodes > .node > .status > .fa
 
 /** ==================== SCREEN.SCHEDULE ==================== */
 
-body.dark .scheduleScreen > .list {
+body.dark .scheduleTable,
+body.dark .scheduleList {
 	--schedule-gray: #5a5a5a;
 	--schedule-green: var(--color-green);
 	--schedule-blue: var(--color-blue);
 }
 
-body.dark .scheduleScreen > .list > .generalTable > tbody > tr > td {
+body.dark table.scheduleTable.scheduleTable > tbody > tr > td {
 	background-color: transparent;
 }
 
-body.dark .scheduleScreen > .list > .generalTable > tbody > tr.odd > td {
+body.dark table.scheduleTable.scheduleTable > tbody > tr.odd > td {
 	background-color: rgba(38, 38, 38, 0.8);
 }
 
-body.dark .scheduleScreen > .list > .generalTable > tbody > tr.row:hover > td {
+body.dark table.scheduleTable.scheduleTable > tbody > tr.row:hover > td {
 	background-color: rgb(46, 46, 46);
 }
 
-body.dark .scheduleScreen > .list > .listItem > .items::before {
+body.dark .scheduleList > .listItem > .items::before {
 	background-color: rgb(46, 46, 46);
 }
 
-body.dark .scheduleScreen > .list > .listItem > .items > .item {
+body.dark .scheduleList > .listItem > .items > .item {
 	background-color: #242424;
 }
 
-body.dark .scheduleScreen > .list > .listItem > .items > .item > .gradient {
+body.dark .scheduleList > .listItem > .items > .item > .gradient {
 	display: block;
 }
 
-body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > t,
-body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > span::before {
+body.dark .scheduleList > .listItem > .items > .item > .bottom > t,
+body.dark .scheduleList > .listItem > .items > .item > .bottom > span::before {
 	color: rgb(214, 214, 214);
 }
 
-body.dark .scheduleScreen > .list > .listItem > .items > .item > .bottom > t:empty::before {
+body.dark .scheduleList > .listItem > .items > .item > .bottom > t:empty::before {
 	color: rgb(85, 85, 85);
 }
 

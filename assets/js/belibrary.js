@@ -2364,10 +2364,25 @@ function createSelectInput({
 function createChoiceInput({
 	color,
 	choice,
-	value
+	value,
+	classes
 } = {}) {
 	let container = document.createElement("div");
 	container.classList.add("sq-choice");
+
+	switch (typeof classes) {
+		case "string":
+			container.classList.add(classes);
+			break;
+		
+		case "object":
+			if (classes.length && classes.length > 0)
+				container.classList.add(...classes);
+			else
+				throw { code: -1, description: `createChoiceInput(): Invalid or empty "classes" type: ${typeof classes}` }
+
+			break;
+	}
 
 	let choiceNodes = {}
 	let activeNode = null;

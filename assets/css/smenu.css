@@ -326,6 +326,10 @@
 	font-size: 13px;
 }
 
+.smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.choice > .sq-choice {
+	margin-top: 10px;
+}
+
 /** COMPONENT: SELECT **/
 
 .smenuContainer > .main > .wrapper > .smenu > .group > .child > .component.select > .label {

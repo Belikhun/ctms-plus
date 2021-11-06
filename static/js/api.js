@@ -527,7 +527,7 @@ const api = {
 		let table = response.dom.getElementById("LeftCol_ThoikhoabieuWeekView1_grvThoikhoabieu");
 
 		/** @type {ScheduleWeekRow[]} */
-		let info = Array();
+		response.info = Array();
 
 		// Parse first row to get current week's day
 		let header = [ ...table.querySelectorAll(`:scope > tbody > tr:first-child > th`) ];
@@ -545,11 +545,11 @@ const api = {
 			let timeToken = tokens[2].split("/");
 			let date = new Date(timeToken[2], timeToken[1] - 1, timeToken[0]);
 
-			info.push({
-				dateString: tokens[1],
-				weekDay: tokens[2],
+			response.info.push({
+				dateString: tokens[2],
+				weekDay: tokens[1],
 				date,
-				time: `${tokens[1]} ${tokens[2]}`,
+				time: `${tokens[2]} ${tokens[1]}`,
 				rows: Array()
 			});
 		}
@@ -561,10 +561,10 @@ const api = {
 			let classroom = classroomRow.children[0].innerText.trim();
 
 			for (let i = 1; i < classroomRow.children.length; i++) {
-				if (typeof info[i - 1] === "undefined")
+				if (typeof response.info[i - 1] === "undefined")
 					continue;
 
-				let timeToken = info[i - 1].weekDay.split("/");
+				let timeToken = response.info[i - 1].dateString.split("/");
 				let cell = classroomRow.children[i];
 				let subjects = cell.querySelectorAll(`:scope > table`);
 
@@ -576,19 +576,28 @@ const api = {
 					let startDate = new Date(timeToken[2], timeToken[1] - 1, timeToken[0], timeStartToken[0], timeStartToken[1]);
 					let endDate = new Date(timeToken[2], timeToken[1] - 1, timeToken[0], timeEndToken[0], timeEndToken[1]);
 
-					info[i - 1].rows.push({
+					// Parse subject (this can be null, ffs)
+					let subjectName = (tokens[1].children.length !== 0)
+						? `${tokens[1].children[0].title} (${tokens[1].innerText.trim()})`
+						: null;
+
+					response.info[i - 1].rows.push({
 						time: rowTime,
 						date: [startDate, endDate],
 						classroom,
-						subject: `${tokens[1].children[0].title} (${tokens[1].innerText.trim()})`,
+						subject: subjectName,
 						teacher: tokens[2].innerText.trim(),
-						classID: tokens[3].innerText.trim(),
+						classID: tokens[3].innerHTML.trim()
+							.replace(/\[|\]/g, "")
+							.split("<br>"),
 						status: tokens[4].innerText.trim(),
 						listID: null,
 						noteID: null
 					});
 				}
 				
+				// Sort by start time
+				response.info[i - 1].rows.sort((a, b) => a.date[0] - b.date[0]);
 			}
 		}
 
@@ -1116,15 +1125,15 @@ const api = {
  * Schedule subject object
  * @typedef		ScheduleSubject
  * @type		{Object}
- * @property	{String[]}		time
- * @property	{Date[]}		date
- * @property	{String}		classroom
- * @property	{String}		subject
- * @property	{String}		teacher
- * @property	{String}		classID
- * @property	{String}		listID
- * @property	{String}		status
- * @property	{String}		noteID
+ * @property	{String[]}			time
+ * @property	{Date[]}			date
+ * @property	{String}			classroom
+ * @property	{String}			subject
+ * @property	{String}			teacher
+ * @property	{String|String[]}	classID
+ * @property	{String}			listID
+ * @property	{String}			status
+ * @property	{String}			noteID
  */
 
 /**

@@ -16,6 +16,16 @@ var STATE = "local";
  * @version		1.0
  */
 class CoreScreen {
+	/**
+	 * Create a new Screen
+	 * @param	{Object}				options
+	 * @param	{String}				options.id				Screen ID
+	 * @param	{String}				options.icon			Icon name
+	 * @param	{String|HTMLElement}	options.title			Title
+	 * @param	{String}				options.description		Description for menu icon
+	 * @param	{String}				options.subTitle		Subtitle, will display under title
+	 * @param	{Boolean}				options.applyScrollable	Automatically apply scrollable for content
+	 */
 	constructor({
 		id = "sample",
 		icon = "circle",
@@ -129,6 +139,13 @@ class CoreScreen {
 		this.reloadHandlers.push(f);
 	}
 
+	/**
+	 * Update Screen Info
+	 * @param	{Object}				info				General info
+	 * @param	{String}				info.icon			Icon name
+	 * @param	{String|HTMLElement}	info.title			Title
+	 * @param	{String}				info.subTitle		Subtitle, will display under title
+	 */
 	set({
 		icon,
 		title,
@@ -137,8 +154,13 @@ class CoreScreen {
 		if (typeof icon === "string")
 			this.view.header.icon.dataset.icon = icon;
 
-		if (typeof title === "string")
+		if (typeof title === "string") {
 			this.view.header.detail.sTitle.innerText = title;
+			this.button.navtip.set({ title });
+		} else if (typeof title === "object" && title.tagName) {
+			emptyNode(this.view.header.detail.sTitle);
+			this.view.header.detail.sTitle.appendChild(title);
+		}
 
 		if (typeof subTitle === "string")
 			this.view.header.detail.subTitle.innerHTML = subTitle;
@@ -1527,7 +1549,8 @@ const core = {
 		priority: 3,
 
 		init() {
-			api.home();
+			this.home.log = (l, m) => clog(l, m);
+			this.home.init();
 			return false;
 		},
 
@@ -1535,7 +1558,102 @@ const core = {
 			/** @type {CoreScreen} */
 			screen: undefined,
 
+			/** @type {HTMLDivElement} */
+			view: null,
+
+			/** @type {HTMLDivElement} */
+			title: null,
+
+			/** @type {HTMLDivElement} */
+			emptyClassIDsNotice: null,
+
+			loaded: false,
+			activeScreen: null,
+			currentScreen: null,
+
+			autoChangeRenderer: true,
+			defaultRenderMode: "table",
+			currentRenderer: "table",
+			listRenderTrigger: 700,
+			currentData: [],
+
 			async init() {
+				this.view = makeTree("div", "homeScreen", {
+					control: { tag: "div", class: "control", child: {
+						dateInput: createInput({
+							type: "date",
+							id: "schedule.date",
+							label: "Ngày Bắt Đầu"
+						}),
+
+						confirm: createButton("XEM", {
+							icon: "calendarWeek",
+							color: "orange",
+							style: "round",
+							complex: true,
+							disabled: true
+						}),
+
+						edit: createButton(undefined, {
+							icon: "pencil",
+							color: "blue",
+							style: "round",
+							complex: true
+						})
+					}},
+
+					list: { tag: "div", class: ["list", "showEmpty"] }
+				});
+
+				this.title = makeTree("div", "homeScreenTitle", {
+					my: { tag: "span", class: "my", text: "của bạn" },
+					home: { tag: "span", class: "home", text: "trang chủ" }
+				});
+
+				this.emptyClassIDsNotice = makeTree("div", "emptyClassIDsNotice", {
+					icon: { tag: "icon", data: { icon: "pencil" } },
+					titleNode: { tag: "t", class: "title", text: `Danh Sách Lớp Của Bạn Trống!` },
+					description: {
+						tag: "t",
+						class: "description",
+						html: `Hãy nhập danh sách mã lớp mà bạn đã đăng kí,
+							lịch học của bạn sẽ được hiển thị tại đây.
+							Lưu ý rằng lịch học này được lấy từ lịch học chung của khoa được hiển thị tại trang chủ của CTMS
+							dựa trên danh sách mã lớp mà bạn đã nhập, vì vậy hãy đảm bảo chắc chắn rằng danh sách
+							này là <b>CHÍNH XÁC</b>. Danh sách mã lớp cũng sẽ được cập nhật tự động khi bạn vào trang <b>Đăng Kí</b> của CTMS+`
+					},
+
+					buttons: { tag: "div", class: "buttons", child: {
+						edit: createButton("CHỈNH SỬA", {
+							color: "blue",
+							style: "round",
+							icon: "pencil",
+							complex: true
+						}),
+
+						help: createButton("Hướng Dẫn", {
+							color: "purple",
+							style: "round",
+							icon: "question",
+							complex: true
+						})
+					}}
+				});
+
+				// Add new settings
+				let settingsChild = new smenu.Child(
+					{ label: "Trang Chủ" },
+					core.userSettings.schedule.group
+				);
+
+				new smenu.components.Button({
+					label: "Chỉnh Sửa Danh Sách Mã Lớp",
+					color: "orange",
+					icon: "pencil",
+					complex: true,
+					onClick: () => this.showClassIDEditor()
+				}, settingsChild);
+
 				this.screen = new CoreScreen({
 					id: "home",
 					icon: "home",
@@ -1543,6 +1661,267 @@ const core = {
 					description: "trang chủ của CTMS",
 					applyScrollable: false
 				});
+				
+				this.setScreen("my");
+				this.setLoading(true);
+				this.screen.onShow(() => this.load());
+				new Scrollable(this.view, { content: this.view.list });
+				this.screen.view.header.reload.style.display = "none";
+				this.screen.set({ title: this.title });
+				this.screen.content = this.view;
+
+				this.title.my.addEventListener("click", () => this.setScreen("my"));
+				this.title.home.addEventListener("click", () => this.setScreen("home"));
+				this.view.control.edit.addEventListener("click", () => this.showClassIDEditor());
+				this.view.control.confirm.addEventListener("click", () => this.load(this.getInputDate()));
+				this.emptyClassIDsNotice.buttons.edit.addEventListener("click", () => this.showClassIDEditor());
+				this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => {});
+
+				api.onResponse("home", (response) => {
+					if (response.date)
+						this.setInputNow(response.date);
+					
+					this.loaded = true;
+					this.render(response.info);
+				});
+
+				// Event listener to update current render mode
+				window.addEventListener("resize", () => {
+					if (!this.autoChangeRenderer)
+						return;
+
+					this.render();
+				});
+
+				this.setInputNow();
+				this.screen.show();
+			},
+
+			/**
+			 * @returns {Array<String>}
+			 */
+			getClassID() {
+				// Load list from storage
+				let storage = localStorage.getItem("home.classID");
+
+				if (!storage)
+					return []
+				else
+					return storage.split("||");
+			},
+
+			async showClassIDEditor() {
+				let editor = document.createElement("textarea");
+				editor.classList.add("classIDInput", "flatInput");
+				editor.value = this.getClassID().join("\n");
+
+				let command = await popup.show({
+					windowTitle: `Trang Chủ`,
+					title: "Sửa Danh Sách Mã Lớp",
+					message: "Nhập các mã lớp mà bạn đang theo học, mỗi mã nằm trên một dòng",
+					description: `Danh sách mã lớp cũng sẽ được tự động cập nhật nếu bạn vào trang <b>Đăng Kí<b> của CTMS+`,
+					icon: "pencil",
+					bgColor: "blue",
+					customNode: editor,
+					buttonList: {
+						save: { icon: "save", text: "LƯU", color: "blue" },
+						cancel: { icon: "close", text: "HỦY", color: "red" },
+					}
+				});
+
+				let values = editor.value
+					.toUpperCase()
+					.split("\n")
+					.filter((i) => i.length > 0)
+					.join("||");
+
+				if (command === "save") {
+					localStorage.setItem("home.classID", values);
+					this.log("DEBG", "showClassIDEditor(): manually saved class ID list");
+
+					if (this.activeScreen === "my")
+						this.render(undefined, { force: true });
+				}
+			},
+
+			setScreen(screen) {
+				if (screen === this.currentScreen)
+					return;
+
+				if (screen === "home") {
+					this.title.home.classList.add("active");
+					this.title.my.classList.remove("active");
+					this.currentScreen = "home";
+				} else {
+					this.title.my.classList.add("active");
+					this.title.home.classList.remove("active");
+					this.currentScreen = "my";
+				}
+
+				this.render();
+			},
+
+			reset() {
+				this.loaded = false;
+				emptyNode(this.view.list);
+				this.setInputNow();
+			},
+
+			setLoading(loading = false) {
+				if (this.screen.overlayShowing) {
+					this.screen.loading = loading;
+					this.view.control.confirm.loading(false);
+				} else {
+					this.screen.loading = false;
+					this.view.control.confirm.loading(loading);
+				}
+			},
+
+			/**
+			 * @param {Date} date 
+			 * @returns
+			 */
+			 async load(date) {
+				try {
+					if (!this.loaded) {
+						this.setLoading(true);
+						this.screen.overlay({ show: false });
+						await api.home();
+						this.view.control.confirm.disabled = false;
+						this.setLoading(false);
+					} else {
+						if (date) {
+							this.setLoading(true);
+							await api.home(date);
+							this.setLoading(false);
+						}
+					}
+				} catch(e) {
+					let error = parseException(e);
+
+					this.reset();
+					this.view.control.confirm.disabled = true;
+					this.screen.overlay({
+						icon: "bomb",
+						title: "Toang Rồi Ông Giáo Ạ!",
+						description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
+						buttons: {
+							login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
+						}
+					});
+
+					this.setLoading(false);
+				}
+			},
+
+			setInputNow(date = new Date()) {
+				setDateTimeValue(this.view.control.dateInput.input, null, time(date));
+			},
+
+			getInputDate() {
+				return new Date(this.view.control.dateInput.input.value);
+			},
+
+			setAutoChangeRenderer(enabled) {
+				this.autoChangeRenderer = enabled;
+
+				if (this.initialized)
+					this.render();
+			},
+
+			setDefaultRenderMode(mode) {
+				this.defaultRenderMode = mode;
+
+				if (this.initialized && !this.autoChangeRenderer)
+					this.render();
+			},
+
+			/**
+			 * Render handler
+			 * @param 	{ScheduleWeekRow[]}		data
+			 */
+			render(data, {
+				force = false
+			} = {}) {
+				if (!this.loaded)
+					return;
+
+				let renderer = this.defaultRenderMode;
+				let newData = false;
+
+				if (typeof data === "object" && typeof data.length === "number") {
+					newData = true;
+					this.currentData = data;
+				} else
+					data = this.currentData;
+
+				if (this.autoChangeRenderer) {
+					if (window.innerWidth <= this.listRenderTrigger)
+						renderer = "list";
+					else
+						renderer = "table";
+				}
+
+				// Only re-render when render mode changed or we have
+				// updated data to render
+				if (force || this.currentRenderer !== renderer || newData || this.activeScreen !== this.currentScreen) {
+					this.log("DEBG", `render(${renderer}): re-rendering`, `(force: ${force})`);
+					emptyNode(this.view.list);
+
+					/** @type {ScheduleWeekRow[]} */
+					let renderData = Array();
+					
+					if (this.currentScreen === "my") {
+						let classIDs = this.getClassID();
+	
+						if (classIDs.length > 0) {
+							for (let item of data) {
+								let rows = Array();
+		
+								for (let row of item.rows) {
+									if (typeof row.classID !== "object" || !row.classID.length)
+										continue;
+		
+									let match = false;
+									for (let id of row.classID) {
+										if (classIDs.includes(id)) {
+											match = true;
+											break;
+										}
+									}
+		
+									if (match)
+										rows.push(row);
+								}
+
+								if (rows.length > 0) {
+									renderData.push({
+										time: item.time,
+										date: item.date,
+										dateString: item.dateString,
+										weekDay: item.weekDay,
+										rows
+									});
+								}
+							}
+						} else {
+							this.view.list.appendChild(this.emptyClassIDsNotice);
+							this.activeScreen = this.currentScreen;
+
+							return;
+						}
+					} else {
+						renderData = data;
+					}
+
+					if (renderer === "table")
+						this.view.list.appendChild(core.screen.schedule.renderTable(renderData));
+					else
+						this.view.list.appendChild(core.screen.schedule.renderList(renderData));
+
+					this.currentRenderer = renderer;
+					this.activeScreen = this.currentScreen;
+				}
 			}
 		},
 
@@ -1550,7 +1929,9 @@ const core = {
 			/** @type {CoreScreen} */
 			screen: undefined,
 
+			/** @type {HTMLDivElement} */
 			view: null,
+
 			loaded: false,
 			autoChangeRenderer: true,
 			defaultRenderMode: "table",
@@ -1589,9 +1970,9 @@ const core = {
 					applyScrollable: false
 				});
 
+				this.setLoading(true);
 				this.screen.view.header.reload.style.display = "none";
 				this.screen.content = this.view;
-				this.setLoading(true);
 				this.screen.onShow(() => this.load());
 				new Scrollable(this.view, { content: this.view.list });
 
@@ -1627,7 +2008,6 @@ const core = {
 							info: response.info
 						}));
 					}
-
 					
 					this.loaded = true;
 					this.render(response.info);
@@ -1792,7 +2172,7 @@ const core = {
 
 			/**
 			 * Render schedule handler
-			 * @param 	{Array}		data
+			 * @param 	{ScheduleWeekRow[]}		data
 			 */
 			render(data) {
 				let renderer = this.defaultRenderMode;
@@ -1815,22 +2195,30 @@ const core = {
 				// updated data to render
 				if (this.currentRenderer !== renderer || newData) {
 					this.log("DEBG", `render(${renderer}): re-rendering`);
+					emptyNode(this.view.list);
 
 					if (renderer === "table")
-						this.renderTable(data);
+						this.view.list.appendChild(this.renderTable(data));
 					else
-						this.renderList(data);
+						this.view.list.appendChild(this.renderList(data));
 
 					this.currentRenderer = renderer;
 				}
 			},
 
-			renderTable(data) {
-				emptyNode(this.view.list);
+			/**
+			 * Render schedule data in table format
+			 * 
+			 * @param		{ScheduleWeekRow[]}		data 	Schedule data
+			 * @returns		{HTMLTableElement}
+			 */
+			renderTable(data, {
+				removeListID = true
+			} = {}) {
 				let today = new Date();
 				let foundNextDay = false;
 
-				let table = makeTree("table", "generalTable", {
+				let table = makeTree("table", ["generalTable", "scheduleTable"], {
 					thead: { tag: "thead", child: {
 						row: { tag: "tr", child: {
 							state: { tag: "th" },
@@ -1841,7 +2229,10 @@ const core = {
 							time: { tag: "th", class: "bold", text: "Giờ" },
 							teacher: { tag: "th", text: "Giảng Viên" },
 							classID: { tag: "th", class: "right", text: "Mã Lớp" },
-							listID: { tag: "th", class: "right", text: "Mã DS Thi" },
+							
+							...((!removeListID)
+								? { listID: { tag: "th", class: "right", text: "Mã DS Thi" } }
+								: {})
 						}}
 					}},
 
@@ -1894,8 +2285,18 @@ const core = {
 							classroom: { tag: "td", text: row.classroom },
 							time: { tag: "td", class: "bold", html: `${row.time[0]}<arr></arr>${row.time[1]}` },
 							teacher: { tag: "td", text: row.teacher },
-							classID: { tag: "td", class: ["bold", "right"], text: row.classID },
-							listID: { tag: "td", class: ["bold", "right"], text: row.listID }
+
+							classID: {
+								tag: "td",
+								class: ["bold", "right"],
+								html: (typeof row.classID === "object")
+									? row.classID.join("<br>")
+									: row.classID
+							},
+
+							...((!removeListID)
+								? { listID: { tag: "td", class: ["bold", "right"], text: row.listID } }
+								: {})
 						});
 	
 						if (today > row.date[1]) {
@@ -1921,13 +2322,21 @@ const core = {
 					}
 				}
 
-				this.view.list.appendChild(table);
+				return table;
 			},
 
+			/**
+			 * Render schedule data in list format.
+			 * This format is mobile-fiendly
+			 * 
+			 * @param		{ScheduleWeekRow[]}		data 	Schedule data
+			 * @returns		{HTMLTableElement}
+			 */
 			renderList(data) {
-				emptyNode(this.view.list);
 				let today = new Date();
 				let foundNextDay = false;
+				let container = document.createElement("div");
+				container.classList.add("scheduleList");
 
 				for (let { time, date, dateString, weekDay, rows = [] } of data) {
 					let isItemToday = false;
@@ -1998,8 +2407,10 @@ const core = {
 						group.items.appendChild(item);
 					}
 		
-					this.view.list.appendChild(group);
+					container.appendChild(group);
 				}
+
+				return container;
 			},
 
 			async viewNote(id) {

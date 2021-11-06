@@ -6,21 +6,36 @@
 //? |-----------------------------------------------------------------------------------------------|
 
 const navbar = {
-	container: HTMLElement.prototype,
+	/** @type {HTMLElement} */
+	container: undefined,
 
 	block: {
-		left: HTMLElement.prototype,
-		middle: HTMLElement.prototype,
-		right: HTMLElement.prototype
+		/** @type {HTMLElement} */
+		left: undefined,
+
+		/** @type {HTMLElement} */
+		middle: undefined,
+
+		/** @type {HTMLElement} */
+		right: undefined
 	},
 
 	tooltip: {
-		container: HTMLElement.prototype,
-		title: HTMLElement.prototype,
-		description: HTMLElement.prototype
+		/** @type {HTMLElement} */
+		container: undefined,
+
+		/** @type {HTMLElement} */
+		title: undefined,
+
+		/** @type {HTMLElement} */
+		description: undefined
 	},
 
-	subWindow: HTMLElement.prototype,
+	/** @type {HTMLElement} */
+	underlay: undefined,
+
+	/** @type {HTMLElement} */
+	subWindow: undefined,
 	subWindowLists: [],
 
 	init(container) {
@@ -45,7 +60,16 @@ const navbar = {
 		this.tooltip.description.classList.add("description");
 		this.tooltip.container.append(this.tooltip.title, this.tooltip.description);
 
-		this.container.appendChild(this.tooltip.container);
+		this.underlay = document.createElement("div");
+		this.underlay.classList.add("underlay");
+		this.underlay.addEventListener("click", () => {
+			for (let item of this.subWindowLists)
+				item.hide(false);
+
+			this.setUnderlay(false);
+		});
+
+		this.container.append(this.tooltip.container, this.underlay);
 
 		window.addEventListener("resize", () => {
 			for (let item of this.subWindowLists)
@@ -75,6 +99,10 @@ const navbar = {
 			throw { code: -1, description: `navbar.insert(): not a valid location` }
 
 		this.block[location].removeChild(component.container);
+	},
+
+	setUnderlay(visible = false) {
+		this.underlay.classList[visible ? "add" : "remove"]("show");
 	},
 
 	Tooltip: class {
@@ -144,7 +172,7 @@ const navbar = {
 			this.showing = false;
 			this.hideTimeout = null;
 			this.toggleHandlers = [];
-			this.container = container
+			this.container = container;
 
 			this.windowNode = document.createElement("div");
 			this.windowNode.classList.add("subWindow", "hide");
@@ -201,6 +229,7 @@ const navbar = {
 			if (typeof sounds === "object")
 				sounds.toggle()
 
+			navbar.setUnderlay(true);
 			this.windowNode.classList.remove("hide");
 			this.windowNode.classList.add("show");
 			this.container.classList.add("active");
@@ -209,11 +238,15 @@ const navbar = {
 			this.update();
 		}
 
-		hide(sound = true) {
+		hide(trusted = true) {
 			clearTimeout(this.hideTimeout);
 
-			if (sound && typeof sounds === "object")
-				sounds.toggle(1)
+			if (trusted) {
+				if (typeof sounds === "object")
+					sounds.toggle(1)
+
+				navbar.setUnderlay(false);
+			}
 
 			this.windowNode.classList.remove("show");
 			this.container.classList.remove("active");

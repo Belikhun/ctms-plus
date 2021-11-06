@@ -919,6 +919,10 @@ table.scheduleTable.scheduleTable > tbody > .row > td[key="listID"] {
 	background-color: var(--color-red);
 }
 
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Ngoại khoá"] {
+	background-color: var(--color-orange);
+}
+
 .scheduleList > .listItem > .items > .item > .top > .classroom {
 	flex-grow: 1;
 	margin: 0 10px;

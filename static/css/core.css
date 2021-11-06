@@ -177,7 +177,8 @@ arr::before {
 #content[data-screen="schedule"] > div.schedule,
 #content[data-screen="tests"] > div.tests,
 #content[data-screen="results"] > div.results,
-#content[data-screen="subscribe"] > div.subscribe {
+#content[data-screen="subscribe"] > div.subscribe,
+#content[data-screen="home"] > div.home {
 	display: flex;
 }
 
@@ -296,6 +297,10 @@ arr::before {
 	z-index: 2;
 }
 
+#content > div > .header > icon {
+	min-width: 45px;
+}
+
 #content > div > .header > icon::after {
 	font-size: 38px;
 }
@@ -332,7 +337,664 @@ arr::before {
 	overflow: auto;
 }
 
+/** ==================== SCREEN.HOME ==================== */
+
+.homeScreenTitle > span {
+	position: relative;
+	display: inline-block;
+	user-select: none;
+	cursor: pointer;
+
+	transition: font-weight 0.3s ease;
+}
+
+.homeScreenTitle > span::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	bottom: 0;
+	left: 0;
+	width: 0;
+	height: 2px;
+
+	z-index: -1;
+	opacity: 1;
+	background-color: rgb(100, 100, 100);
+
+	transition:
+		all 0.4s cubic-bezier(0.87, 0, 0.13, 1),
+		width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.4s cubic-bezier(0.87, 0, 0.13, 1) 0.2s;
+}
+
+.homeScreenTitle > span:hover::before {
+	width: 100%;
+}
+
+.homeScreenTitle > span.active {
+	font-weight: 700;
+}
+
+.homeScreenTitle > span.active::before {
+	width: 100%;
+	height: 20px;
+	opacity: 0.3;
+	transform: translate(-5px, 3px);
+	background-color: var(--osc-color-blue);
+}
+
+.homeScreenTitle > .my {
+	margin-right: 15px;
+}
+
+.emptyClassIDsNotice {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.emptyClassIDsNotice > icon {
+	margin: 20px 0 40px;
+}
+
+.emptyClassIDsNotice > icon::after {
+	font-size: 68px;
+	line-height: 100%;
+}
+
+.emptyClassIDsNotice > .title {
+	font-family: Nunito;
+	font-size: 32px;
+	font-weight: 900;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+.emptyClassIDsNotice > .description {
+	max-width: 800px;
+	margin-bottom: 30px;
+	text-align: center;
+	font-size: 18px;
+}
+
+.emptyClassIDsNotice > .buttons > button {
+	margin: 0 5px;
+}
+
+.homeScreen {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	width: 100%;
+	height: 100%;
+}
+
+.homeScreen > .control {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: space-between;
+
+	padding: 10px;
+	overflow: visible;
+	background-color: var(--global-background);
+	z-index: 3;
+}
+
+.homeScreen > .control > .sq-input {
+	margin: 0;
+}
+
+.homeScreen > .control > .sq-btn {
+	margin-left: 10px;
+}
+
+.homeScreen > .control > .sq-selector {
+	--background: rgb(255, 255, 255);
+
+	height: 100%;
+	min-width: 200px;
+	margin-left: 10px;
+
+	box-shadow: rgba(33, 35, 38, 0.1) 0 10px 10px -10px;
+}
+
+.homeScreen > .control > .separator {
+	flex-shrink: 0;
+	display: inline-block;
+	width: 2px;
+	height: 100%;
+	margin-left: 10px;
+
+	background-color: rgba(194, 194, 194, 0.8);
+}
+
+.homeScreen > .control:not([data-screen="home"]) > .sq-selector,
+.homeScreen > .control:not([data-screen="home"]) > .separator[key="separatorLine2"] {
+	display: none;
+}
+
+@media only screen and (max-width: 700px) {
+	.homeScreen > .control[data-screen="home"] {
+		padding-bottom: 50px;
+	}
+
+	.homeScreen > .control > .separator {
+		display: none;
+	}
+
+	.homeScreen > .control > .sq-selector {
+		position: absolute;
+
+		bottom: 0;
+		left: 10px;
+		right: 10px;
+		height: auto;
+		margin-left: unset;
+	}
+}
+
+.homeScreen > .list {
+	position: relative;
+	display: block;
+	flex-grow: 1;
+
+	margin-top: 20px;
+	padding: 0 10px;
+	box-sizing: border-box;
+	overflow: auto;
+}
+
+.homeScreen > .list:last-child {
+	padding-bottom: 200px;
+}
+
+.classIDInput {
+	width: 100%;
+	height: 220px;
+	padding: 5px 10px;
+
+	font-family: "Consolas";
+	font-size: 19px;
+	font-weight: bold;
+	tab-size: 4;
+	text-transform: uppercase;
+
+	box-shadow: rgba(33, 35, 38, 0.1) 0 10px 10px -10px;
+	resize: none;
+}
+
 /** ==================== SCREEN.SCHEDULE ==================== */
+
+.scheduleTable,
+.scheduleList {
+	--schedule-gray: rgba(112, 112, 112, 0.6);
+	--schedule-green: rgb(4, 151, 78);
+	--schedule-blue: rgb(15, 124, 197);
+}
+
+/**? ------------ SCREEN.SCHEDULE.TABLE ------------ */
+
+table.scheduleTable.scheduleTable > tbody > tr > td {
+	background-color: transparent;
+}
+
+table.scheduleTable.scheduleTable > tbody > tr.odd > td {
+	background-color: rgba(250, 250, 250, 0.8);
+}
+
+table.scheduleTable.scheduleTable > tbody > tr.row:hover > td {
+	background-color: rgb(226, 226, 226);
+}
+
+table.scheduleTable.scheduleTable > tbody > .header:not(:first-child) > td {
+	padding-top: 40px;
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .state,
+table.scheduleTable.scheduleTable > tbody > .row > .state {
+	width: 40px;
+	padding-right: 5px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .state::before {
+	content: "\f017";
+	position: relative;
+	display: block;
+	margin-bottom: 2px;
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 19px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+table.scheduleTable.scheduleTable > tbody > .header.today > .state::before {
+	color: var(--schedule-blue);
+}
+
+table.scheduleTable.scheduleTable > tbody > .header.passed > .state::before {
+	color: var(--schedule-green);
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .inner {
+	font-family: Nunito;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 28px;
+	letter-spacing: .4px;
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .inner > b {
+	font-weight: 800;
+	letter-spacing: 0;
+	text-transform: capitalize;
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .tags {
+	margin-left: 10px;
+	margin-bottom: 3px;
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .tags > .today {
+	background-color: var(--color-orange);
+}
+
+table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .tags > .next {
+	background-color: var(--color-pink);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > .state::before {
+	content: "\f192";
+	display: block;
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row.passed > .state::before {
+	content: "\f058";
+	color: var(--schedule-green);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row.inProgress > .state::before {
+	content: "\f304";
+	color: var(--schedule-blue);
+}
+
+table.scheduleTable.scheduleTable > thead > .row > th[key="stt"],
+table.scheduleTable.scheduleTable > tbody > .row > td[key="stt"] {
+	width: 20px;
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Học"] {
+	background-color: var(--color-green);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Học trực tuyến"] {
+	background-color: var(--color-blue);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Nghỉ"] {
+	background-color: var(--color-yellow);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Thi"] {
+	background-color: var(--color-red);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Ngoại khoá"] {
+	background-color: var(--color-orange);
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > td[key="status"] {
+	width: 120px;
+}
+
+table.scheduleTable.scheduleTable > thead > .row > th[key="subject"],
+table.scheduleTable.scheduleTable > tbody > .row > td[key="subject"] {
+	width: 320px;
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > td[key="subject"] {
+	font-family: Nunito;
+	font-size: 15px;
+	font-weight: 800;
+	letter-spacing: .3px;
+}
+
+table.scheduleTable.scheduleTable > tbody > .row > td[key="subject"] > .openNote {
+	margin-left: 5px;
+	cursor: pointer;
+}
+
+table.scheduleTable.scheduleTable > thead > .row > th[key="classroom"],
+table.scheduleTable.scheduleTable > tbody > .row > td[key="classroom"] {
+	width: 60px;
+}
+
+table.scheduleTable.scheduleTable > thead > .row > th[key="classID"],
+table.scheduleTable.scheduleTable > thead > .row > th[key="listID"],
+table.scheduleTable.scheduleTable > tbody > .row > td[key="classID"],
+table.scheduleTable.scheduleTable > tbody > .row > td[key="listID"] {
+	width: 120px;
+}
+
+/**? ------------ SCREEN.SCHEDULE.LIST ------------ */
+
+.scheduleList > .listItem {
+	position: relative;
+}
+
+.scheduleList > .listItem:last-child {
+	margin-bottom: 300px;
+}
+
+.scheduleList > .listItem > .label {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	margin-top: 20px;
+	padding-left: 24px;
+}
+
+.scheduleList > .listItem > .label::after {
+	content: "\f017";
+	position: absolute;
+	display: block;
+
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+.scheduleList > .listItem.today > .label::after {
+	color: var(--schedule-blue);
+}
+
+.scheduleList > .listItem.passed > .label::after {
+	color: var(--schedule-green);
+}
+
+.scheduleList > .listItem > .label > .inner {
+	font-family: Nunito;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 38px;
+	letter-spacing: .4px;
+}
+
+.scheduleList > .listItem > .label > .inner > b {
+	font-weight: 800;
+	letter-spacing: 0;
+}
+
+.scheduleList > .listItem > .label > .tags {
+	margin-left: 10px;
+	margin-bottom: 5px;
+}
+
+.scheduleList > .listItem > .label > .tags > .today {
+	background-color: var(--color-orange);
+}
+
+.scheduleList > .listItem > .label > .tags > .next {
+	background-color: var(--color-pink);
+}
+
+.scheduleList > .listItem > .items {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	padding-left: 24px;
+}
+
+.scheduleList > .listItem > .items > .item {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	background-color: white;
+	margin-bottom: 10px;
+	padding: 8px 10px;
+	border-radius: 12px;
+}
+
+.scheduleList > .listItem > .items > .item::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	top: 0;
+	left: 0;
+	width: 4px;
+	height: calc(100% + 10px);
+	transform: translateX(-18px);
+
+	background-color: var(--schedule-gray);
+}
+
+.scheduleList > .listItem > .items > .item.passed::before {
+	background-color: var(--schedule-green);
+}
+
+.scheduleList > .listItem > .items > .item.inProgress::before {
+	background-color: var(--schedule-blue);
+}
+
+.scheduleList > .listItem > .items > .item:last-child::before {
+	height: 50%;
+}
+
+.scheduleList > .listItem > .items > .item::after {
+	content: "\f192";
+	position: absolute;
+	display: block;
+
+	top: 50%;
+	left: 0;
+	padding: 8px 0;
+	transform: translate(-24px, -50%);
+	background-color: var(--global-background);
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+.scheduleList > .listItem > .items > .item.passed::after {
+	content: "\f058";
+	color: var(--schedule-green);
+}
+
+.scheduleList > .listItem > .items > .item.inProgress::after {
+	content: "\f304";
+	color: var(--schedule-blue);
+}
+
+.scheduleList > .listItem > .items > .item:last-child {
+	margin-bottom: 0;
+}
+
+.scheduleList > .listItem > .items > .item > .gradient {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+
+	border-radius: 12px;
+	overflow: hidden;
+	--color: rgb(202, 202, 202);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Học"] {
+	--color: var(--color-green);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Học trực tuyến"] {
+	--color: var(--color-blue);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Nghỉ"] {
+	--color: var(--color-yellow);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Thi"] {
+	--color: var(--color-red);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	left: 0;
+	right: 0;
+	height: 3px;
+	z-index: 1;
+
+	background-color: var(--color);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient::after {
+	content: "";
+	position: absolute;
+	display: block;
+
+	left: 0;
+	right: 0;
+	height: 60%;
+	opacity: 0.4;
+
+	box-shadow: inset 0 50px 55px -60px var(--color);
+}
+
+.scheduleList > .listItem > .items > .item > .top {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Học"] {
+	background-color: var(--color-green);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Học trực tuyến"] {
+	background-color: var(--color-blue);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Nghỉ"] {
+	background-color: var(--color-yellow);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Thi"] {
+	background-color: var(--color-red);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .classroom {
+	flex-grow: 1;
+	margin: 0 10px;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 100%;
+}
+
+.scheduleList > .listItem > .items > .item > .top > .time {
+	font-weight: bold;
+}
+
+.scheduleList > .listItem > .items > .item > .subject {
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+}
+
+.scheduleList > .listItem > .items > .item > .subject > .inner {
+	font-family: Nunito;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.scheduleList > .listItem > .items > .item > .subject > .openNote {
+	cursor: pointer;
+	margin-left: 10px;
+}
+
+.scheduleList > .listItem > .items > .item > .teacher {
+	font-family: Calibri;
+    font-size: 18px;
+    font-weight: bold;
+	line-height: 16px;
+}
+
+.scheduleList > .listItem > .items > .item > .teacher::before {
+	content: "\f007";
+    margin-right: 5px;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.scheduleList > .listItem > .items > .item > .bottom {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-top: 8px;
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > span {
+	margin: 0 10px 2px;
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > span::before {
+	content: "/";
+	font-size: 13px;
+	font-weight: bold;
+	line-height: 14px;
+	color: rgb(56, 56, 56);
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > t {
+	font-size: 13px;
+	line-height: 14px;
+	color: rgb(56, 56, 56);
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > t:empty::before {
+	content: "X";
+	font-weight: bold;
+	color: rgb(186, 186, 186);
+}
+
+/**? ------------ SCREEN.SCHEDULE MAIN STYLE ------------ */
 
 .scheduleScreen {
 	position: relative;
@@ -345,7 +1007,7 @@ arr::before {
 }
 
 .scheduleScreen > .control {
-	position: sticky;
+	position: relative;
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
@@ -353,11 +1015,7 @@ arr::before {
 	align-items: center;
 	justify-content: space-between;
 
-	top: 0;
-	left: 0;
-	right: 0;
 	padding: 0 10px;
-
 	overflow: visible;
 	background-color: var(--global-background);
 	z-index: 1;
@@ -376,459 +1034,10 @@ arr::before {
 	padding: 0 10px;
 	box-sizing: border-box;
 	overflow: auto;
-
-	--schedule-gray: rgba(112, 112, 112, 0.6);
-	--schedule-green: rgb(4, 151, 78);
-	--schedule-blue: rgb(15, 124, 197);
 }
 
 .scheduleScreen > .list:last-child {
 	padding-bottom: 200px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > tr > td {
-	background-color: transparent;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > tr.odd > td {
-	background-color: rgba(250, 250, 250, 0.8);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > tr.row:hover > td {
-	background-color: rgb(226, 226, 226);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header:not(:first-child) > td {
-	padding-top: 40px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .state,
-.scheduleScreen > .list > .generalTable > tbody > .row > .state {
-	width: 40px;
-	padding-right: 5px;
-	text-align: center;
-	vertical-align: middle;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .state::before {
-	content: "\f017";
-	position: relative;
-	display: block;
-	margin-bottom: 2px;
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 19px;
-	font-weight: bold;
-	color: var(--schedule-gray);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header.today > .state::before {
-	color: var(--schedule-blue);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header.passed > .state::before {
-	color: var(--schedule-green);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .inner {
-	font-family: Nunito;
-	font-weight: 600;
-	font-size: 16px;
-	line-height: 28px;
-	letter-spacing: .4px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .inner > b {
-	font-weight: 800;
-	letter-spacing: 0;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .tags {
-	margin-left: 10px;
-	margin-bottom: 3px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .tags > .today {
-	background-color: var(--color-orange);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .header > .label > .wrapper > .tags > .next {
-	background-color: var(--color-pink);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > .state::before {
-	content: "\f192";
-	display: block;
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 16px;
-	font-weight: bold;
-	color: var(--schedule-gray);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row.passed > .state::before {
-	content: "\f058";
-	color: var(--schedule-green);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row.inProgress > .state::before {
-	content: "\f304";
-	color: var(--schedule-blue);
-}
-
-.scheduleScreen > .list > .generalTable > thead > .row > th[key="stt"],
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="stt"] {
-	width: 20px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Học"] {
-	background-color: var(--color-green);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Học trực tuyến"] {
-	background-color: var(--color-blue);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Nghỉ"] {
-	background-color: var(--color-yellow);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > .status > span[data-status="Thi"] {
-	background-color: var(--color-red);
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="status"] {
-	width: 120px;
-}
-
-.scheduleScreen > .list > .generalTable > thead > .row > th[key="subject"],
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="subject"] {
-	width: 320px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="subject"] {
-	font-family: Nunito;
-	font-size: 15px;
-	font-weight: 700;
-	letter-spacing: .2px;
-}
-
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="subject"] > .openNote {
-	margin-left: 5px;
-	cursor: pointer;
-}
-
-.scheduleScreen > .list > .generalTable > thead > .row > th[key="classroom"],
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="classroom"] {
-	width: 60px;
-}
-
-.scheduleScreen > .list > .generalTable > thead > .row > th[key="classID"],
-.scheduleScreen > .list > .generalTable > thead > .row > th[key="listID"],
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="classID"],
-.scheduleScreen > .list > .generalTable > tbody > .row > td[key="listID"] {
-	width: 120px;
-}
-
-.scheduleScreen > .list > .listItem {
-	position: relative;
-}
-
-.scheduleScreen > .list > .listItem:last-child {
-	margin-bottom: 300px;
-}
-
-.scheduleScreen > .list > .listItem > .label {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	margin-top: 20px;
-	padding-left: 24px;
-}
-
-.scheduleScreen > .list > .listItem > .label::after {
-	content: "\f017";
-	position: absolute;
-	display: block;
-
-	top: 50%;
-	left: 0;
-	transform: translateY(-50%);
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 16px;
-	font-weight: bold;
-	color: var(--schedule-gray);
-}
-
-.scheduleScreen > .list > .listItem.today > .label::after {
-	color: var(--schedule-blue);
-}
-
-.scheduleScreen > .list > .listItem.passed > .label::after {
-	color: var(--schedule-green);
-}
-
-.scheduleScreen > .list > .listItem > .label > .inner {
-	font-family: Nunito;
-	font-weight: 600;
-	font-size: 16px;
-	line-height: 38px;
-	letter-spacing: .4px;
-}
-
-.scheduleScreen > .list > .listItem > .label > .inner > b {
-	font-weight: 800;
-	letter-spacing: 0;
-}
-
-.scheduleScreen > .list > .listItem > .label > .tags {
-	margin-left: 10px;
-	margin-bottom: 5px;
-}
-
-.scheduleScreen > .list > .listItem > .label > .tags > .today {
-	background-color: var(--color-orange);
-}
-
-.scheduleScreen > .list > .listItem > .label > .tags > .next {
-	background-color: var(--color-pink);
-}
-
-.scheduleScreen > .list > .listItem > .items {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	padding-left: 24px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	background-color: white;
-	margin-bottom: 10px;
-	padding: 8px 10px;
-	border-radius: 12px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item::before {
-	content: "";
-	position: absolute;
-	display: block;
-
-	top: 0;
-	left: 0;
-	width: 4px;
-	height: calc(100% + 10px);
-	transform: translateX(-18px);
-
-	background-color: var(--schedule-gray);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item.passed::before {
-	background-color: var(--schedule-green);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item.inProgress::before {
-	background-color: var(--schedule-blue);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item:last-child::before {
-	height: 50%;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item::after {
-	content: "\f192";
-	position: absolute;
-	display: block;
-
-	top: 50%;
-	left: 0;
-	padding: 8px 0;
-	transform: translate(-24px, -50%);
-	background-color: var(--global-background);
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 16px;
-	font-weight: bold;
-	color: var(--schedule-gray);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item.passed::after {
-	content: "\f058";
-	color: var(--schedule-green);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item.inProgress::after {
-	content: "\f304";
-	color: var(--schedule-blue);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item:last-child {
-	margin-bottom: 0;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient {
-	position: absolute;
-	display: none;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-
-	border-radius: 12px;
-	overflow: hidden;
-	--color: rgb(202, 202, 202);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient[data-status="Học"] {
-	--color: var(--color-green);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient[data-status="Học trực tuyến"] {
-	--color: var(--color-blue);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient[data-status="Nghỉ"] {
-	--color: var(--color-yellow);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient[data-status="Thi"] {
-	--color: var(--color-red);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient::before {
-	content: "";
-	position: absolute;
-	display: block;
-
-	left: 0;
-	right: 0;
-	height: 3px;
-	z-index: 1;
-
-	background-color: var(--color);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .gradient::after {
-	content: "";
-	position: absolute;
-	display: block;
-
-	left: 0;
-	right: 0;
-	height: 60%;
-	opacity: 0.4;
-
-	box-shadow: inset 0 50px 55px -60px var(--color);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top > .status[data-status="Học"] {
-	background-color: var(--color-green);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top > .status[data-status="Học trực tuyến"] {
-	background-color: var(--color-blue);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top > .status[data-status="Nghỉ"] {
-	background-color: var(--color-yellow);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top > .status[data-status="Thi"] {
-	background-color: var(--color-red);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top > .classroom {
-	flex-grow: 1;
-	margin: 0 10px;
-	font-size: 14px;
-	font-weight: bold;
-	line-height: 100%;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .top > .time {
-	font-weight: bold;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .subject {
-	display: flex;
-	flex-direction: row;
-	margin-top: 10px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .subject > .inner {
-	font-family: Nunito;
-    font-size: 22px;
-    font-weight: 800;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .subject > .openNote {
-	cursor: pointer;
-	margin-left: 10px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .teacher {
-	font-family: Calibri;
-    font-size: 18px;
-    font-weight: bold;
-	line-height: 16px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .teacher::before {
-	content: "\f007";
-    margin-right: 5px;
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    font-size: 14px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .bottom {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	margin-top: 8px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .bottom > span {
-	margin: 0 10px 2px;
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .bottom > span::before {
-	content: "/";
-	font-size: 13px;
-	font-weight: bold;
-	line-height: 14px;
-	color: rgb(56, 56, 56);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .bottom > t {
-	font-size: 13px;
-	line-height: 14px;
-	color: rgb(56, 56, 56);
-}
-
-.scheduleScreen > .list > .listItem > .items > .item > .bottom > t:empty::before {
-	content: "X";
-	font-weight: bold;
-	color: rgb(186, 186, 186);
 }
 
 /** ==================== SCREEN.TESTS ==================== */

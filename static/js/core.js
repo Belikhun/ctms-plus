@@ -10,6 +10,215 @@ var VERSION = "0.1";
 var STATE = "local";
 
 /**
+ * Screen class, used to construct new screen
+ * 
+ * @author		Belikhun
+ * @version		1.0
+ */
+class CoreScreen {
+	/**
+	 * Create a new Screen
+	 * @param	{Object}				options
+	 * @param	{String}				options.id				Screen ID
+	 * @param	{String}				options.icon			Icon name
+	 * @param	{String|HTMLElement}	options.title			Title
+	 * @param	{String}				options.description		Description for menu icon
+	 * @param	{String}				options.subTitle		Subtitle, will display under title
+	 * @param	{Boolean}				options.applyScrollable	Automatically apply scrollable for content
+	 */
+	constructor({
+		id = "sample",
+		icon = "circle",
+		title = "sample screen",
+		description = "this is a sample screen description",
+		subTitle = "",
+		applyScrollable = true
+	} = {}) {
+		this.id = id;
+		this.showing = false;
+		this.overlayShowing = false;
+		this.reloadHandlers = []
+		this.showHandlers = []
+		this.hideHandlers = []
+
+		this.button = core.navbar.switch.component.button({
+			icon,
+			tooltip: {
+				title,
+				description
+			}
+		});
+
+		this.view = makeTree("div", ["screen", id], {
+			loading: { tag: "div", class: "loading", child: {
+				spinner: { tag: "span", class: "spinner" }
+			}},
+
+			overlay: { tag: "div", class: "overlay", child: {
+				icon: { tag: "icon" },
+				oTitle: { tag: "t", class: "title" },
+				description: { tag: "t", class: "description" },
+				buttons: { tag: "div", class: "buttons" }
+			}},
+
+			header: { tag: "div", class: "header", child: {
+				icon: { tag: "icon", data: { icon } },
+				detail: { tag: "span", class: "detail", child: {
+					sTitle: { tag: "t", class: "title", text: title },
+					subTitle: { tag: "t", class: "subTitle", html: subTitle }
+				}},
+
+				reload: createButton("TẢI LẠI", {
+					style: "round",
+					icon: "reload",
+					complex: true
+				})
+			}},
+
+			content: { tag: "div", class: "content" }
+		});
+
+		if (applyScrollable)
+			new Scrollable(this.view, { content: this.view.content });
+
+		this.view.header.reload.addEventListener("click", async () => {
+			this.view.header.reload.disabled = true;
+
+			try {
+				for (let f of this.reloadHandlers)
+					await f();
+			} catch(error) {
+				errorHandler(error);
+			}
+
+			this.view.header.reload.disabled = false;
+		});
+
+		this.view.overlay.style.display = "none";
+		core.screen.container.appendChild(this.view);
+		this.button.click.setHandler((a) => a ? this.__show() : this.__hide());
+	}
+
+	show() {
+		this.button.click.active = true;
+	}
+
+	__show() {
+		this.showing = true;
+		core.screen.container.dataset.screen = this.id;
+		this.showHandlers.forEach(f => f());
+	}
+
+	onShow(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `CoreScreen(${this.id}).onShow(): not a valid function` }
+
+		this.showHandlers.push(f);
+	}
+
+	hide() {
+		this.button.click.active = false;
+	}
+
+	__hide() {
+		this.showing = false;
+		this.hideHandlers.forEach(f => f());
+	}
+
+	onHide(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `CoreScreen(${this.id}).onHide(): not a valid function` }
+
+		this.hideHandlers.push(f);
+	}
+
+	onReload(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `CoreScreen(${this.id}).onReload(): not a valid function` }
+
+		this.reloadHandlers.push(f);
+	}
+
+	/**
+	 * Update Screen Info
+	 * @param	{Object}				info				General info
+	 * @param	{String}				info.icon			Icon name
+	 * @param	{String|HTMLElement}	info.title			Title
+	 * @param	{String}				info.subTitle		Subtitle, will display under title
+	 */
+	set({
+		icon,
+		title,
+		subTitle
+	} = {}) {
+		if (typeof icon === "string")
+			this.view.header.icon.dataset.icon = icon;
+
+		if (typeof title === "string") {
+			this.view.header.detail.sTitle.innerText = title;
+			this.button.navtip.set({ title });
+		} else if (typeof title === "object" && title.tagName) {
+			emptyNode(this.view.header.detail.sTitle);
+			this.view.header.detail.sTitle.appendChild(title);
+		}
+
+		if (typeof subTitle === "string")
+			this.view.header.detail.subTitle.innerHTML = subTitle;
+	}
+
+	overlay({
+		show = true,
+		icon = "circle",
+		title = "Screen Overlay Example",
+		description = " This is an example of screen overlay, which is immortal 😇",
+		buttons = {}
+	} = {}) {
+		if (!show) {
+			this.view.overlay.style.display = "none";
+			this.overlayShowing = false;
+			return;
+		}
+
+		this.overlayShowing = true;
+		this.view.overlay.style.display = null;
+		this.view.overlay.icon.dataset.icon = icon;
+		this.view.overlay.oTitle.innerText = title;
+		this.view.overlay.description.innerHTML = description;
+		
+		emptyNode(this.view.overlay.buttons);
+		for (let key of Object.keys(buttons)) {
+			let b = createButton(buttons[key].text, {
+				color: buttons[key].color || "blue",
+				style: "round",
+				icon: buttons[key].icon,
+				complex: true
+			});
+
+			if (typeof buttons[key].onClick === "function")
+				b.addEventListener("click", () => buttons[key].onClick());
+
+			this.view.overlay.buttons.appendChild(b);
+		}
+	}
+
+	/** @param {Boolean} loading */
+	set loading(loading) {
+		this.view.loading.classList[loading ? "add" : "remove"]("show");
+	}
+
+	/** @param {String|HTMLElement} content */
+	set content(content) {
+		this.view.overlay.style.display = "none";
+		emptyNode(this.view.content);
+
+		if (typeof content === "object" && content.classList)
+			this.view.content.appendChild(content);
+		else
+			this.view.content.innerHTML = content;
+	}
+}
+
+/**
  * This object contains CTMS+ core modules and will be
  * initialized after every resources on the page is loaded
  * 
@@ -773,7 +982,10 @@ const core = {
 					color: "pink",
 					save: "schedule.autoChangeRenderer",
 					defaultValue: true,
-					onChange: (v) => core.screen.schedule.setAutoChangeRenderer(v)
+					onChange: (v) => {
+						core.screen.home.setAutoChangeRenderer(v)
+						core.screen.schedule.setAutoChangeRenderer(v);
+					}
 				}, ux);
 
 				new smenu.components.Choice({
@@ -785,7 +997,10 @@ const core = {
 					},
 					save: "schedule.renderMode",
 					defaultValue: "table",
-					onChange: (v) => core.screen.schedule.setDefaultRenderMode(v)
+					onChange: (v) => {
+						core.screen.home.setDefaultRenderMode(v);
+						core.screen.schedule.setDefaultRenderMode(v);
+					}
 				}, ux);
 			}
 		},
@@ -1201,7 +1416,15 @@ const core = {
 			this.logoutHandlers.push(f);
 		},
 
+		/**
+		 * Check for login state from other requests.
+		 * @param	{APIResponse}	response
+		 */
 		async check(response) {
+			// Skip check for page that don't require login
+			if (response.path.includes("index.aspx"))
+				return;
+
 			if (response.dom.getElementById("LeftCol_UserLogin1_pnlLogin")) {
 				this.loggedIn = false;
 				this.email = undefined;
@@ -1331,188 +1554,470 @@ const core = {
 		container: $("#content"),
 		priority: 3,
 
-		Screen: class {
-			constructor({
-				id = "sample",
-				icon = "circle",
-				title = "sample screen",
-				description = "this is a sample screen description",
-				subTitle = "",
-				applyScrollable = true
-			} = {}) {
-				this.id = id;
-				this.showing = false;
-				this.overlayShowing = false;
-				this.reloadHandlers = []
-				this.showHandlers = []
-				this.hideHandlers = []
+		init() {},
 
-				this.button = core.navbar.switch.component.button({
-					icon,
-					tooltip: {
-						title,
-						description
-					}
-				});
+		home: {
+			/** @type {CoreScreen} */
+			screen: undefined,
 
-				this.view = makeTree("div", ["screen", id], {
-					loading: { tag: "div", class: "loading", child: {
-						spinner: { tag: "span", class: "spinner" }
-					}},
+			/** @type {HTMLDivElement} */
+			view: null,
 
-					overlay: { tag: "div", class: "overlay", child: {
-						icon: { tag: "icon" },
-						oTitle: { tag: "t", class: "title" },
-						description: { tag: "t", class: "description" },
-						buttons: { tag: "div", class: "buttons" }
-					}},
+			/** @type {HTMLDivElement} */
+			title: null,
 
-					header: { tag: "div", class: "header", child: {
-						icon: { tag: "icon", data: { icon } },
-						detail: { tag: "span", class: "detail", child: {
-							sTitle: { tag: "t", class: "title", text: title },
-							subTitle: { tag: "t", class: "subTitle", html: subTitle }
-						}},
+			/** @type {HTMLDivElement} */
+			emptyClassIDsNotice: null,
 
-						reload: createButton("TẢI LẠI", {
+			loaded: false,
+			loading: false,
+			activeScreen: null,
+			currentScreen: null,
+
+			activeWeekday: null,
+			currentWeekday: null,
+
+			autoChangeRenderer: true,
+			defaultRenderMode: "table",
+			currentRenderer: "table",
+			listRenderTrigger: 700,
+			currentData: [],
+
+			async init() {
+				this.view = makeTree("div", "homeScreen", {
+					control: { tag: "div", class: "control", child: {
+						dateInput: createInput({
+							type: "date",
+							id: "schedule.date",
+							label: "Ngày Bắt Đầu"
+						}),
+
+						confirm: createButton("XEM", {
+							icon: "calendarWeek",
+							color: "orange",
 							style: "round",
-							icon: "reload",
+							complex: true,
+							disabled: true
+						}),
+
+						separatorLine1: {
+							tag: "div",
+							class: "separator"
+						},
+
+						homeDate: createSelectInput({
+							icon: "table",
+							color: "blue",
+							fixed: true
+						}),
+
+						separatorLine2: {
+							tag: "div",
+							class: "separator"
+						},
+
+						edit: createButton(undefined, {
+							icon: "pencil",
+							color: "blue",
+							style: "round",
 							complex: true
 						})
 					}},
 
-					content: { tag: "div", class: "content" }
+					list: { tag: "div", class: ["list", "showEmpty"] }
 				});
 
-				if (applyScrollable)
-					new Scrollable(this.view, { content: this.view.content });
+				this.title = makeTree("div", "homeScreenTitle", {
+					my: { tag: "span", class: "my", text: "của bạn" },
+					home: { tag: "span", class: "home", text: "trang chủ" }
+				});
 
-				this.view.header.reload.addEventListener("click", async () => {
-					this.view.header.reload.disabled = true;
+				this.emptyClassIDsNotice = makeTree("div", "emptyClassIDsNotice", {
+					icon: { tag: "icon", data: { icon: "pencil" } },
+					titleNode: { tag: "t", class: "title", text: `Danh Sách Lớp Của Bạn Trống!` },
+					description: {
+						tag: "t",
+						class: "description",
+						html: `Hãy nhập danh sách mã lớp mà bạn đã đăng kí,
+							lịch học của bạn sẽ được hiển thị tại đây.
+							Lưu ý rằng lịch học này được lấy từ lịch học chung của khoa được hiển thị tại trang chủ của CTMS
+							dựa trên danh sách mã lớp mà bạn đã nhập, vì vậy hãy đảm bảo chắc chắn rằng danh sách
+							này là <b>CHÍNH XÁC</b>. Danh sách mã lớp cũng sẽ được cập nhật tự động khi bạn vào trang <b>Đăng Kí</b> của CTMS+`
+					},
 
-					try {
-						for (let f of this.reloadHandlers)
-							await f();
-					} catch(error) {
-						errorHandler(error);
+					buttons: { tag: "div", class: "buttons", child: {
+						edit: createButton("CHỈNH SỬA", {
+							color: "blue",
+							style: "round",
+							icon: "pencil",
+							complex: true
+						}),
+
+						help: createButton("Hướng Dẫn", {
+							color: "purple",
+							style: "round",
+							icon: "question",
+							complex: true
+						})
+					}}
+				});
+
+				// Add new settings
+				let settingsChild = new smenu.Child(
+					{ label: "Trang Chủ" },
+					core.userSettings.schedule.group
+				);
+
+				new smenu.components.Button({
+					label: "Chỉnh Sửa Danh Sách Mã Lớp",
+					color: "orange",
+					icon: "pencil",
+					complex: true,
+					onClick: () => this.showClassIDEditor()
+				}, settingsChild);
+
+				// Attach to subscribe API to update Class ID list
+				api.onResponse("subscribe", (data) => {
+					let classIDs = this.getClassID();
+
+					/** @type {SubscribeEntry} */
+					let item;
+
+					for (item of data.subscribed)
+						if (!classIDs.includes(item.classID)) {
+							this.log("DEBG", `updateClassID: new class ID from subscribe: ${item.classID}`);
+							classIDs.push(item.classID);
+						}
+
+					this.saveClassID(classIDs);
+				});
+
+				this.screen = new CoreScreen({
+					id: "home",
+					icon: "home",
+					title: "trang chủ",
+					description: "trang chủ của CTMS",
+					applyScrollable: false
+				});
+				
+				this.setScreen("my");
+				this.setLoading(true);
+				this.screen.onShow(() => this.load());
+				new Scrollable(this.view, { content: this.view.list });
+				this.screen.view.header.reload.style.display = "none";
+				this.screen.set({ title: this.title });
+				this.screen.content = this.view;
+
+				this.title.my.addEventListener("click", () => this.setScreen("my"));
+				this.title.home.addEventListener("click", () => this.setScreen("home"));
+				this.view.control.edit.addEventListener("click", () => this.showClassIDEditor());
+				this.view.control.confirm.addEventListener("click", () => this.load(this.getInputDate()));
+				this.emptyClassIDsNotice.buttons.edit.addEventListener("click", () => this.showClassIDEditor());
+				this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => {});
+
+				this.view.control.homeDate.onChange((value) => {
+					this.currentWeekday = value;
+					this.log("DEBG", "Change Weekday:", value, `(loading: ${this.loading})`);
+
+					if (!this.loading)
+						this.render();
+				});
+
+				api.onResponse("home", (response) => {
+					if (response.date)
+						this.setInputNow(response.date);
+					
+					// Update weekday selector options
+					let options = { all: "Toàn Bộ" }
+					let defaultValue = null;
+
+					for (let item of response.info) {
+						options[item.weekDay] = item.weekDay;
+
+						if (!defaultValue || isToday(item.date))
+							defaultValue = item.weekDay;
 					}
 
-					this.view.header.reload.disabled = false;
-				});
-
-				this.view.overlay.style.display = "none";
-				core.screen.container.appendChild(this.view);
-				this.button.click.setHandler((a) => a ? this.show() : this.hide());
-			}
-
-			show() {
-				this.showing = true;
-				core.screen.container.dataset.screen = this.id;
-				this.showHandlers.forEach(f => f());
-			}
-
-			onShow(f) {
-				if (typeof f !== "function")
-					throw { code: -1, description: `core.screen.Screen(${this.id}).onShow(): not a valid function` }
-	
-				this.showHandlers.push(f);
-			}
-
-			hide() {
-				this.showing = false;
-				this.hideHandlers.forEach(f => f());
-			}
-
-			onHide(f) {
-				if (typeof f !== "function")
-					throw { code: -1, description: `core.screen.Screen(${this.id}).onHide(): not a valid function` }
-	
-				this.hideHandlers.push(f);
-			}
-
-			onReload(f) {
-				if (typeof f !== "function")
-					throw { code: -1, description: `core.screen.Screen(${this.id}).onReload(): not a valid function` }
-	
-				this.reloadHandlers.push(f);
-			}
-
-			set({
-				icon,
-				title,
-				subTitle
-			} = {}) {
-				if (typeof icon === "string")
-					this.view.header.icon.dataset.icon = icon;
-
-				if (typeof title === "string")
-					this.view.header.detail.sTitle.innerText = title;
-
-				if (typeof subTitle === "string")
-					this.view.header.detail.subTitle.innerHTML = subTitle;
-			}
-
-			overlay({
-				show = true,
-				icon = "circle",
-				title = "Screen Overlay Example",
-				description = " This is an example of screen overlay, which is immortal 😇",
-				buttons = {}
-			} = {}) {
-				if (!show) {
-					this.view.overlay.style.display = "none";
-					this.overlayShowing = false;
-					return;
-				}
-
-				this.overlayShowing = true;
-				this.view.overlay.style.display = null;
-				this.view.overlay.icon.dataset.icon = icon;
-				this.view.overlay.oTitle.innerText = title;
-				this.view.overlay.description.innerHTML = description;
-				
-				emptyNode(this.view.overlay.buttons);
-				for (let key of Object.keys(buttons)) {
-					let b = createButton(buttons[key].text, {
-						color: buttons[key].color || "blue",
-						style: "round",
-						icon: buttons[key].icon,
-						complex: true
+					this.view.control.homeDate.set({
+						options,
+						value: defaultValue
 					});
 
-					if (typeof buttons[key].onClick === "function")
-						b.addEventListener("click", () => buttons[key].onClick());
+					this.loaded = true;
+					this.render(response.info);
+				});
 
-					this.view.overlay.buttons.appendChild(b);
+				// Event listener to update current render mode
+				window.addEventListener("resize", () => {
+					if (!this.autoChangeRenderer)
+						return;
+
+					this.render();
+				});
+
+				this.setInputNow();
+			},
+
+			/**
+			 * Get Class ID List
+			 * @returns {Array<String>}
+			 */
+			getClassID() {
+				// Load list from storage
+				let storage = localStorage.getItem("home.classID");
+
+				if (!storage)
+					return []
+				else
+					return storage.split("||");
+			},
+
+			/**
+			 * Save Clas ID List
+			 * @param {String[]} ids 
+			 */
+			saveClassID(ids) {
+				localStorage.setItem("home.classID", ids.join("||"));
+
+				if (this.activeScreen === "my")
+					this.render(undefined, { force: true });
+			},
+
+			async showClassIDEditor() {
+				let editor = document.createElement("textarea");
+				editor.classList.add("classIDInput", "flatInput");
+				editor.value = this.getClassID().join("\n");
+
+				let command = await popup.show({
+					windowTitle: `Trang Chủ`,
+					title: "Sửa Danh Sách Mã Lớp",
+					message: "Nhập các mã lớp mà bạn đang theo học, mỗi mã nằm trên một dòng",
+					description: `Danh sách mã lớp cũng sẽ được tự động cập nhật nếu bạn vào trang <b>Đăng Kí</b> của CTMS+`,
+					icon: "pencil",
+					bgColor: "blue",
+					customNode: editor,
+					buttonList: {
+						save: { icon: "save", text: "LƯU", color: "blue" },
+						cancel: { icon: "close", text: "HỦY", color: "red" },
+					}
+				});
+
+				if (command === "save") {
+					let values = editor.value
+						.toUpperCase()
+						.split("\n")
+						.filter((i) => i.length > 0);
+
+					this.saveClassID(values);
+					this.log("DEBG", "showClassIDEditor(): manually saved class ID list");
+				}
+			},
+
+			setScreen(screen) {
+				if (screen === this.currentScreen)
+					return;
+
+				if (screen === "home") {
+					this.title.home.classList.add("active");
+					this.title.my.classList.remove("active");
+					this.currentScreen = "home";
+					this.screen.set({ icon: "home" });
+				} else {
+					this.title.my.classList.add("active");
+					this.title.home.classList.remove("active");
+					this.currentScreen = "my";
+					this.screen.set({ icon: "userPortrait" });
+				}
+
+				this.render();
+			},
+
+			reset() {
+				this.loaded = false;
+				emptyNode(this.view.list);
+				this.setInputNow();
+			},
+
+			setLoading(loading = false) {
+				this.loading = loading;
+
+				if (this.screen.overlayShowing) {
+					this.screen.loading = loading;
+					this.view.control.confirm.loading(false);
+				} else {
+					this.screen.loading = false;
+					this.view.control.confirm.loading(loading);
+				}
+			},
+
+			/**
+			 * @param {Date} date 
+			 * @returns
+			 */
+			async load(date) {
+				try {
+					if (!this.loaded) {
+						this.setLoading(true);
+						this.screen.overlay({ show: false });
+						await api.home();
+						this.view.control.confirm.disabled = false;
+						this.setLoading(false);
+					} else {
+						if (date) {
+							this.setLoading(true);
+							await api.home(date);
+							this.setLoading(false);
+						}
+					}
+				} catch(e) {
+					let error = parseException(e);
+
+					this.reset();
+					this.view.control.confirm.disabled = true;
+					this.screen.overlay({
+						icon: "bomb",
+						title: "Toang Rồi Ông Giáo Ạ!",
+						description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
+						buttons: {
+							login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
+						}
+					});
+
+					this.setLoading(false);
+				}
+			},
+
+			setInputNow(date = new Date()) {
+				setDateTimeValue(this.view.control.dateInput.input, null, time(date));
+			},
+
+			getInputDate() {
+				return new Date(this.view.control.dateInput.input.value);
+			},
+
+			setAutoChangeRenderer(enabled) {
+				this.autoChangeRenderer = enabled;
+
+				if (this.initialized)
+					this.render();
+			},
+
+			setDefaultRenderMode(mode) {
+				this.defaultRenderMode = mode;
+
+				if (this.initialized && !this.autoChangeRenderer)
+					this.render();
+			},
+
+			/**
+			 * Render handler
+			 * @param 	{ScheduleWeekRow[]}		data
+			 */
+			render(data, {
+				force = false
+			} = {}) {
+				if (!this.loaded)
+					return;
+
+				let renderer = this.defaultRenderMode;
+				let newData = false;
+
+				if (typeof data === "object" && typeof data.length === "number") {
+					newData = true;
+					this.currentData = data;
+				} else
+					data = this.currentData;
+
+				if (this.autoChangeRenderer) {
+					if (window.innerWidth <= this.listRenderTrigger)
+						renderer = "list";
+					else
+						renderer = "table";
+				}
+
+				let needUpdate = force
+					|| this.currentRenderer !== renderer
+					|| newData
+					|| this.activeScreen !== this.currentScreen
+					|| this.activeWeekday !== this.currentWeekday;
+
+				// Only re-render when render mode changed or we have
+				// updated data to render
+				if (needUpdate) {
+					this.log("DEBG", `render(${renderer}): re-rendering`, `(force: ${force})`);
+					emptyNode(this.view.list);
+
+					/** @type {ScheduleWeekRow[]} */
+					let renderData = Array();
+					
+					if (this.currentScreen === "my") {
+						let classIDs = this.getClassID();
+	
+						if (classIDs.length > 0) {
+							for (let item of data) {
+								let rows = Array();
+		
+								for (let row of item.rows) {
+									if (typeof row.classID !== "object" || !row.classID.length)
+										continue;
+		
+									let match = false;
+									for (let id of row.classID) {
+										if (classIDs.includes(id)) {
+											match = true;
+											break;
+										}
+									}
+		
+									if (match)
+										rows.push(row);
+								}
+
+								if (rows.length > 0) {
+									renderData.push({
+										time: item.time,
+										date: item.date,
+										dateString: item.dateString,
+										weekDay: item.weekDay,
+										rows
+									});
+								}
+							}
+						} else {
+							this.view.list.appendChild(this.emptyClassIDsNotice);
+							this.activeScreen = this.currentScreen;
+
+							return;
+						}
+					} else {
+						renderData = data;
+					}
+
+					// In home screen, we filter to only display selected date
+					if (this.currentScreen === "home" && this.currentWeekday !== "all")
+						renderData = renderData.filter((i) => i.weekDay === this.currentWeekday);
+
+					if (renderer === "table")
+						this.view.list.appendChild(core.screen.schedule.renderTable(renderData));
+					else
+						this.view.list.appendChild(core.screen.schedule.renderList(renderData));
+
+					this.currentRenderer = renderer;
+					this.activeScreen = this.currentScreen;
+					this.activeWeekday = this.currentWeekday;
+					this.view.control.dataset.render = renderer;
+					this.view.control.dataset.screen = this.currentScreen;
 				}
 			}
-
-			/** @param {Boolean} loading */
-			set loading(loading) {
-				this.view.loading.classList[loading ? "add" : "remove"]("show");
-			}
-
-			/** @param {String|HTMLElement} content */
-			set content(content) {
-				this.view.overlay.style.display = "none";
-				emptyNode(this.view.content);
-
-				if (typeof content === "object" && content.classList)
-					this.view.content.appendChild(content);
-				else
-					this.view.content.innerHTML = content;
-			}
-		},
-
-		init() {
-			
 		},
 
 		schedule: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: undefined,
 
+			/** @type {HTMLDivElement} */
 			view: null,
+
 			loaded: false,
 			autoChangeRenderer: true,
 			defaultRenderMode: "table",
@@ -1543,7 +2048,7 @@ const core = {
 					list: { tag: "div", class: ["list", "showEmpty"] }
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "schedule",
 					icon: "calendarWeek",
 					title: "lịch học",
@@ -1551,9 +2056,9 @@ const core = {
 					applyScrollable: false
 				});
 
+				this.setLoading(true);
 				this.screen.view.header.reload.style.display = "none";
 				this.screen.content = this.view;
-				this.setLoading(true);
 				this.screen.onShow(() => this.load());
 				new Scrollable(this.view, { content: this.view.list });
 
@@ -1589,7 +2094,6 @@ const core = {
 							info: response.info
 						}));
 					}
-
 					
 					this.loaded = true;
 					this.render(response.info);
@@ -1613,38 +2117,47 @@ const core = {
 						// Convert date string back to date object
 						cache.stored = new Date(cache.stored);
 						cache.date = new Date(cache.date);
-	
-						for (let item of cache.info) {
-							item.date = new Date(item.date);
-	
-							for (let row of item.rows) {
-								row.date[0] = new Date(row.date[0]);
-								row.date[1] = new Date(row.date[1]);
+
+						// Validate cache age (7 days)
+						if (time(cache.date) >= time() - 604800) {
+							for (let item of cache.info) {
+								item.date = new Date(item.date);
+		
+								for (let row of item.rows) {
+									row.date[0] = new Date(row.date[0]);
+									row.date[1] = new Date(row.date[1]);
+								}
+							}
+		
+							this.render(cache.info);
+		
+							// Render notice for user
+							let note = createNote({
+								level: "warning",
+								style: "round",
+								message: `
+									Đây là dữ liệu lịch học của tuần từ ngày
+									<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
+									của tài khoản <b>${cache.name}</b>.<br>
+									Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai!<br>
+									Hãy <a href="javascript:core.account.subWindow.show()">đăng nhập</a> để cập nhật dữ liệu!
+								`
+							});
+		
+							note.group.style.marginBottom = "30px";
+							this.view.list.insertBefore(note.group, this.view.list.firstChild);
+							this.screen.overlay({ show: false });
+		
+							let autoLogin = localStorage.getItem("autoLogin.enabled");
+							if (autoLogin === "true") {
+								// Switch to button loading indicator because we have just
+								// hided the screen loading overlay
+								this.setLoading(true);
+							} else {
+								this.setLoading(false);
+								this.view.control.confirm.disabled = true;
 							}
 						}
-	
-						this.render(cache.info);
-	
-						// Render notice for user
-						let note = createNote({
-							level: "warning",
-							style: "round",
-							message: `
-								Đây là dữ liệu lịch học của tuần từ ngày
-								<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
-								của tài khoản <b>${cache.name}</b>.<br>
-								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể không chính xác!<br>
-							`
-						});
-	
-						note.group.style.marginBottom = "30px";
-						this.view.list.insertBefore(note.group, this.view.list.firstChild);
-						this.view.control.confirm.disabled = true;
-						this.screen.overlay({ show: false });
-	
-						// Switch to button loading indicator because we have just
-						// hided the screen loading overlay
-						this.setLoading(true);
 					} catch(e) {
 						this.log("WARN", "Loading cache data failed! Ignoring cache for now...", e);
 					}
@@ -1676,9 +2189,10 @@ const core = {
 				this.screen.overlay({
 					icon: "exclamation",
 					title: "Yêu Cầu Đăng Nhập",
-					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này!`,
+					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này! Hoặc bạn <b>có thể</b> xem lịch học mà không cần đăng nhập.`,
 					buttons: {
-						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true }
+						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true },
+						viewHome: { text: "Xem Lịch Học", icon: "table", color: "purple", onClick: () => core.screen.home.screen.show() }
 					}
 				});
 
@@ -1754,7 +2268,7 @@ const core = {
 
 			/**
 			 * Render schedule handler
-			 * @param 	{Array}		data
+			 * @param 	{ScheduleWeekRow[]}		data
 			 */
 			render(data) {
 				let renderer = this.defaultRenderMode;
@@ -1777,22 +2291,30 @@ const core = {
 				// updated data to render
 				if (this.currentRenderer !== renderer || newData) {
 					this.log("DEBG", `render(${renderer}): re-rendering`);
+					emptyNode(this.view.list);
 
 					if (renderer === "table")
-						this.renderTable(data);
+						this.view.list.appendChild(this.renderTable(data));
 					else
-						this.renderList(data);
+						this.view.list.appendChild(this.renderList(data));
 
 					this.currentRenderer = renderer;
 				}
 			},
 
-			renderTable(data) {
-				emptyNode(this.view.list);
+			/**
+			 * Render schedule data in table format
+			 * 
+			 * @param		{ScheduleWeekRow[]}		data 	Schedule data
+			 * @returns		{HTMLTableElement}
+			 */
+			renderTable(data, {
+				removeListID = true
+			} = {}) {
 				let today = new Date();
 				let foundNextDay = false;
 
-				let table = makeTree("table", "generalTable", {
+				let table = makeTree("table", ["generalTable", "scheduleTable"], {
 					thead: { tag: "thead", child: {
 						row: { tag: "tr", child: {
 							state: { tag: "th" },
@@ -1803,7 +2325,10 @@ const core = {
 							time: { tag: "th", class: "bold", text: "Giờ" },
 							teacher: { tag: "th", text: "Giảng Viên" },
 							classID: { tag: "th", class: "right", text: "Mã Lớp" },
-							listID: { tag: "th", class: "right", text: "Mã DS Thi" },
+							
+							...((!removeListID)
+								? { listID: { tag: "th", class: "right", text: "Mã DS Thi" } }
+								: {})
 						}}
 					}},
 
@@ -1856,8 +2381,18 @@ const core = {
 							classroom: { tag: "td", text: row.classroom },
 							time: { tag: "td", class: "bold", html: `${row.time[0]}<arr></arr>${row.time[1]}` },
 							teacher: { tag: "td", text: row.teacher },
-							classID: { tag: "td", class: ["bold", "right"], text: row.classID },
-							listID: { tag: "td", class: ["bold", "right"], text: row.listID }
+
+							classID: {
+								tag: "td",
+								class: ["bold", "right"],
+								html: (typeof row.classID === "object")
+									? row.classID.join("<br>")
+									: row.classID
+							},
+
+							...((!removeListID)
+								? { listID: { tag: "td", class: ["bold", "right"], text: row.listID } }
+								: {})
 						});
 	
 						if (today > row.date[1]) {
@@ -1883,13 +2418,21 @@ const core = {
 					}
 				}
 
-				this.view.list.appendChild(table);
+				return table;
 			},
 
+			/**
+			 * Render schedule data in list format.
+			 * This format is mobile-fiendly
+			 * 
+			 * @param		{ScheduleWeekRow[]}		data 	Schedule data
+			 * @returns		{HTMLTableElement}
+			 */
 			renderList(data) {
-				emptyNode(this.view.list);
 				let today = new Date();
 				let foundNextDay = false;
+				let container = document.createElement("div");
+				container.classList.add("scheduleList");
 
 				for (let { time, date, dateString, weekDay, rows = [] } of data) {
 					let isItemToday = false;
@@ -1960,8 +2503,10 @@ const core = {
 						group.items.appendChild(item);
 					}
 		
-					this.view.list.appendChild(group);
+					container.appendChild(group);
 				}
+
+				return container;
 			},
 
 			async viewNote(id) {
@@ -1996,7 +2541,7 @@ const core = {
 		},
 
 		tests: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: null,
 
 			view: null,
@@ -2021,7 +2566,7 @@ const core = {
 					}}
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "tests",
 					icon: "pencil",
 					title: "lịch thi",
@@ -2171,7 +2716,7 @@ const core = {
 		},
 
 		subscribe: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: null,
 
 			view: null,
@@ -2188,7 +2733,7 @@ const core = {
 					subscribed: { tag: "div", class: ["content", "showEmpty", "subscribed"] }
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "subscribe",
 					icon: "play",
 					title: "đăng kí lớp",
@@ -2546,7 +3091,7 @@ const core = {
 		},
 
 		results: {
-			/** @type {core.screen.Screen} */
+			/** @type {CoreScreen} */
 			screen: null,
 
 			view: null,
@@ -2609,7 +3154,7 @@ const core = {
 					}}
 				});
 
-				this.screen = new core.screen.Screen({
+				this.screen = new CoreScreen({
 					id: "results",
 					icon: "poll",
 					title: "kết quả học tập",

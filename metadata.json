@@ -8,20 +8,25 @@
         "classIDHelp": "https://nc-minh.github.io/FITHOU/"
     },
     "middleware": {
-        "DHS": {
-            "host": "https://dealhuntersuite.com",
-            "name": "DHS Middleware",
+        "heroku-node": {
+            "host": "https://ctmsmw-node.herokuapp.com",
+            "name": "Heroku Middleware (Node)",
             "default": true
         },
 
+        "DHS": {
+            "host": "https://dealhuntersuite.com",
+            "name": "DHS Middleware"
+        },
+
         "heroku": {
-            "host": "https://ctmsmw.herokuapp.com/",
+            "host": "https://ctmsmw.herokuapp.com",
             "name": "Heroku Middleware"
         },
         
         "local": {
             "host": "http://localhost:80",
-            "name": "localhost"
+            "name": "localhost (do not use!)"
         }
     },
     "author": {

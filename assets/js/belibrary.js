@@ -966,18 +966,18 @@ function clamp(value, min, max) {
 }
 
 class StopClock {
-	__time(date) {
-		return (typeof date !== "undefined")
-			? date.getTime()
-			: performance.now();
-	}
-
 	/**
 	 * Create a new StopClock instance
 	 * @param {Date} date 
 	 */
 	constructor(date) {
 		this.start = this.__time(date);
+	}
+
+	__time(date) {
+		return (typeof date !== "undefined")
+			? date.getTime()
+			: performance.now();
 	}
 
 	get stop() {
@@ -1542,14 +1542,15 @@ function currentScript() {
  * + 21 with length 3: 021
  * + "sample" with length 8: "  sample"
  *
- * @param	{string/number}		input Input
- * @param	{number}			length Length
+ * @param	{String|Number}		input	Input String
+ * @param	{Number}			length	Length
+ * @param	{Boolean}			right	Align right???
  */
-function pleft(inp, length = 0, right = false) {
-	let type = typeof inp;
+function pleft(input, length = 0, right = false) {
+	let type = typeof input;
 	let padd = "";
 
-	inp = (type === "number") ? inp.toString() : inp;
+	input = (type === "number") ? input.toString() : input;
 
 	switch (type) {
 		case "number":
@@ -1565,8 +1566,8 @@ function pleft(inp, length = 0, right = false) {
 			return false;
 	}
 
-	padd = padd.repeat(Math.max(0, length - inp.length));
-	return (right) ? inp + padd : padd + inp;
+	padd = padd.repeat(Math.max(0, length - input.length));
+	return (right) ? input + padd : padd + input;
 }
 
 /**
@@ -2854,8 +2855,8 @@ const cookie = {
 
 /**
  * Log to console, with sparkles!
- * @param {String}				level	Log level
- * @param  {...String|Object}	args	Log info
+ * @param	{String}				level	Log level
+ * @param	{...String|Object}		args	Log info
  */
 function clog(level, ...args) {
 	// We only want to log DEBG level in development mode

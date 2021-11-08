@@ -8,15 +8,20 @@
         "classIDHelp": "https://nc-minh.github.io/FITHOU/"
     },
     "middleware": {
-        "heroku-node": {
-            "host": "https://ctmsmw-node.herokuapp.com",
-            "name": "Heroku Middleware (Node)",
+        "DHS": {
+            "host": "https://dealhuntersuite.com",
+            "name": "DHS Middleware",
             "default": true
         },
 
-        "DHS": {
-            "host": "https://dealhuntersuite.com",
-            "name": "DHS Middleware"
+        "maylockhongkhi": {
+            "host": "https://a4fe-117-5-141-146.ap.ngrok.io",
+            "name": "[beta] maylockhongkhi (Node) 🔥"
+        },
+
+        "heroku-node": {
+            "host": "https://ctmsmw-node.herokuapp.com",
+            "name": "Heroku Middleware (Node)"
         },
 
         "heroku": {
@@ -26,7 +31,7 @@
         
         "local": {
             "host": "http://localhost:80",
-            "name": "localhost (do not use!)"
+            "name": "localhost"
         }
     },
     "author": {

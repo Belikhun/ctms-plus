@@ -1534,7 +1534,22 @@ const core = {
 			api.onResponse("services", (response) => this.updateEmail(response.info.email));
 
 			set({ p: 50, d: `Đang Kiểm Tra Phiên Làm Việc` });
-			await api.request();
+			try {
+				await api.request();
+			} catch(error) {
+				if (!error.data || error.data.code === 106 || error.data.code > 0 && error.data.code < 100) {
+					this.log("ERRR", "Session check request failed! Error indicate middleware failue!");
+					this.log("ERRR", "We will perform a auto middleware change to resolve this problem and try again.");
+					set({ p: 60, d: `Đang Chọn Middleware Khác` });
+					await core.middleware.check({
+						message: "Middleware hiện tại đã bị lỗi!",
+						description: "CTMS+ đang tìm kiếm middleware phù hợp để sử dụng, quá trình này sẽ mất vài giây!"
+					});
+
+					set({ p: 70, d: `Đang Kiểm Tra Phiên Làm Việc (LẦN 2)` });
+					await api.request();
+				}
+			}
 
 			if (!this.loggedIn) {
 				// This code will be executed if app started with

@@ -1781,6 +1781,51 @@ table.scheduleTable.scheduleTable > tbody > .row > td[key="listID"] {
 	margin-left: 10px;
 }
 
+/** ===================== middlewareStatus ===================== */
+
+.middlewareStatus {
+	--hover: rgb(216, 216, 216);
+}
+
+.middlewareStatus > tbody > .row > .middleware > .name {
+	font-weight: bold;
+}
+
+.middlewareStatus > tbody > .row > .middleware > .host {
+	font-size: 13px;
+}
+
+.middlewareStatus > tbody > .row > .status {
+	position: relative;
+}
+
+.middlewareStatus > tbody > .row > .status > .simpleSpinner,
+.middlewareStatus > tbody > .row > .status > icon {
+	position: absolute;
+	display: none;
+
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.middlewareStatus > tbody > .row > .status[data-status="good"] > icon,
+.middlewareStatus > tbody > .row > .status[data-status="error"] > icon,
+.middlewareStatus > tbody > .row > .status[data-status="loading"] > .simpleSpinner {
+	display: block;
+}
+
+.middlewareStatus > tbody > .row > .status[data-status="good"] > icon::after {
+	content: "\f00c";
+	color: rgb(0, 206, 24);
+}
+
+.middlewareStatus > tbody > .row > .status[data-status="error"] > icon::after {
+	content: "\f00d";
+	font-size: 25px;
+	color: rgb(206, 21, 0);
+}
+
 /** ===================== projectInfo ===================== */
 
 .projectInfo {

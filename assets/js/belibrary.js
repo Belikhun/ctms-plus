@@ -2977,9 +2977,12 @@ function clog(level, ...args) {
 }
 
 const popup = {
-	tree: {},
-	popup: {},
-	popupNode: null,
+	/** @type {HTMLElement} */
+	popup: undefined,
+
+	/** @type {HTMLElement} */
+	popupNode: undefined,
+
 	initialized: false,
 	showing: false,
 
@@ -3003,15 +3006,34 @@ const popup = {
 	},
 
 	init() {
-		const tree = [{type:"div",class:"popupWindow",name:"popup",list:[{type:"div",class:"header",name:"header",list:[{type:"span",class:"top",name:"top",list:[{type:"t",class:["windowTitle","text-overflow"],name:"windowTitle"},{type:"span",class:"close",name:"close"}]},{type:"icon",name:"icon"},{type:"t",class:"text",name:"text"}]},{type:"div",class:"body",name:"body",list:[{type:"div",class:"top",name:"top",list:[{type:"t",class:"message",name:"message"},{type:"t",class:"description",name:"description"}]},{type:"div",class:"note",name:"note",list:[{type:"span",class:"inner",name:"inner"}]},{type:"div",class:"customNode",name:"customNode"},{type:"div",class:"buttonGroup",name:"button"}]}]}];
+		this.popupNode = makeTree("div", "popupContainer", {
+			popup: { tag: "div", class: "popupWindow", child: {
+				header: { tag: "div", class: "header", child: {
+					top: { tag: "span", class: "top", child: {
+						windowTitle: { tag: "t", class: ["windowTitle", "text-overflow"] },
+						close: { tag: "span", class: "close", title: "Đóng" }
+					}},
 
-		this.tree = buildElementTree("div", "popupContainer", tree);
-		this.popupNode = this.tree.tree;
-		this.popup = this.tree.obj.popup;
+					icon: { tag: "icon" },
+					text: { tag: "t", class: "text" }
+				}},
+
+				body: { tag: "div", class: "body", child: {
+					top: { tag: "div", class: "top", child: {
+						message: { tag: "t", class: "message" },
+						description: { tag: "t", class: "description" }
+					}},
+
+					note: createNote(),
+					customNode: { tag: "div", class: "customNode" },
+					button: { tag: "div", class: "buttonGroup" }
+				}}
+			}}
+		});
+
+		this.popup = this.popupNode.popup;
+		this.popup.body.note.group.style.display = "none";
 		document.body.insertBefore(this.popupNode, document.body.childNodes[0]);
-
-		this.popup.header.top.close.title = "Đóng";
-		this.popup.body.note.style.display = "none";
 
 		if (typeof sounds !== "undefined")
 			sounds.applySound(this.popup.header.top.close, ["soundhover", "soundselect"]);
@@ -3043,7 +3065,9 @@ const popup = {
 			this.popup.dataset.level = level;
 
 			//* THEME
-			let template = document.body.classList.contains("dark") ? this.levelTemplate.dark : this.levelTemplate.light;
+			let template = document.body.classList.contains("dark")
+				? this.levelTemplate.dark
+				: this.levelTemplate.light;
 
 			if (template[level])
 				template = template[level];
@@ -3053,7 +3077,9 @@ const popup = {
 			triBg(this.popup.header, {
 				scale: 4,
 				speed: 64,
-				color: (typeof bgColor === "string") ? bgColor : template.bg
+				color: (typeof bgColor === "string")
+					? bgColor
+					: template.bg
 			});
 
 			this.popup.header.icon.dataset.icon = (typeof icon === "string") ? icon : template.icon;
@@ -3069,11 +3095,13 @@ const popup = {
 			this.popup.body.top.description.innerHTML = description;
 
 			if (note) {
-				this.popup.body.note.style.display = "flex";
-				this.popup.body.note.className = `note ${noteLevel || level}`;
-				this.popup.body.note.inner.innerHTML = note;
+				this.popup.body.note.group.style.display = null;
+				this.popup.body.note.set({
+					level: noteLevel || level,
+					message: note
+				});
 			} else
-				this.popup.body.note.style.display = "none";
+				this.popup.body.note.group.style.display = "none";
 
 			if (customNode && customNode.classList) {
 				customNode.classList.add("customNode");
@@ -3083,7 +3111,6 @@ const popup = {
 				this.popup.body.customNode.style.display = "none";
 
 			//* BODY BUTTON
-
 			this.popup.header.top.close.onclick = () => {
 				resolve("close");
 				this.hide();
@@ -3119,7 +3146,7 @@ const popup = {
 
 			if (typeof sounds !== "undefined")
 				sounds.select();
-		})
+		});
 	},
 
 	hide() {

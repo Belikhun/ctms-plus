@@ -902,26 +902,6 @@ const core = {
 
 			init() {
 				this.group = new smenu.Group({ label: "máy chủ", icon: "server" });
-				let general = new smenu.Child({ label: "Chung" }, this.group);
-
-				let mwOptions = {}
-				let mwDefault = undefined;
-
-				for (let key of Object.keys(META.middleware)) {
-					mwOptions[key] = META.middleware[key].name;
-
-					if (META.middleware[key].default)
-						mwDefault = key;
-				}
-
-				let mwSelect = new smenu.components.Select({
-					label: "Middleware",
-					icon: "hive",
-					options: mwOptions,
-					defaultValue: mwDefault,
-					save: `server.middleware.${VERSION}`,
-					onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
-				}, general);
 			}
 		},
 
@@ -1206,6 +1186,172 @@ const core = {
 		}
 	},
 
+	middleware: {
+		priority: 2,
+		list: {},
+		select: smenu.components.Select.prototype,
+
+		init() {
+			if (typeof META === "undefined" || !META.middleware)
+				return false;
+
+			this.list = META.middleware;
+			let general = new smenu.Child({ label: "Middleware" }, core.userSettings.server.group);
+
+			let mwOptions = {}
+			let mwDefault;
+
+			for (let key of Object.keys(META.middleware)) {
+				mwOptions[key] = META.middleware[key].name;
+
+				if (META.middleware[key].default)
+					mwDefault = key;
+			}
+
+			this.select = new smenu.components.Select({
+				label: "Middleware",
+				icon: "hive",
+				options: mwOptions,
+				defaultValue: mwDefault,
+				save: `server.middleware.${VERSION}`,
+				onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
+			}, general);
+
+			new smenu.components.Button({
+				label: "chọn máy chủ tốt nhất",
+				color: "pink",
+				complex: true,
+				onClick: async () => await this.check()
+			}, general);
+		},
+
+		async check({
+			message = "Đang tìm middleware phù hợp",
+			description = "CTMS+ sẽ tự động chọn máy chủ nhanh nhất, quá trình này sẽ mất vài giây."
+		} = {}) {
+			let promises = []
+			let checkData = {}
+			let cancelled = false;
+
+			let checkStatus = makeTree("table", ["generalTable", "middlewareStatus"], {
+				thead: { tag: "thead", child: {
+					row: { tag: "tr", child: {
+						mw: { tag: "th", text: "middleware" },
+						ping: { tag: "th", class: "right", text: "ping" },
+						status: { tag: "th", class: "center", text: "status" }
+					}}
+				}},
+
+				tbody: { tag: "tbody" }
+			});
+
+			for (let key of Object.keys(this.list)) {
+				let item = this.list[key];
+
+				let row = makeTree("tr", "row", {
+					mw: { tag: "td", class: "middleware", child: {
+						mwName: { tag: "t", class: "name", text: item.name },
+						mwHost: { tag: "t", class: "host", text: item.host }
+					}},
+
+					ping: { tag: "td", class: ["right", "ping"] },
+					
+					status: {
+						tag: "td",
+						class: ["center", "status"],
+						data: { status: "loading" },
+						child: {
+							spinner: { tag: "div", class: "simpleSpinner" },
+							icon: { tag: "icon" }
+						}
+					}
+				});
+
+				checkStatus.tbody.appendChild(row);
+				checkData[key] = {
+					status: "loading",
+					ping: null
+				}
+
+				// Start check request
+				promises.push(new Promise(async (resolve) => {
+					let start = performance.now();
+
+					try {
+						await myajax({ url: `${item.host}/api/ping` });
+					} catch(e) {
+						checkData[key].status = "error";
+						row.status.dataset.status = "error";
+
+						resolve();
+						return;
+					}
+
+					checkData[key].status = "good";
+					checkData[key].ping = performance.now() - start;
+					row.status.dataset.status = "good";
+					row.ping.innerText = `${round(checkData[key].ping, 2)}ms`;
+					resolve();
+				}));
+			}
+
+			popup.show({
+				windowTitle: `Middleware Status Check`,
+				title: "Middleware",
+				icon: "server",
+				message,
+				description,
+				customNode: checkStatus,
+				buttonList: {
+					cancel: { color: "red", text: "HỦY" }
+				}
+			}).then((value) => {
+				if (value === "cancel")
+					cancelled = true;
+			});
+
+			// Await all check to complete
+			await Promise.all(promises);
+
+			if (cancelled)
+				return;
+
+			// Find suitable middleware
+			let minPing = 999999;
+			let target;
+			for (let key of Object.keys(checkData)) {
+				if (checkData[key].status !== "good")
+					continue;
+
+				if (checkData[key].ping < minPing) {
+					target = key;
+					minPing = checkData[key].ping;
+				}
+			}
+			
+			// Hack the popup
+			popup.popup.body.top.message.innerText = "Kiểm Tra Hoàn Thành!";
+			popup.popup.body.button.children[0].dataset.color = "blue";
+			popup.popup.body.button.children[0].children[0].innerText = "ĐÓNG";
+
+			if (target) {
+				this.log("OKAY", `Switched to middleware`, {
+					text: target,
+					color: oscColor("blue")
+				}, `(${this.list[target].host})`);
+
+				popup.popup.header.dataset.triColor = "green";
+				popup.popup.body.top.description.innerHTML = `Đã chuyển sang middleware <b>${this.list[target].name}</b>!`;
+				this.select.set({ value: target });
+			} else {
+				this.log("WARN", `No suitable middleware found!`);
+				popup.popup.header.dataset.triColor = "red";
+				popup.popup.body.top.description.innerHTML = `Không tìm thấy middleware phù hợp!
+					Bạn có thể <a target="_blank" href="${REPORT_ERROR}">báo cáo sự cố này</a> để được khắc phục sớm nhất!`;
+			}
+		}
+	},
+
 	account: {
 		priority: 4,
 
@@ -1388,7 +1534,22 @@ const core = {
 			api.onResponse("services", (response) => this.updateEmail(response.info.email));
 
 			set({ p: 50, d: `Đang Kiểm Tra Phiên Làm Việc` });
-			await api.request();
+			try {
+				await api.request();
+			} catch(error) {
+				if (!error.data || error.data.code === 106 || error.data.code > 0 && error.data.code < 100) {
+					this.log("ERRR", "Session check request failed! Error indicate middleware failue!");
+					this.log("ERRR", "We will perform a auto middleware change to resolve this problem and try again.");
+					set({ p: 60, d: `Đang Chọn Middleware Khác` });
+					await core.middleware.check({
+						message: "Middleware hiện tại đã bị lỗi!",
+						description: "CTMS+ đang tìm kiếm middleware phù hợp để sử dụng, quá trình này sẽ mất vài giây!"
+					});
+
+					set({ p: 70, d: `Đang Kiểm Tra Phiên Làm Việc (LẦN 2)` });
+					await api.request();
+				}
+			}
 
 			if (!this.loggedIn) {
 				// This code will be executed if app started with

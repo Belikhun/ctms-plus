@@ -48,23 +48,31 @@ const api = {
 
 	responseHandlers: {},
 
-	onResponse(type, f) {
+	onResponse(type, f, { lock = false } = {}) {
 		if (typeof f !== "function")
 			throw { code: -1, description: `api.onResponse(${type}): not a valid function` }
 
 		if (this.responseHandlers[type] === null || typeof this.responseHandlers[type] !== "object")
 			this.responseHandlers[type] = []
 
-		this.responseHandlers[type].push(f);
+		this.responseHandlers[type].push({
+			handler: f,
+			lock
+		});
 	},
 
-	__handleResponse(type, data) {
+	async __handleResponse(type, data) {
 		if (this.responseHandlers[type] === null || typeof this.responseHandlers[type] !== "object" || this.responseHandlers[type].length === 0) {
 			clog("WARN", `api.__handleResponse(${type}): no handler found`);
 			return;
 		}
 
-		this.responseHandlers[type].forEach(f => f(data));
+		for (let item of this.responseHandlers[type]) {
+			if (item.lock)
+				await item.handler(data);
+			else
+				item.handler(data);
+		}
 	},
 
 	/**
@@ -136,7 +144,7 @@ const api = {
 		} catch(error) {
 			if (error.data) {
 				error.c2m = start.tick() - error.data.runtime;
-				this.__handleResponse("error", error);
+				await this.__handleResponse("error", error);
 
 				// Check maintain mode
 				if (error.data.status === 503 && error.data.data && error.data.data.response) {
@@ -152,7 +160,7 @@ const api = {
 				throw error;
 			} else {
 				error.c2m = start.tick();
-				this.__handleResponse("error", error);
+				await this.__handleResponse("error", error);
 				throw { code: -1, description: `api.request(): invalid middleware response (middleware: ${this.MIDDLEWARE})`, data: error }
 			}
 		}
@@ -231,7 +239,7 @@ const api = {
 			...response.data
 		}
 
-		this.__handleResponse("global", data);
+		await this.__handleResponse("global", data);
 		return data;
 	},
 
@@ -261,7 +269,7 @@ const api = {
 		});
 
 		localStorage.setItem("session.username", username);
-		this.__handleResponse("login", response);
+		await this.__handleResponse("login", response);
 		return response;
 	},
 
@@ -289,7 +297,7 @@ const api = {
 		});
 
 		this.reset();
-		this.__handleResponse("logout", response);
+		await this.__handleResponse("logout", response);
 
 		return response;
 	},
@@ -413,7 +421,7 @@ const api = {
 		else
 			response.info.grade = "Yếu"
 
-		this.__handleResponse("results", response);
+		await this.__handleResponse("results", response);
 		return response;
 	},
 
@@ -460,7 +468,7 @@ const api = {
 			}
 		}
 
-		this.__handleResponse("services", response);
+		await this.__handleResponse("services", response);
 		return response;
 	},
 
@@ -601,7 +609,7 @@ const api = {
 			}
 		}
 
-		this.__handleResponse("home", response);
+		await this.__handleResponse("home", response);
 		return response;
 	},
 
@@ -713,7 +721,7 @@ const api = {
 			response.info.push(item);
 		}
 
-		this.__handleResponse("schedule", response);
+		await this.__handleResponse("schedule", response);
 		return response;
 	},
 
@@ -746,7 +754,7 @@ const api = {
 			.substring(hashLength);
 
 		response.data = { content: cleanRes }
-		this.__handleResponse("getNote", response);
+		await this.__handleResponse("getNote", response);
 		return response;	
 	},
 
@@ -823,7 +831,7 @@ const api = {
 		list = list.sort((a, b) => b.time - a.time);
 		response.list = list;
 
-		this.__handleResponse("tests", response);
+		await this.__handleResponse("tests", response);
 		return response;
 	},
 
@@ -1079,7 +1087,7 @@ const api = {
 		else if (haveSubscribed)
 			response.subscribed = this.parseSubscribe(tables[0]);
 
-		this.__handleResponse("subscribe", response);
+		await this.__handleResponse("subscribe", response);
 		return response;
 	},
 

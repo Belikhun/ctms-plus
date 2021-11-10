@@ -1787,6 +1787,12 @@ table.scheduleTable.scheduleTable > tbody > .row > td[key="listID"] {
 	--hover: rgb(216, 216, 216);
 }
 
+.middlewareStatus > tbody > .row > .middleware > t {
+	max-width: calc(100vw - 200px);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .middlewareStatus > tbody > .row > .middleware > .name {
 	font-weight: bold;
 }

@@ -2353,8 +2353,8 @@ const core = {
 				this.view.control.confirm.disabled = true;
 				this.screen.overlay({
 					icon: "exclamation",
-					title: "Yêu Cầu Đăng Nhập",
-					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này! Hoặc bạn <b>có thể</b> xem lịch học mà không cần đăng nhập.`,
+					title: "Bạn Chưa Đăng Nhập",
+					description: `Hãy đăng nhập vào CTMS để xem nội dung này! Hoặc bạn <b>có thể</b> xem lịch học của khoa mà không cần đăng nhập.`,
 					buttons: {
 						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true },
 						viewHome: { text: "Xem Lịch Học", icon: "table", color: "purple", onClick: () => core.screen.home.screen.show() }
@@ -2786,8 +2786,8 @@ const core = {
 				this.reset();
 				this.screen.overlay({
 					icon: "exclamation",
-					title: "Yêu Cầu Đăng Nhập",
-					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này!`,
+					title: "Bạn Chưa Đăng Nhập",
+					description: `Hãy đăng nhập vào CTMS để xem nội dung này!`,
 					buttons: {
 						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true }
 					}
@@ -2962,8 +2962,8 @@ const core = {
 				this.reset();
 				this.screen.overlay({
 					icon: "exclamation",
-					title: "Yêu Cầu Đăng Nhập",
-					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này!`,
+					title: "Bạn Chưa Đăng Nhập",
+					description: `Hãy đăng nhập vào CTMS để xem nội dung này!`,
 					buttons: {
 						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true }
 					}
@@ -3406,8 +3406,8 @@ const core = {
 				this.reset();
 				this.screen.overlay({
 					icon: "exclamation",
-					title: "Yêu Cầu Đăng Nhập",
-					description: `Bạn phải đăng nhập vào CTMS trước khi xem nội dung này!`,
+					title: "Bạn Chưa Đăng Nhập",
+					description: `Hãy đăng nhập vào CTMS để xem nội dung này!`,
 					buttons: {
 						login: { text: "ĐĂNG NHẬP", icon: "signin", onClick: () => core.account.clickable.active = true }
 					}

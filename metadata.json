@@ -18,11 +18,6 @@
             "host": "https://ctmsmw-node.herokuapp.com",
             "name": "Heroku Middleware (Node)"
         },
-        
-        "DHS": {
-            "host": "https://dealhuntersuite.com",
-            "name": "DHS Middleware"
-        },
 
         "heroku": {
             "host": "https://ctmsmw.herokuapp.com",

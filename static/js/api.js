@@ -736,7 +736,9 @@ const api = {
 
 				if (note && note.children[0] && note.children[0].title === "Đã có ghi chú") {
 					let noteRe = /javascript:getNote\((\d+)\);/gm.exec(note.href);
-					noteID = parseInt(noteRe[1]);
+
+					if (noteRe)
+						noteID = parseInt(noteRe[1]);
 				}
 
 				item.rows.push({

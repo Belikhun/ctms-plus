@@ -210,12 +210,20 @@ const api = {
 		}
 
 		// Check for forced change password
-		if (dom.content.getElementById("LeftCol_UsersChangePassword1_lblUser"))
+		if (dom.content.getElementById("LeftCol_UsersChangePassword1_lblUser")) {
+			try {
+				this.logout();
+			} catch(e) {
+				// Nothing needed here.
+			}
+
 			throw { code: -1, description: `api.request(): CTMS yêu cầu bạn thay đổi mật khẩu, vui lòng thực hiện hành động này trên trang chủ của CTMS` }
+		}
 
 		// Check for announcement
 		if (!ignoreAnnouncement) {
 			let ann = dom.content.getElementById("thongbao");
+
 			if (ann) {
 				await popup.show({
 					windowTitle: "Thông Báo",
@@ -230,6 +238,32 @@ const api = {
 					}
 				});
 			}
+		}
+
+		// Check for survey
+		if (response.data.response.includes("sát ý kiến sinh viên")) {
+			let msg = `Bạn cần hoàn thành <b>Khảo Sát Ý Kiến Sinh Viên</b> về hoạt động giảng dạy của giảng viên để có thể tiếp tục sử dụng CTMS`;
+
+			await popup.show({
+				windowTitle: "Thông Báo",
+				title: "Thông Báo",
+				icon: "horn",
+				bgColor: "blue",
+				message: `Khảo Sát`,
+				description: msg,
+				buttonList: {
+					survey: {
+						text: "KHẢO SÁT",
+						color: "green",
+						onClick: () => window.open("http://dbcl.hou.edu.vn/cntt", "_blank"),
+						resolve: false
+					},
+
+					close: { text: "ĐÓNG", color: "blue" }
+				}
+			});
+
+			throw { code: 101, description: msg }
 		}
 
 		let data = {

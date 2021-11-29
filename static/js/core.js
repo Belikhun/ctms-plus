@@ -1537,7 +1537,10 @@ const core = {
 			try {
 				await api.request();
 			} catch(error) {
-				if (!error.data || error.data.code === 106 || error.data.code > 0 && error.data.code < 100) {
+				let check = (error.code < 100 && error.code != 0)
+					|| (error.data && (error.data.code === 106 || (error.data.code > 0 && error.data.code < 100)))
+
+				if (check) {
 					this.log("ERRR", "Session check request failed! Error indicate middleware failue!");
 					this.log("ERRR", "We will perform a auto middleware change to resolve this problem and try again.");
 					set({ p: 60, d: `Đang Chọn Middleware Khác` });

@@ -1846,6 +1846,9 @@ const core = {
 
 				// Attach to subscribe API to update Class ID list
 				api.onResponse("subscribe", (data) => {
+					if (!data.subscribed || data.subscribed.length <= 0)
+						return;
+
 					let classIDs = this.getClassID();
 
 					/** @type {SubscribeEntry} */

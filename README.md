@@ -1,8 +1,8 @@
 # CTMS+
 #### The Next Generation Of CTMS
 
-[![Check](https://img.shields.io/github/checks-status/Belikhun/ctms-plus/main?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/main.yml)
-[![Build](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/Build?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/main.yml)
+[![Build](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%9A%80%20build%20and%20deploy?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/build.yml)
+[![Test](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%A5%97%20browser%20test?label=TEST&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/test.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/Belikhun/ctms-plus/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/Belikhun/ctms-plus)
 
 ---

@@ -73,6 +73,7 @@
 	border: unset;
 	cursor: pointer;
 	overflow: hidden;
+	user-select: none;
 	z-index: 0;
 
 	transition:
@@ -146,6 +147,24 @@ body.dark .sq-btn > icon::after {
 	margin: unset;
 }
 
+.sq-btn > .simpleSpinner {
+	position: absolute;
+	display: none;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	--color: white;
+}
+
+.sq-btn[data-loading="true"] > .simpleSpinner {
+	display: block;
+}
+
+.sq-btn[data-loading="true"] > .text,
+.sq-btn[data-loading="true"] > icon {
+	visibility: hidden;
+}
+
 .sq-btn[data-style="round"] {
 	padding: 14px;
 	border-radius: 4px;
@@ -153,6 +172,21 @@ body.dark .sq-btn > icon::after {
 
 .sq-btn[data-style="round"]:focus {
 	outline: none;
+}
+
+.sq-btn[data-style="flat"] {
+	padding: 14px;
+	border-radius: 4px;
+}
+
+.sq-btn[data-style="flat"]::before,
+.sq-btn[data-style="flat"]::after {
+	content: unset;
+	display: none;
+}
+
+.sq-btn[data-style="flat"] > .triBgContainer {
+	display: none;
 }
 
 @keyframes sq-btn-trig-anim {
@@ -348,28 +382,45 @@ body.dark .sq-btn:focus {
 
 /** Simple Text Button */
 .text-btn {
-	position: relative;
-	background-color: transparent;
-	border: unset;
-	font-family: Calibri;
-	font-size: 13px;
-	color: rgb(22, 153, 33);
-	cursor: pointer;
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	--color: rgb(59, 138, 255);
+
+	padding: unset;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: bold;
+	text-decoration: none;
+	color: var(--color);
+
+	user-select: none;
+}
+
+.text-btn::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	top: 0;
+	left: -10px;
+	width: calc(100% + 20px);
+	height: 100%;
+	border-radius: 4px;
+
+	opacity: 0;
+	transition: opacity 150ms linear;
+	background-color: var(--color);
 }
 
 .text-btn:hover {
-	text-decoration: underline;
+	text-decoration: none;
 }
 
-.text-btn:disabled {
-	color: rgb(175, 175, 175);
-	cursor: not-allowed;
+.text-btn:hover::before {
+	opacity: 0.15;
 }
 
-body.dark .text-btn {
-	color: rgb(67, 246, 82);
-}
-
-body.dark .text-btn:disabled {
-	color: rgb(88, 88, 88);
+.text-btn:active::before {
+	opacity: 0.3;
 }

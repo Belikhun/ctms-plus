@@ -8,7 +8,7 @@
 /**
  * Settings Menu
  * 
- * @author	@belivipro9x99
+ * @author	@Belikhun
  * @version	v1.0
  * @license	MIT
  */
@@ -22,6 +22,7 @@ const smenu = {
 	containerHideTimeout: null,
 	mainHideTimeout: null,
 	activePanel: null,
+	align: "right",
 
 	showHandlers: [],
 	hideHandlers: [],
@@ -36,29 +37,29 @@ const smenu = {
 		if (typeof container !== "object" || !container.classList || !container.parentElement)
 			throw { code: -1, description: `smenu.init(): container is not a valid node` }
 
-		let tree = buildElementTree("div", ["smenuContainer", "hide"], [
-			{ type: "div", class: "main", name: "main", list: [
-				{ type: "div", class: "wrapper", name: "wrapper", list: [
-					{ type: "div", class: "smenu", name: "smenu", list: [
-						{ type: "t", class: "title", name: "menuTitle", text: title },	
-						{ type: "t", class: "description", name: "menuDescription", text: description },
-						{ type: "div", class: "searchBox", name: "search", list: [
-							{ type: "input", class: "flatInput", name: "input" }
-						]}
-					]}
-				]},
+		let view = makeTree("div", ["smenuContainer", "hide"], {
+			main: { tag: "div", class: "main", child: {
+				wrapper: { tag: "div", class: "wrapper", child: {
+					smenu: { tag: "div", class: "smenu", child: {
+						menuTitle: { tag: "t", class: "title", text: title },
+						menuDescription: { tag: "t", class: "description", text: description },
+						search: { tag: "div", class: "searchBox", child: {
+							input: { tag: "input", class: "flatInput" }
+						}}
+					}}
+				}},
 
-				{ type: "div", class: "navigator", name: "navigator" }
-			]},
+				navigator: { tag: "div", class: "navigator" }
+			}},
 
-			{ type: "div", class: "panels", name: "panels", list: [
-				{ type: "div", class: "underlay", name: "underlay" }
-			]}
-		])
+			panels: { tag: "div", class: "panels", child: {
+				underlay: { tag: "div", class: "underlay" }
+			}}
+		});
 
-		tree.tree.id = container.id;
-		container.parentElement.replaceChild(tree.tree, container);
-		this.container = tree.obj;
+		view.id = container.id;
+		container.parentElement.replaceChild(view, container);
+		this.container = view;
 		
 		let searchTimeout;
 		let navExpandTimeout;
@@ -114,6 +115,11 @@ const smenu = {
 		});
 
 		this.initialized = true;
+	},
+
+	setAlignment(align) {
+		this.align = align;
+		this.container.dataset.align = align;
 	},
 
 	onShow(f) {
@@ -656,22 +662,26 @@ const smenu = {
 				this.labelNode = document.createElement("t");
 				this.labelNode.classList.add("label");
 
-				this.choiceBox = document.createElement("div");
-				this.choiceBox.classList.add("choiceBox");
-
-				this.container.append(this.labelNode, this.choiceBox);
-				this.choiceNodes = {}
-				this.activeNode = null;
-				this.activeValue = null;
-				this.changeHandlers = []
+				this.choice = createChoiceInput();
+				this.container.append(this.labelNode, this.choice.container);
 				this.save = save;
 				this.defaultValue = defaultValue;
 
+				this.onChange((value) => {
+					if (this.save)
+						localStorage.setItem(this.save, value);
+
+					if (value !== this.defaultValue)
+						this.container.classList.add("changed");
+					else
+						this.container.classList.remove("changed");
+				});
+
 				let savedValue = localStorage.getItem(this.save);
 				if (savedValue === null)
-					value = (typeof value === "number") ? value : defaultValue;
+					value = (typeof value === "string") ? value : defaultValue;
 				else
-					value = parseInt(savedValue);
+					value = savedValue;
 
 				if (typeof onChange === "function")
 					this.onChange(onChange);
@@ -690,7 +700,7 @@ const smenu = {
 				if (typeof f !== "function")
 					throw { code: -1, description: `smenu.components.Choice().onChange(): not a valid function` }
 
-				this.changeHandlers.push(f);
+				this.choice.onChange(f);
 			}
 
 			set({
@@ -702,45 +712,7 @@ const smenu = {
 				if (typeof label === "string")
 					this.labelNode.innerHTML = label;
 
-				if (typeof color === "string")
-					this.container.dataset.color = color;
-
-				if (typeof choice === "object") {
-					this.choiceNodes = {}
-					this.activeNode = null;
-					this.activeValue = null;
-
-					for (let key of Object.keys(choice)) {
-						let node = document.createElement("icon");
-						node.dataset.icon = choice[key].icon || "circle";
-						
-						if (typeof choice[key].title === "string")
-							node.title = choice[key].title;
-
-						this.choiceBox.appendChild(node);
-						this.choiceNodes[key] = node;
-						node.addEventListener("click", () => this.setValue(key));
-					}
-				}
-
-				if (typeof value !== "undefined")
-					this.setValue(value);
-			}
-
-			setValue(value) {
-				if (value === this.activeValue)
-					return;
-
-				if (!this.choiceNodes[value])
-					return;
-
-				if (this.activeNode)
-					this.activeNode.classList.remove("active");
-
-				this.choiceNodes[value].classList.add("active");
-				this.activeValue = value;
-				this.activeNode = this.choiceNodes[value];
-				this.changeHandlers.forEach(f => f(value, this));
+				this.choice.set({ color, choice, value });
 			}
 		},
 
@@ -879,7 +851,7 @@ const smenu = {
 				header.append(this.labelNode, this.previewNode);
 				this.container.append(header, this.slider.group);
 
-				this.onInput((value) => this.update(value));
+				this.onInput((value, e) => this.update(value, !!(e && e.isTrusted)));
 				this.update(value, false);
 
 				if (typeof onInput === "function")
@@ -960,22 +932,30 @@ const smenu = {
 				color = "blue",
 				icon,
 				complex = false,
+				disabled = false,
+				triangleCount = 8,
 				onClick
 			} = {}, child) {
 				this.container = document.createElement("div");
 				this.container.classList.add("component", "button");
 
-				this.button = createButton(label, { color, icon, complex });
+				this.button = createButton(label, { color, icon, complex, triangleCount, disabled });
 				this.container.appendChild(this.button);
 				
 				this.clickHandlers = []
 				this.button.addEventListener("click", async (e) => {
-					this.button.disabled = true;
+					this.button.loading(true);
 
-					for (let f of this.clickHandlers)
-						await f(e);
+					for (let f of this.clickHandlers) {
+						try {
+							await f(e);
+						} catch(error) {
+							clog("ERRR", "smenu.components.Button().handleClick(): An error occured when handling click handlers", error);
+							continue;
+						}
+					}
 
-					this.button.disabled = false;
+					this.button.loading(false);
 				});
 
 				if (typeof onClick === "function")
@@ -992,19 +972,21 @@ const smenu = {
 			set({
 				label,
 				color,
-				icon
+				icon,
+				disabled
 			} = {}) {
 				if (typeof label === "string")
-					this.button.innerText = label;
+					this.button.changeText(label);
 				
 				if (typeof color === "string")
-					if (this.triBg)
-						this.button.dataset.triColor = color;
-					else
-						this.button.dataset.color = color;
+					if (this.button.background)
+						this.button.background.setColor(color);
 
 				if (typeof icon === "string")
 					this.button.dataset.icon = icon;
+
+				if (typeof disabled === "boolean")
+					this.button.disabled = disabled;
 			}
 
 			onClick(f) {
@@ -1100,19 +1082,30 @@ const smenu = {
 				emptyNode(this.container.main);
 				let re = null;
 	
-				if (typeof content === "object" && content.classList)
+				if (typeof content === "object" && content.classList) {
 					this.container.main.appendChild(content);
-				else if ((re = /iframe:(.+)/gm.exec(content)) !== null) {
+					resolve();
+				} else if ((re = /iframe:(.+)/gm.exec(content)) !== null) {
+					this.loading = true;
 					this.iframe = document.createElement("iframe");
-					this.iframe.src = re[1];
-					this.container.main.appendChild(this.iframe);
 
-					this.iframe.addEventListener("load", () => resolve());
+					if (re[1][0] === "/")
+						this.iframe.src = `${window.location.protocol}//${window.location.host}${re[1]}`;
+					else
+						this.iframe.src = re[1];
+
+					this.container.main.appendChild(this.iframe);
+					this.iframe.addEventListener("load", () => {
+						this.loading = false;
+						resolve()
+					});
+
 					return;
-				} else
+				} else {
 					this.container.main.innerHTML = content;
+					resolve();
+				}
 				
-				resolve();
 				return;
 			});
 		}
@@ -1176,7 +1169,7 @@ const smenu = {
 			requestAnimationFrame(() => {
 				smenu.collapse();
 				this.container.classList.add("show");
-			})
+			});
 		}
 
 		hide(callShowMenu = true) {

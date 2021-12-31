@@ -5,6 +5,80 @@
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
+const HTTP_STATUS_MESSAGES = {
+	100: `Continue`,
+	101: `Switching Protocols`,
+	102: `Processing`,
+
+	// 2×× Success
+	200: `OK`,
+	201: `Created`,
+	202: `Accepted`,
+	203: `Non-authoritative Information`,
+	204: `No Content`,
+	205: `Reset Content`,
+	206: `Partial Content`,
+	207: `Multi-Status`,
+	208: `Already Reported`,
+	226: `IM Used`,
+
+	// 3×× Redirection
+	300: `Multiple Choices`,
+	301: `Moved Permanently`,
+	302: `Found`,
+	303: `See Other`,
+	304: `Not Modified`,
+	305: `Use Proxy`,
+	307: `Temporary Redirect`,
+	308: `Permanent Redirect`,
+
+	// 4×× Client Error
+	400: `Bad Request`,
+	401: `Unauthorized`,
+	402: `Payment Required`,
+	403: `Forbidden`,
+	404: `Not Found`,
+	405: `Method Not Allowed`,
+	406: `Not Acceptable`,
+	407: `Proxy Authentication Required`,
+	408: `Request Timeout`,
+	409: `Conflict`,
+	410: `Gone`,
+	411: `Length Required`,
+	412: `Precondition Failed`,
+	413: `Payload Too Large`,
+	414: `Request-URI Too Long`,
+	415: `Unsupported Media Type`,
+	416: `Requested Range Not Satisfiable`,
+	417: `Expectation Failed`,
+	418: `I'm a teapot`,
+	421: `Misdirected Request`,
+	422: `Unprocessable Entity`,
+	423: `Locked`,
+	424: `Failed Dependency`,
+	426: `Upgrade Required`,
+	428: `Precondition Required`,
+	429: `Too Many Requests`,
+	431: `Request Header Fields Too Large`,
+	444: `Connection Closed Without Response`,
+	451: `Unavailable For Legal Reasons`,
+	499: `Client Closed Request`,
+
+	// 5×× Server Error
+	500: `Internal Server Error`,
+	501: `Not Implemented`,
+	502: `Bad Gateway`,
+	503: `Service Unavailable`,
+	504: `Gateway Timeout`,
+	505: `HTTP Version Not Supported`,
+	506: `Variant Also Negotiates`,
+	507: `Insufficient Storage`,
+	508: `Loop Detected`,
+	510: `Not Extended`,
+	511: `Network Authentication Required`,
+	599: `Network Connect Timeout Error`,
+}
+
 /**
  * An AJAX function designed for my API
  * @param	{Object}		param0		request data
@@ -80,8 +154,12 @@ function myajax({
 		xhr.addEventListener("progress", e => onDownload(e), false);
 
 		xhr.addEventListener("readystatechange", async function() {
+			let statusText = (typeof HTTP_STATUS_MESSAGES[this.status] !== "undefined")
+				? HTTP_STATUS_MESSAGES[this.status]
+				: this.statusText;
+
 			if (this.readyState === this.DONE) {
-				if (this.status === 0) {
+				if (this.status === 0 && this.responseText === "") {
 					if (changeState === true)
 						__connection__.stateChange("offline");
 
@@ -102,9 +180,9 @@ function myajax({
 					}, {
 						color: flatc("red"),
 						text: `HTTP ${this.status}:`
-					}, this.statusText);
+					}, statusText);
 
-					let errorObj = { code: 1, description: `HTTP ${this.status}: ${this.statusText} (${method} ${url})`, data: { status: this.status, method, url } }
+					let errorObj = { code: 1, description: `HTTP ${this.status}: ${statusText} (${method} ${url})`, data: { status: this.status, method, url } }
 					error(errorObj);
 					reject(errorObj);
 
@@ -140,7 +218,7 @@ function myajax({
 							}, {
 								color: flatc("red"),
 								text: `HTTP ${this.status}:`
-							}, this.statusText, ` >>> ${response.description}`);
+							}, statusText, ` >>> ${response.description}`);
 	
 							if (this.status === 429 && response.code === 32 && reRequest === true) {
 								// Wait for :?unratelimited:?
@@ -164,7 +242,7 @@ function myajax({
 							}
 						}
 
-						let errorObj = { code: 3, description: `HTTP ${this.status}: ${this.statusText} (${method} ${url})`, data: response }
+						let errorObj = { code: 3, description: `HTTP ${this.status}: ${statusText} (${method} ${url})`, data: response }
 						error(errorObj);
 						reject(errorObj);
 
@@ -177,7 +255,7 @@ function myajax({
 
 					if (this.status >= 400) {
 						let code = `HTTP ${this.status}`;
-						let text = (this.statusText === "") ? "?Unknown statusText" : this.statusText;
+						let text = (statusText === "") ? "?Unknown statusText" : statusText;
 						let resData = response;
 
 						let header = this.getResponseHeader("output-json");
@@ -606,6 +684,17 @@ function time(date = new Date()) {
 }
 
 /**
+ * Is date today??
+ * @param	{Date}	date
+ * @param	{Date}	today	Date to compare to
+ */
+function isToday(date, today = new Date()) {
+	return (date.getDate() === today.getDate() &&
+			date.getMonth() === today.getMonth() &&
+			date.getFullYear() === today.getFullYear())
+}
+
+/**
  * Get current Week in a year
  * @returns {Number}	Current Week
  */
@@ -622,12 +711,19 @@ function parseTime(t = 0, {
 	msDigit = 3,
 	showPlus = false,
 	strVal = true,
+	calcDays = false
 } = {}) {
 	let d = showPlus ? "+" : "";
+	let days = 0;
 	
 	if (t < 0) {
 		t = -t;
 		d = "-";
+	}
+
+	if (calcDays) {
+		days = Math.floor(t / 86400);
+		t %= 86400;
 	}
 	
 	let h = Math.floor(t / 3600);
@@ -637,6 +733,7 @@ function parseTime(t = 0, {
 
 	return {
 		h, m, s, ms, d,
+		days,
 		str: (strVal)
 			? d + [h, m, s]
 				.map(v => v < 10 ? "0" + v : v)
@@ -644,6 +741,28 @@ function parseTime(t = 0, {
 				.join(":")
 			: null
 	}
+}
+
+/**
+ * Date to human readable time
+ * 
+ * @param	{Date}			date		Date to display
+ * @param	{Boolean}		beautify	Will return beautified html code
+ * @return	{String}
+ */
+function humanReadableTime(date, {
+	beautify = false,
+	alwayShowSecond = false
+} = {}) {
+	let timeString = `${pleft(date.getHours(), 2)}:${pleft(date.getMinutes(), 2)}`;
+
+	if (date.getSeconds() > 0 || alwayShowSecond)
+		timeString += `:${pleft(date.getSeconds(), 2)}`;
+
+	let dateString = `${pleft(date.getDate(), 2)}/${pleft(date.getMonth() + 1, 2)}/${date.getFullYear()}`;
+	return beautify
+		? `<b>${timeString}</b> ${dateString}`
+		: `${timeString} ${dateString}`;
 }
 
 function formatTime(seconds, {
@@ -745,14 +864,34 @@ function liveTime(element, start = time(new Date()), {
 	}, interval);
 }
 
-function setDateTimeValue(dateNode, timeNode, value = time()) {
+/**
+ * Set date and time input to a specified time
+ * @param	{HTMLInputElement}		dateNode	Date Input
+ * @param	{HTMLInputElement}		timeNode	Time Input
+ * @param	{Number}				value		UNIX Time
+ */
+ function setDateTimeValue(dateNode, timeNode, value = time()) {
 	let date = new Date(value * 1000);
-	dateNode.value = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(i => pleft(i, 2)).join("-");
-	timeNode.value = [date.getHours(), date.getMinutes(), date.getSeconds()].map(i => pleft(i, 2)).join(":");
+
+	if (typeof dateNode === "object" && dateNode)
+		dateNode.value = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(i => pleft(i, 2)).join("-");
+
+	if (typeof timeNode === "object" && timeNode)
+		timeNode.value = [date.getHours(), date.getMinutes(), date.getSeconds()].map(i => pleft(i, 2)).join(":");
 }
 
 function getDateTimeValue(dateNode, timeNode) {
 	return time(new Date(`${dateNode.value}T${timeNode.value}`));
+}
+
+/**
+ * Return number of days between two dates
+ * @param	{Date}	start	Start date
+ * @param	{Date}	end		End date
+ * @returns {Number}
+ */
+function daysBetween(start, end) {
+	return (start.getTime() - end.getTime()) / (1000 * 3600 * 24);
 }
 
 function convertSize(bytes) {
@@ -827,18 +966,18 @@ function clamp(value, min, max) {
 }
 
 class StopClock {
-	__time(date) {
-		return (typeof date !== "undefined")
-			? date.getTime()
-			: performance.now();
-	}
-
 	/**
 	 * Create a new StopClock instance
 	 * @param {Date} date 
 	 */
 	constructor(date) {
 		this.start = this.__time(date);
+	}
+
+	__time(date) {
+		return (typeof date !== "undefined")
+			? date.getTime()
+			: performance.now();
 	}
 
 	get stop() {
@@ -1034,6 +1173,7 @@ class lazyload {
 		source,
 		classes,
 		tagName = "div",
+		spinner = "simpleSpinner",
 		doLoad = true
 	} = {}) {
 		/** @type {HTMLElement} */
@@ -1069,7 +1209,8 @@ class lazyload {
 
 		this.source = source;
 		this.spinner = document.createElement("div");
-		this.spinner.classList.add("simpleSpinner");
+		this.spinner.classList.add(spinner);
+		this.spinner.setAttribute("spinner", "true");
 		this.container.append(this.spinner);
 
 		if (doLoad)
@@ -1401,14 +1542,15 @@ function currentScript() {
  * + 21 with length 3: 021
  * + "sample" with length 8: "  sample"
  *
- * @param	{string/number}		input Input
- * @param	{number}			length Length
+ * @param	{String|Number}		input	Input String
+ * @param	{Number}			length	Length
+ * @param	{Boolean}			right	Align right???
  */
-function pleft(inp, length = 0, right = false) {
-	let type = typeof inp;
+function pleft(input, length = 0, right = false) {
+	let type = typeof input;
 	let padd = "";
 
-	inp = (type === "number") ? inp.toString() : inp;
+	input = (type === "number") ? input.toString() : input;
 
 	switch (type) {
 		case "number":
@@ -1424,8 +1566,8 @@ function pleft(inp, length = 0, right = false) {
 			return false;
 	}
 
-	padd = padd.repeat(Math.max(0, length - inp.length));
-	return (right) ? inp + padd : padd + inp;
+	padd = padd.repeat(Math.max(0, length - input.length));
+	return (right) ? input + padd : padd + input;
 }
 
 /**
@@ -1500,6 +1642,12 @@ function triBg(element, {
 	const DARKCOLOR = ["brown", "dark", "darkRed", "darkGreen", "darkBlue"]
 	const LIGHTCOLOR = ["lightBlue"]
 
+	let getRandBright = (color) => DARKCOLOR.includes(color)
+		? randBetween(1.1, 1.3, false)
+		: (LIGHTCOLOR.includes(color)
+			? randBetween(0.96, 1.05, false)
+			: randBetween(0.9, 1.2, false))
+
 	let current = element.querySelector(":scope > .triBgContainer");
 
 	if (current)
@@ -1531,13 +1679,7 @@ function triBg(element, {
 		let randScale = randBetween(0.4, 2.0, false) * scale;
 		let width = 15 * randScale;
 		let height = 0.866 * (30 * randScale);
-
-		let randBright = DARKCOLOR.includes(color)
-			? randBetween(1.1, 1.3, false)
-			: LIGHTCOLOR.includes(color)
-				? randBetween(0.95, 1.05, false)
-				: randBetween(0.9, 1.2, false)
-
+		let randBright = getRandBright(color);
 		let randLeftPos = randBetween(0, 98, false);
 		let delay = randBetween(-speed / 2, speed / 2, false);
 
@@ -1558,10 +1700,7 @@ function triBg(element, {
 			element.dataset.triColor = color;
 
 			for (let triangle of container.childNodes) {
-				let randBright = DARKCOLOR.includes(color)
-					? randBetween(1.1, 1.3, false)
-					: randBetween(0.9, 1.2, false)
-
+				let randBright = getRandBright(color);
 				triangle.style.filter = `brightness(${randBright})`;
 			}
 		}
@@ -1921,6 +2060,8 @@ function createInput({
 
 	return {
 		group: container,
+
+		/** @type {HTMLInputElement} */
 		input: container.input,
 
 		set({
@@ -2069,6 +2210,7 @@ function createCheckbox({
 function createSelectInput({
 	icon,
 	color = "blue",
+	fixed = false,
 	options = {},
 	value
 } = {}) {
@@ -2091,8 +2233,7 @@ function createSelectInput({
 
 	if (typeof Scrollable === "function")
 		new Scrollable(container.select, {
-			content: container.select.list,
-			scrollbar: false
+			content: container.select.list
 		});
 
 	/** @type {HTMLDivElement} */
@@ -2108,7 +2249,7 @@ function createSelectInput({
 
 		showing = true;
 		container.classList.add("show");
-		container.select.style.height = `${container.select.list.offsetHeight}px`;
+		container.select.style.height = `${Math.min(150, container.select.list.scrollHeight)}px`;
 	}
 
 	const hide = (isSelected = false) => {
@@ -2131,6 +2272,7 @@ function createSelectInput({
 		icon,
 		color,
 		options,
+		fixed,
 		value
 	} = {}) => {
 		if (typeof color === "string")
@@ -2163,6 +2305,7 @@ function createSelectInput({
 						activeNode.classList.remove("active");
 					
 					activeNode = item;
+					activeValue = item.dataset.value;
 					item.classList.add("active");
 					container.current.value.innerText = item.innerText;
 					changeHandlers.forEach(f => f(item.dataset.value));
@@ -2179,6 +2322,10 @@ function createSelectInput({
 			currentOptions = options;
 		}
 
+		if (typeof fixed === "boolean") {
+			container.classList[fixed ? "add" : "remove"]("fixed");
+		}
+
 		if (typeof value === "string" && currentOptions[value]) {
 			if (activeNode)
 				activeNode.classList.remove("active");
@@ -2191,14 +2338,14 @@ function createSelectInput({
 		}
 	}
 
-	set({ icon, color, options, value });
+	set({ icon, color, options, fixed, value });
 
 	container.current.addEventListener("click", () => toggle());
 
 	return {
 		group: container,
 		showing,
-		value: activeValue,
+		value: () => activeValue,
 		show,
 		hide,
 		set,
@@ -2211,6 +2358,119 @@ function createSelectInput({
 
 			if (activeValue)
 				f(activeValue);
+		}
+	}
+}
+
+/**
+ * Check current agent is a mobile phone?
+ * @returns {Boolean}
+ */
+function checkAgentMobile() {
+	if (typeof navigator.userAgentData === "object"
+		&& typeof navigator.userAgentData.mobile === "boolean")
+		return navigator.userAgentData.mobile;
+
+	// Borrowed from Stack Overflow
+	// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+	const toMatch = Array(
+		/Android/i,
+		/webOS/i,
+		/iPhone/i,
+		/iPad/i,
+		/iPod/i,
+		/BlackBerry/i,
+		/Windows Phone/i
+	);
+		
+	return toMatch.some((i) => navigator.userAgent.match(i));
+}
+
+function createChoiceInput({
+	color,
+	choice,
+	value,
+	classes
+} = {}) {
+	let container = document.createElement("div");
+	container.classList.add("sq-choice");
+
+	switch (typeof classes) {
+		case "string":
+			container.classList.add(classes);
+			break;
+		
+		case "object":
+			if (classes.length && classes.length > 0)
+				container.classList.add(...classes);
+			else
+				throw { code: -1, description: `createChoiceInput(): Invalid or empty "classes" type: ${typeof classes}` }
+
+			break;
+	}
+
+	let choiceNodes = {}
+	let activeNode = null;
+	let activeValue = null;
+	let changeHandlers = []
+
+	const setValue = (value) => {
+		if (value === activeValue)
+			return;
+
+		if (!choiceNodes[value])
+			return;
+
+		if (activeNode)
+			activeNode.classList.remove("active");
+
+		choiceNodes[value].classList.add("active");
+		activeValue = value;
+		activeNode = choiceNodes[value];
+		changeHandlers.forEach(f => f(value));
+	}
+
+	const set = ({
+		color,
+		choice,
+		value
+	} = {}) => {
+		if (typeof color === "string")
+			container.dataset.color = color;
+
+		if (typeof choice === "object") {
+			choiceNodes = {}
+			activeNode = null;
+			activeValue = null;
+
+			for (let key of Object.keys(choice)) {
+				let node = document.createElement("icon");
+				node.dataset.icon = choice[key].icon || "circle";
+				
+				if (typeof choice[key].title === "string")
+					node.title = choice[key].title;
+
+				container.appendChild(node);
+				choiceNodes[key] = node;
+				node.addEventListener("click", () => setValue(key));
+			}
+		}
+
+		if (typeof value !== "undefined")
+			setValue(value);
+	}
+
+	set({ color, choice, value });
+
+	return {
+		container,
+		set,
+
+		onChange(f) {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createChoiceInput().onChange(): not a valid function` }
+
+			changeHandlers.push(f);
 		}
 	}
 }
@@ -2229,6 +2489,7 @@ function createSlider({
 		{ type: "span", class: "rightTrack", name: "right" }
 	]);
 
+	let mouseDownTick = 0;
 	let o = container.obj;
 	o.dataset.color = color;
 	o.dataset.soundhover = true;
@@ -2243,6 +2504,10 @@ function createSlider({
 	o.input.value = value;
 
 	const update = (e) => {
+		mouseDownTick++;
+		if (mouseDownTick > 1)
+			o.classList.add("dragging");
+
 		let valP = (e.target.value - min) / (max - min);
 
 		o.thumb.style.left = `calc(20px + (100% - 40px) * ${valP})`;
@@ -2263,12 +2528,17 @@ function createSlider({
 	let inputHandlers = []
 	let changeHandlers = []
 
+	// Event train
 	o.input.addEventListener("input", (e) => {
 		inputHandlers.forEach(f => f(parseFloat(e.target.value), e));
 		update(e);
 	});
 
 	o.input.addEventListener("change", (e) => changeHandlers.forEach(f => f(parseFloat(e.target.value), e)));
+	o.addEventListener("mouseup", () => {
+		o.classList.remove("dragging");
+		mouseDownTick = 0;
+	});
 
 	return {
 		group: container.tree,
@@ -2307,11 +2577,12 @@ function createButton(text, {
 	color = "blue",
 	element = "button",
 	type = "button",
-	style = "flat",
+	style = "default",
 	classes,
 	icon = null,
 	align = "left",
 	complex = false,
+	triangleCount = 16,
 	disabled = false
 } = {}) {
 	let button = document.createElement(element);
@@ -2353,12 +2624,26 @@ function createButton(text, {
 			button.insertBefore(textNode, button.firstChild);
 	}
 
-	if (complex)
-		triBg(button, {
+	let spinner = document.createElement("div");
+	spinner.classList.add("simpleSpinner");
+	button.appendChild(spinner);
+
+	button.loading = (loading) => {
+		if (loading) {
+			button.disabled = true;
+			button.dataset.loading = true;
+		} else {
+			button.disabled = false;
+			button.removeAttribute("data-loading");
+		}
+	}
+
+	if (complex && style !== "flat")
+		button.background = triBg(button, {
 			scale: 1.6,
 			speed: 8,
 			color: color,
-			triangleCount: 16
+			triangleCount
 		});
 
 	if (typeof sounds === "object")
@@ -2448,11 +2733,13 @@ function createImageInput({
 
 function createNote({
 	level = "info",
-	message = "Smaple Note"
+	message = "Smaple Note",
+	style = "flat"
 } = {}) {
 	let container = document.createElement("div");
 	container.classList.add("note");
 	container.dataset.level = level;
+	container.dataset.style = style;
 
 	let inner = document.createElement("span");
 	inner.classList.add("inner");
@@ -2469,6 +2756,51 @@ function createNote({
 
 			if (message)
 				inner.innerHTML = message;
+		}
+	}
+}
+
+/**
+ * Create Timer Element
+ * @param	{Number|Object}	time	Time in seconds or object from parseTime()
+ */
+function createTimer(time = 0, {
+	style = "normal"
+} = {}) {
+	let timer = document.createElement("timer");
+	timer.dataset.style = style;
+
+	let days = document.createElement("days");
+	let inner = document.createElement("span");
+	let ms = document.createElement("ms");
+
+	timer.append(days, inner, ms);
+
+	const set = ({
+		time,
+		style
+	}) => {
+		if (typeof time === "number")
+			time = parseTime(time);
+
+		if (typeof time === "object") {
+			days.innerText = (time.days != 0) ? `${time.d}${time.days}` : "";
+			inner.innerText = time.str;
+			ms.innerText = time.ms;
+		}
+
+		if (typeof style === "string")
+			timer.dataset.style = style;
+	}
+
+	set({ time, style });
+
+	return {
+		group: timer,
+		set,
+
+		toggleMs: (show) => {
+			ms.style.display = (show) ? null : "none";
 		}
 	}
 }
@@ -2521,7 +2853,16 @@ const cookie = {
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
+/**
+ * Log to console, with sparkles!
+ * @param	{String}				level	Log level
+ * @param	{...String|Object}		args	Log info
+ */
 function clog(level, ...args) {
+	// We only want to log DEBG level in development mode
+	if (level.toUpperCase() === "DEBG" && !(typeof DEBUG === "boolean" && DEBUG === true))
+		return;
+
 	const font = "Consolas";
 	const size = "12";
 	let date = new Date();
@@ -2636,9 +2977,12 @@ function clog(level, ...args) {
 }
 
 const popup = {
-	tree: {},
-	popup: {},
-	popupNode: null,
+	/** @type {HTMLElement} */
+	popup: undefined,
+
+	/** @type {HTMLElement} */
+	popupNode: undefined,
+
 	initialized: false,
 	showing: false,
 
@@ -2662,15 +3006,34 @@ const popup = {
 	},
 
 	init() {
-		const tree = [{type:"div",class:"popupWindow",name:"popup",list:[{type:"div",class:"header",name:"header",list:[{type:"span",class:"top",name:"top",list:[{type:"t",class:["windowTitle","text-overflow"],name:"windowTitle"},{type:"span",class:"close",name:"close"}]},{type:"icon",name:"icon"},{type:"t",class:"text",name:"text"}]},{type:"div",class:"body",name:"body",list:[{type:"div",class:"top",name:"top",list:[{type:"t",class:"message",name:"message"},{type:"t",class:"description",name:"description"}]},{type:"div",class:"note",name:"note",list:[{type:"span",class:"inner",name:"inner"}]},{type:"div",class:"customNode",name:"customNode"},{type:"div",class:"buttonGroup",name:"button"}]}]}];
+		this.popupNode = makeTree("div", "popupContainer", {
+			popup: { tag: "div", class: "popupWindow", child: {
+				header: { tag: "div", class: "header", child: {
+					top: { tag: "span", class: "top", child: {
+						windowTitle: { tag: "t", class: ["windowTitle", "text-overflow"] },
+						close: { tag: "span", class: "close", title: "Đóng" }
+					}},
 
-		this.tree = buildElementTree("div", "popupContainer", tree);
-		this.popupNode = this.tree.tree;
-		this.popup = this.tree.obj.popup;
+					icon: { tag: "icon" },
+					text: { tag: "t", class: "text" }
+				}},
+
+				body: { tag: "div", class: "body", child: {
+					top: { tag: "div", class: "top", child: {
+						message: { tag: "t", class: "message" },
+						description: { tag: "t", class: "description" }
+					}},
+
+					note: createNote(),
+					customNode: { tag: "div", class: "customNode" },
+					button: { tag: "div", class: "buttonGroup" }
+				}}
+			}}
+		});
+
+		this.popup = this.popupNode.popup;
+		this.popup.body.note.group.style.display = "none";
 		document.body.insertBefore(this.popupNode, document.body.childNodes[0]);
-
-		this.popup.header.top.close.title = "Đóng";
-		this.popup.body.note.style.display = "none";
 
 		if (typeof sounds !== "undefined")
 			sounds.applySound(this.popup.header.top.close, ["soundhover", "soundselect"]);
@@ -2702,7 +3065,9 @@ const popup = {
 			this.popup.dataset.level = level;
 
 			//* THEME
-			let template = document.body.classList.contains("dark") ? this.levelTemplate.dark : this.levelTemplate.light;
+			let template = document.body.classList.contains("dark")
+				? this.levelTemplate.dark
+				: this.levelTemplate.light;
 
 			if (template[level])
 				template = template[level];
@@ -2712,7 +3077,9 @@ const popup = {
 			triBg(this.popup.header, {
 				scale: 4,
 				speed: 64,
-				color: (typeof bgColor === "string") ? bgColor : template.bg
+				color: (typeof bgColor === "string")
+					? bgColor
+					: template.bg
 			});
 
 			this.popup.header.icon.dataset.icon = (typeof icon === "string") ? icon : template.icon;
@@ -2728,11 +3095,13 @@ const popup = {
 			this.popup.body.top.description.innerHTML = description;
 
 			if (note) {
-				this.popup.body.note.style.display = "flex";
-				this.popup.body.note.className = `note ${noteLevel || level}`;
-				this.popup.body.note.inner.innerHTML = note;
+				this.popup.body.note.group.style.display = null;
+				this.popup.body.note.set({
+					level: noteLevel || level,
+					message: note
+				});
 			} else
-				this.popup.body.note.style.display = "none";
+				this.popup.body.note.group.style.display = "none";
 
 			if (customNode && customNode.classList) {
 				customNode.classList.add("customNode");
@@ -2742,7 +3111,6 @@ const popup = {
 				this.popup.body.customNode.style.display = "none";
 
 			//* BODY BUTTON
-
 			this.popup.header.top.close.onclick = () => {
 				resolve("close");
 				this.hide();
@@ -2765,8 +3133,8 @@ const popup = {
 				button.returnValue = key;
 
 				if (!(typeof item.resolve === "boolean") || item.resolve !== false)
-					button.addEventListener("mouseup", e => {
-						resolve(e.target.returnValue);
+					button.addEventListener("mouseup", () => {
+						resolve(key);
 						this.hide();
 					});
 
@@ -2778,7 +3146,7 @@ const popup = {
 
 			if (typeof sounds !== "undefined")
 				sounds.select();
-		})
+		});
 	},
 
 	hide() {
@@ -2924,14 +3292,61 @@ const __connection__ = {
 
 }
 
+const mouseCursor = {
+	/**
+	 * X Position of Mouse cursor in the screen
+	 * @type {Number}
+	 */
+	x: 0,
+
+	/**
+	 * Y Position of Mouse cursor in the screen
+	 * @type {Number}
+	 */
+	y: 0,
+
+	/**
+	 * The change amount in X coordinates between current position
+	 * and last position
+	 * @type {Number}
+	 */
+	deltaX: 0,
+
+	/**
+	 * The change amount in Y coordinates between current position
+	 * and last position
+	 * @type {Number}
+	 */
+	deltaY: 0,
+
+	/**
+	 * Current element under the cursor
+	 * @type {HTMLElement}
+	 */
+	target: null,
+
+	/**
+	 * Update Function
+	 * @param {MouseEvent} event 
+	 */
+	update(event) {
+		this.x = event.clientX;
+		this.y = event.clientY;
+		this.deltaX = event.movementX;
+		this.deltaY = event.movementY;
+	}
+}
+
 //? =================
 //?    SCRIPT INIT
 
 if (typeof document.__onclog === "undefined")
 	document.__onclog = (lv, t, m) => {}
 
+window.addEventListener("mousemove", (e) => mouseCursor.update(e), { passive: true });
+
 let sc = new StopClock();
-clog("info", "Log started at:", {
+clog("INFO", "Log started at:", {
 	color: flatc("green"),
 	text: (new Date()).toString()
 })

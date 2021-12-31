@@ -1,14 +1,14 @@
-name: Build
+name: 🚀 build and deploy
 
 on:
   push:
     branches:
       - main
-  
+    
   workflow_dispatch:
-  
+
 jobs:
-  build:
+  main:
     runs-on: ubuntu-latest
 
     strategy:
@@ -32,13 +32,13 @@ jobs:
           pip install requests
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: 📜 Update Information
+      - name: 📜 Run Build
         run: python build/build.py
 
-      - name: ⛳ Commit Update
+      - name: ⛳ Deploy Changes
         env:
           INPUT_BRANCH: "production"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dos2unix build/deploy.sh
           sudo chmod a+x build/deploy.sh

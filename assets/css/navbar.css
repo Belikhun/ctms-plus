@@ -18,7 +18,7 @@
 
 	background-color: #ffffff;
 	user-select: none;
-	z-index: 99;
+	z-index: 100;
 
 	box-shadow: 0 20px 120px 20px transparent;
 	
@@ -93,6 +93,20 @@
 	font-family: Nunito;
 	font-size: 14px;
 	font-weight: 500;
+}
+
+.navigationBar > .underlay {
+	position: absolute;
+	display: none;
+
+	top: 100%;
+	left: 0;
+	right: 0;
+	height: calc(100vh - 100%);
+}
+
+.navigationBar > .underlay.show {
+	display: block;
 }
 
 .navigationBar > .group > .component {
@@ -255,6 +269,12 @@
 	font-weight: 800;
 }
 
+@media only screen and (max-width: 500px) {
+	.navigationBar > .group > .component.title > .title {
+		display: none;
+	}
+}
+
 /** COMPONENTS: ICONBUTTON */
 
 .navigationBar > .group > .component.iconBtn > icon {
@@ -374,6 +394,13 @@
 	background-color: transparent;
 }
 
+@media only screen and (max-width: 500px) {
+	.navigationBar > .group > .component.switch > .indicator,
+	.navigationBar > .group > .component.switch > icon {
+		width: 45px;
+	}
+}
+
 /** COMPONENTS: ACCOUNT */
 
 .navigationBar > .group > .component.account {
@@ -479,8 +506,7 @@
 
 .navigationBar > .group > .component.account > .subWindow > .content > .accountSettings > .header > .avatar[data-state="load"] > .simpleSpinner {
 	display: block;
-	border-color: white;
-	border-right-color: transparent;
+	--color: white;
 
 	z-index: 2;
 }

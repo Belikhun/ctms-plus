@@ -1,20 +1,23 @@
 #? |-----------------------------------------------------------------------------------------------|
 #? |  /tests/lib/log.py                                                                            |
 #? |                                                                                               |
-#? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+#? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 #? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 #? |-----------------------------------------------------------------------------------------------|
 
 from colorama import init
 from colorama import Fore, Style
 from inspect import currentframe
+from threading import Semaphore
 import atexit
 import time
 import re
 import os
 
-#init
-init(autoreset=True)
+screenlock = Semaphore(value = 1)
+
+stripOutput = False if os.getenv("CI") else True
+init(autoreset = True, strip = stripOutput)
 sticks = time.time()
 
 if (not os.path.isdir("logs/")):
@@ -27,6 +30,7 @@ def escape_ansi(line):
 	return ansi_escape.sub("", line)
 
 def log(level, *args, resetCursor = False):
+	screenlock.acquire()
 	level = level.upper()
 	ticks = time.time()
 	ltime = time.localtime(ticks)
@@ -84,6 +88,8 @@ def log(level, *args, resetCursor = False):
 	print(out, end = "\r" if (resetCursor) else "\n")
 	with open(logPath, "a", encoding="utf-8") as f:
 		print(escape_ansi(out), file=f)
+
+	screenlock.release()
 
 def logExitHandler():
 	log("INFO", "Program ended")

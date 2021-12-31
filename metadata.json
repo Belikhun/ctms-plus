@@ -3,31 +3,39 @@
     "version": "0.1",
     "branch": "development",
     "link": {
-        "repo": "https://github.com/belivipro9x99/ctms-plus",
-        "report": "https://github.com/belivipro9x99/ctms-plus/issues"
+        "repo": "https://github.com/Belikhun/ctms-plus",
+        "report": "https://github.com/Belikhun/ctms-plus/issues",
+        "classIDHelp": "https://nc-minh.github.io/FITHOU/"
     },
     "middleware": {
-        "DHS": {
-            "host": "https://dealhuntersuite.com",
-            "name": "DHS Middleware",
+        "maylockhongkhi": {
+            "host": "https://361e-117-5-140-42.ap.ngrok.io",
+            "name": "maylockhongkhi (Node)",
             "default": true
         },
+
+        "heroku-node": {
+            "host": "https://ctmsmw-node.herokuapp.com",
+            "name": "Heroku Middleware (Node)"
+        },
+
+        "heroku": {
+            "host": "https://ctmsmw.herokuapp.com",
+            "name": "Heroku Middleware"
+        },
+        
         "local": {
-            "host": "http://localhost:80",
+            "host": "http://localhost:21075",
             "name": "localhost"
         }
     },
     "author": {
-        "belivipro9x99": {
+        "Belikhun": {
             "name": "Belikhun",
-            "link": "https://github.com/belivipro9x99",
+            "link": "https://github.com/Belikhun",
             "department": "2010A03",
             "role": "Core Developer"
         }
     },
-    "contributors": {
-        "belivipro9x99": {
-            "contributions": 20
-        }
-    }
+    "contributors": {}
 }

@@ -11,16 +11,15 @@
     position: fixed;
     display: flex;
     flex-direction: column;
-	align-items: center;
 	justify-content: flex-end;
 
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 50%;
+    height: 140px;
 
     opacity: 1;
-    z-index: 100;
+    z-index: 98;
 }
 
 .splash.hide {
@@ -37,74 +36,143 @@
     width: 100%;
     height: 100%;
 
-    box-shadow: inset 0 -500px 150px -200px rgba(208, 208, 208, 0.7);
+    box-shadow: inset 0 -150px 50px -100px rgba(240, 240, 240, 0.9);
 }
 
 .splash > .icon {
+    position: absolute;
+
+    bottom: 48px;
+    left: 50%;
 	width: 54px;
 	height: 54px;
+    margin-bottom: 5px;
+
+    transform: translateX(-50%);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.splash > .title {
-	margin-top: 4px;
-	margin-bottom: 10px;
-	font-family: Nunito;
-	font-size: 20px;
-	font-weight: 900;
+.splash.errored > .icon {
+    left: unset;
+    right: 10px;
+    bottom: 4px;
+    width: 42px;
+	height: 42px;
+    transform: unset;
 }
 
 .splash > .phase {
+    position: absolute;
+
+    bottom: 28px;
+    right: 50%;
+    transform: translateX(50%);
+    margin-bottom: 5px;
+
 	font-size: 11px;
 	font-weight: bold;
+    text-align: right;
     text-transform: uppercase;
     letter-spacing: .3px;
     color: rgb(46, 46, 46);
+
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.splash > .detail {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-}
-
-.splash > .detail > .module {
-    margin-right: 6px;
-
-    font-family: Consolas;
-    font-size: 21px;
-    font-weight: bold;
-    color: rgb(0, 0, 0);
-}
-
-.splash > .detail > .module::after {
-    content: ":";
-}
-
-.splash > .detail > .status {
-    min-height: 18px;
-
-    font-size: 17px;
-    letter-spacing: .6px;
-    color: rgb(44, 44, 44);
-}
-
-.splash > .error {
-    margin: 0 10px 8px;
-
-    font-family: Consolas;
-    font-size: 17px;
-    font-weight: bold;
-	text-align: center;
-    color: rgb(240, 39, 83);
+.splash.errored > .phase {
+    right: 60px;
+    transform: unset;
 }
 
 .splash > .progressBar {
     width: 100%;
-    height: 12px;
+    height: 30px;
 	margin-top: unset;
 
     overflow: hidden;
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.splash.errored > .progressBar {
+    height: 60px;
+}
+
+.splash > .progressBar > .error {
+    position: absolute;
+    display: -webkit-box;
+
+    top: 50%;
+    left: 10px;
+    max-width: 60vw;
+    transform: translateY(-50%);
+
+    font-family: Consolas;
+    font-size: 17px;
+    font-weight: bold;
+	text-align: left;
+    color: rgb(111, 5, 28);
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.splash > .progressBar > .detail {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    bottom: 50%;
+    right: 50%;
+    width: 100%;
+    transform: translate(50%, 50%);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.splash.errored > .progressBar > .detail {
+    bottom: 10px;
+    right: 60px;
+    width: auto;
+    max-width: 40vw;
+    transform: unset;
+}
+
+.splash > .progressBar > .detail > .module {
+    margin-right: 6px;
+
+    font-family: Consolas;
+    font-size: 17px;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+}
+
+.splash > .progressBar > .detail > .module::after {
+    content: ":";
+}
+
+.splash > .progressBar > .detail > .status {
+    min-height: 18px;
+
+    font-size: 15px;
+    letter-spacing: .6px;
+    color: rgb(44, 44, 44);
+}
+
+@media only screen and (max-width: 1000px) {
+    .splash.errored > .phase {
+        display: none;
+    }
+
+	.splash.errored > .progressBar > .detail {
+        display: none;
+    }
+
+    .splash > .progressBar > .error {
+        max-width: calc(100vw - 62px);
+    }
 }
 
 @keyframes splash-disapear {
@@ -128,15 +196,15 @@
 }
 
 body.dark .splash::before {
-	box-shadow: inset 0 -500px 150px -200px rgba(36, 36, 36, 0.7);
+	box-shadow: inset 0 -150px 50px -100px rgba(36, 36, 36);
 }
 
-body.dark .splash > .detail > .module {
-	color: white;
+body.dark .splash > .progressBar > .detail > .module {
+    color: white;
 }
 
-body.dark .splash > .detail > .status {
-	color: rgb(230, 230, 230);
+body.dark .splash > .progressBar > .detail > .status {
+    color: white;
 }
 
 body.dark .splash > .error {

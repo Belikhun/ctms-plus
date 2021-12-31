@@ -1,7 +1,7 @@
 #? |-----------------------------------------------------------------------------------------------|
 #? |  /tests/lib/ehook.py                                                                          |
 #? |                                                                                               |
-#? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+#? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 #? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 #? |-----------------------------------------------------------------------------------------------|
 
@@ -9,10 +9,15 @@ from lib.log import log
 from colorama import init, Fore
 from ntpath import basename
 import sys
+import os
 
-init(autoreset=True)
+stripOutput = False if os.getenv("CI") else True
+init(autoreset = True, strip = stripOutput)
 
 def myexcepthook(exctype, value, tb):
+	line = f"{Fore.LIGHTYELLOW_EX}/{Fore.LIGHTBLACK_EX}/" * 14
+
+	log("EXCP", f"{line} {Fore.LIGHTRED_EX}EXCEPTION {line}")
 	log("EXCP", "File Traceback:")
 	while tb:
 		filename = tb.tb_frame.f_code.co_filename

@@ -5,9 +5,10 @@ from json.decoder import JSONDecodeError
 from lib import ehook
 from lib.log import log
 
-import colorama
+import os
+log("OKAY", "Imported: os")
+
 from colorama import Fore
-colorama.init()
 log("OKAY", "Imported: colorama")
 
 import requests
@@ -15,9 +16,6 @@ log("OKAY", "Imported: requests")
 
 import json
 log("OKAY", "Imported: json")
-
-import os
-log("OKAY", "Imported: os")
 
 import re
 log("OKAY", "Imported: re")
@@ -43,7 +41,7 @@ logStatus("Lấy Thông Tin Dự Án", 1, True)
 
 
 logStatus("Cập Nhật Danh Sách Người Đóng Góp", 0)
-contributors = requests.get("https://api.github.com/repos/belivipro9x99/ctms-plus/contributors")
+contributors = requests.get("https://api.github.com/repos/Belikhun/ctms-plus/contributors")
 contributorsData = contributors.json()
 
 if (contributors.status_code != 200):

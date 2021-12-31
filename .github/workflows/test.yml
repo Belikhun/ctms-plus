@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        chromedriver-version: [96.0.4664.110]
+        chromedriver-version: [96.0.4664.45]
 
     steps:
       - name: 📁 Checkout Repo

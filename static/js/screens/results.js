@@ -114,7 +114,7 @@ core.screen = {
 					}
 				}
 
-				if (needUpdate)
+				if (needUpdate || this.screen.showing)
 					await this.load();
 			});
 

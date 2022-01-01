@@ -247,30 +247,30 @@ core.screen = {
          */
 
         getScanDates(year, semester, count) {
-            var DateArr = []
+            let dates = []
             if (semester === 1) {
-                var Databegin = new Date(`October 1, ${year}`);
+                let Databegin = new Date(`October 1, ${year}`);
                 Databegin = new Date(Databegin.setDate(Databegin.getDate() - Databegin.getDay() + 1));
                 for (let i = 0; i < count; ++i) {
-                    DateArr = [...DateArr, Databegin];
+                    dates = [...dates, Databegin];
                     Databegin = new Date(Databegin.setDate(Databegin.getDate() + 7));
                 }
             } else if (semester === 2) {
-                var Databegin = new Date(`January 12, ${year}`);
-                Databegin = new Date(Databegin.setDate(Databegin.getDate() - Databegin.getDay() + 1));
-                DateArr = [...DateArr, Databegin];
-                Databegin = new Date(`March 3, ${year}`);
-                Databegin = new Date(Databegin.setDate(Databegin.getDate() - Databegin.getDay() + 1));
-                DateArr = [...DateArr, Databegin];
+                let dateDefault = new Date(`January 12, ${year}`);
+                dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
+                dates = [...dates, dateDefault];
+                dateDefault = new Date(`March 3, ${year}`);
+                dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
+                dates = [...dates, dateDefault];
             } else {
-                var Databegin = new Date(`July 7, ${year}`);
-                Databegin = new Date(Databegin.setDate(Databegin.getDate() - Databegin.getDay() + 1));
+                let dateDefault = new Date(`July 7, ${year}`);
+                dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
                 for (let i = 0; i < count; ++i) {
-                    DateArr = [...DateArr, Databegin];
+                    dates = [...dates, Databegin];
                     Databegin = new Date(Databegin.setDate(Databegin.getDate() + 7));
                 }
             }
-            return DateArr
+            return dates
         },
 
         addListItem({

@@ -261,8 +261,8 @@ core.screen = {
                 let dateDefault = new Date(`July 7, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
                 for (let i = 0; i < count; ++i) {
-                    dates = [...dates, Databegin];
-                    Databegin = new Date(Databegin.setDate(Databegin.getDate() + 7));
+                    dates = [...dates, dateDefault];
+                    dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() + 7));
                 }
             }
             return dates

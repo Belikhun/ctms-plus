@@ -75,9 +75,8 @@ core.screen = {
 					this.setInputNow(response.date);
 
 				// Check schedule data is current week or next week, first response
-				// always return current week data, so we can use this.loaded to
-				// determine is current data is from first request.
-				if (!this.loaded) {
+				// always return current week data.
+				if (!this.loaded && core.account.userInfo) {
 					this.log("INFO", `Updating schedule cache for`, {
 						text: core.account.userInfo.name,
 						color: oscColor("blue")

@@ -198,7 +198,13 @@ class CoreScreen {
 			if (typeof buttons[key].onClick === "function")
 				b.addEventListener("click", async () => {
 					b.loading(true);
-					await buttons[key].onClick();
+
+					try {
+						await buttons[key].onClick();
+					} catch(e) {
+						errorHandler(e);
+					}
+					
 					b.loading(false);
 				});
 
@@ -1539,6 +1545,14 @@ const core = {
 					content: { tag: "t", class: ["value", "small"], text: "Không rõ" }
 				}},
 
+				renewBtn: createButton("Làm Mới Phiên", {
+					color: "orange",
+					classes: "logout",
+					style: "round",
+					icon: "reload",
+					complex: true
+				}),
+
 				signoutBtn: createButton("ĐĂNG XUẤT", {
 					color: "blue",
 					classes: "logout",
@@ -1559,6 +1573,7 @@ const core = {
 			navbar.insert({ container }, "right");
 
 			// Attach response handlers
+			this.detailView.renewBtn.addEventListener("click", () => this.renew());
 			this.detailView.signoutBtn.addEventListener("click", () => this.logout());
 			api.onResponse("global", (response) => this.check(response));
 			api.onResponse("results", (response) => this.updateInfo(response));
@@ -1589,8 +1604,8 @@ const core = {
 				// This code will be executed if app started with
 				// no session / session expired
 				// Handle autologin here
-				let username = localStorage.getItem("autoLogin.username");
-				let password = localStorage.getItem("autoLogin.password");
+				let username = localStorage.getItem("session.username");
+				let password = localStorage.getItem("session.password");
 				let enabled = localStorage.getItem("autoLogin.enabled");
 	
 				if (enabled === "true" && username && password) {
@@ -1706,19 +1721,16 @@ const core = {
 
 			let autoLogin = this.loginView.autoLogin.input.checked;
 			localStorage.setItem("autoLogin.enabled", autoLogin);
-
-			if (autoLogin) {
-				localStorage.setItem("autoLogin.username", username);
-				localStorage.setItem("autoLogin.password", password);
-			} else {
-				localStorage.removeItem("autoLogin.username");
-				localStorage.removeItem("autoLogin.password");
-			}
+			localStorage.removeItem("session.username");
+			localStorage.removeItem("session.password");
 
 			try {
 				await api.login({ username, password });
 				this.updateEmail(username);
-				this.password = password;
+
+				// Update current session credentials
+				localStorage.setItem("session.username", username);
+				localStorage.setItem("session.password", password);
 			} catch(e) {
 				let error = parseException(e);
 				this.loginView.note.group.style.display = null;
@@ -1750,14 +1762,22 @@ const core = {
 			this.subWindow.loading = false;
 		},
 
-		async renew() {
-			if (!this.email || !this.password)
+		async renew({ showAccountPanel = true } = {}) {
+			let username = localStorage.getItem("session.username");
+			let password = localStorage.getItem("session.password");
+
+			if (!username || !password)
 				throw { code: 33, description: `core.account.renew(): cannot renew session without active username or password` }
+
+			if (showAccountPanel) {
+				this.subWindow.loading = true;
+				this.subWindow.show();
+			}
 
 			this.log("INFO", `Renewing Current Session`);
 			localStorage.removeItem("session");
 			await api.request();
-			await this.login({ username: this.email, password: this.password });
+			await this.login({ username, password });
 		}
 	},
 

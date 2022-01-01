@@ -237,13 +237,9 @@ core.screen = {
                 this.screen.loading = false;
             }
         },
-
-
-
-        /**
-         * 
-         * @param	{*}			param0 
-         * @returns {String[]}	array day of 2 week // format :2021-12-06
+        /** 
+         * @param	{*}			params ={year, semester, count}
+         * @returns {Date[]}	array include of date of year, semester and count you input " semester must >=1 and <=3 count is number item of this array you want to get"
          */
 
         getScanDates(year, semester, count) {

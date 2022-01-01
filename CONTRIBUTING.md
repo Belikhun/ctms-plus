@@ -21,13 +21,34 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 ## Use a Consistent Coding Style
 
 * Use tab size of 4 rather than space
-* Brace placement should follow **K&R** style, for example
-	```js
-	while (x == y) {
-		something();
-		somethingelse();
+* Brace placement should follow **K&R** style
+* Naming should follow [Camel Case](https://en.wikipedia.org/wiki/Camel_case) naming practice
+* Add jsDoc on everything you write to better explain what your code do
+
+This code below is an example of how you should write your code:
+```js
+	let awesomeVariable;
+	const NICE_CONST = 727;
+
+	class CowThatMoo {
+		// Some code...
 	}
-	```
+
+	/**
+	 * A function that increase number by 1 and return it
+	 * 
+	 * @param	{Number}	number		Input number
+	 * @returns	{Number}	Number increased by 1
+	 */
+	function someThing(number) {
+		return number + 1;
+	}
+
+	while (x == y) {
+		someThing();
+		someThingElse();
+	}
+```
 
 ## Additional
 

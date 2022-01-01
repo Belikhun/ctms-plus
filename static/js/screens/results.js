@@ -247,21 +247,21 @@ core.screen = {
                 let Databegin = new Date(`October 1, ${year}`);
                 Databegin = new Date(Databegin.setDate(Databegin.getDate() - Databegin.getDay() + 1));
                 for (let i = 0; i < count; ++i) {
-                    dates = [...dates, Databegin];
+                    dates.push(dateDefault);
                     Databegin = new Date(Databegin.setDate(Databegin.getDate() + 7));
                 }
             } else if (semester === 2) {
                 let dateDefault = new Date(`January 12, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-                dates = [...dates, dateDefault];
+                dates.push(dateDefault)
                 dateDefault = new Date(`March 3, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-                dates = [...dates, dateDefault];
+                dates.push(dateDefault)
             } else {
                 let dateDefault = new Date(`July 7, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
                 for (let i = 0; i < count; ++i) {
-                    dates = [...dates, dateDefault];
+                    dates.push(dateDefault)
                     dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() + 7));
                 }
             }

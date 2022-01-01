@@ -8,6 +8,7 @@
 var APPNAME = "CTMS+";
 var VERSION = "0.1";
 var STATE = "local";
+var DEBUG = true;
 
 /**
  * Screen class, used to construct new screen
@@ -195,9 +196,38 @@ class CoreScreen {
 			});
 
 			if (typeof buttons[key].onClick === "function")
-				b.addEventListener("click", () => buttons[key].onClick());
+				b.addEventListener("click", async () => {
+					b.loading(true);
+					await buttons[key].onClick();
+					b.loading(false);
+				});
 
 			this.view.overlay.buttons.appendChild(b);
+		}
+	}
+
+	handleError(e, onRetry = async () => {}) {
+		let error = parseException(e);
+
+		if (error.description.includes("Phiên làm việc hết hạn")) {
+			this.overlay({
+				icon: "unlink",
+				title: "Không Có Quyền Truy Cập!",
+				description: `Phiên làm việc của bạn đã hết hạn hoặc bạn không có quyền truy cập chức năng này. `,
+				buttons: {
+					retry: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: async () => await onRetry() },
+					renew: { text: "Làm Mới Phiên", color: "blue", icon: "signin", onClick: async () => await core.account.renew() }
+				}
+			});
+		} else {
+			this.overlay({
+				icon: "bomb",
+				title: "Toang Rồi Ông Giáo Ạ!",
+				description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
+				buttons: {
+					retry: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: async () => await onRetry() }
+				}
+			});
 		}
 	}
 
@@ -1358,6 +1388,7 @@ const core = {
 		loggedIn: false,
 		background: null,
 		email: undefined,
+		password: undefined,
 		userInfo: undefined,
 
 		/** @type {HTMLElement} */
@@ -1687,6 +1718,7 @@ const core = {
 			try {
 				await api.login({ username, password });
 				this.updateEmail(username);
+				this.password = password;
 			} catch(e) {
 				let error = parseException(e);
 				this.loginView.note.group.style.display = null;
@@ -1713,9 +1745,20 @@ const core = {
 				errorHandler(error);
 			}
 
+			this.password = undefined;
 			this.detailView.signoutBtn.disabled = false;
 			this.subWindow.loading = false;
 		},
+
+		async renew() {
+			if (!this.email || !this.password)
+				throw { code: 33, description: `core.account.renew(): cannot renew session without active username or password` }
+
+			this.log("INFO", `Renewing Current Session`);
+			localStorage.removeItem("session");
+			await api.request();
+			await this.login({ username: this.email, password: this.password });
+		}
 	},
 
 	screen: {

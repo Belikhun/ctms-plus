@@ -241,7 +241,6 @@ core.screen = {
          * @param	{*}			params ={year, semester, count}
          * @returns {Date[]}	array include of date of year, semester and count you input " semester must >=1 and <=3 count is number item of this array you want to get"
          */
-
         getScanDates(year, semester, count) {
             let dates = []
             if (semester === 1) {

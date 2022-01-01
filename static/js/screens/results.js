@@ -237,10 +237,17 @@ core.screen = {
                 this.screen.loading = false;
             }
         },
-        /** 
-         * @param	{*}			params ={year, semester, count}
-         * @returns {Date[]}	array include of date of year, semester and count you input " semester must >=1 and <=3 count is number item of this array you want to get"
-         */
+
+		/**
+		 * Return list of date that is the first day of week that we want to check
+		 * schedule for determining Subject's Semester.
+		 * 
+		 * @param	{Object}    params
+		 * @param	{Number}	params.year			Year of semester want to get dates
+		 * @param	{Number}	params.semester		Semester want to get dates
+		 * @param	{Number}	params.count		Number of dates that will return
+		 * @returns {Date[]}	An array of date
+		 */
         getScanDates(year, semester, count) {
             let dates = []
             if (semester === 1) {
@@ -253,19 +260,20 @@ core.screen = {
             } else if (semester === 2) {
                 let dateDefault = new Date(`January 12, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-                dates.push(dateDefault)
+                dates.push(dateDefault);
                 dateDefault = new Date(`March 3, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-                dates.push(dateDefault)
+                dates.push(dateDefault);
             } else {
                 let dateDefault = new Date(`July 7, ${year}`);
                 dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
                 for (let i = 0; i < count; ++i) {
-                    dates.push(dateDefault)
+                    dates.push(dateDefault);
                     dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() + 7));
                 }
             }
-            return dates
+
+            return dates;
         },
 
         addListItem({

@@ -1,0 +1,282 @@
+/*
+? |-----------------------------------------------------------------------------------------------|
+? |  /static/css/screens/results.css                                                              |
+? |                                                                                               |
+? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
+? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+? |-----------------------------------------------------------------------------------------------|
+*/
+
+.resultsScreen {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	width: 100%;
+	height: 100%;
+}
+
+.resultsScreen > .info {
+	display: flex;
+	flex-direction: row;
+	z-index: 2;
+}
+
+.resultsScreen > .info > .points {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 6;
+	margin: 10px 5px 10px 10px;
+}
+
+.resultsScreen > .info > .points > .ruler {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	height: 6px;
+	margin-top: 22px;
+}
+
+.resultsScreen > .info > .points > .ruler > .bar {
+	position: relative;
+	display: inline-block;
+	background-color: gray;
+	height: 100%;
+	margin-right: 2px;
+
+	overflow: visible;
+}
+
+.resultsScreen > .info > .points > .ruler > .bar:last-child {
+	margin-right: unset;
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.D {
+	width: 50%;
+	background-color: var(--color-red-dark);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.D > .generalTag {
+	background-color: var(--color-red);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.C {
+	width: 12.5%;
+	background-color: var(--color-orange-dark);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.C > .generalTag {
+	background-color: var(--color-orange);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.B {
+	width: 17.5%;
+	background-color: var(--color-blue-dark);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.B > .generalTag {
+	background-color: var(--color-blue);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.A {
+	width: 10%;
+	background-color: var(--color-green-dark);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.A > .generalTag {
+	background-color: var(--color-green);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.S {
+	width: 10%;
+	background-color: var(--color-yellow-dark);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar.S > .generalTag {
+	background-color: var(--color-yellow);
+}
+
+.resultsScreen > .info > .points > .ruler > .bar > .generalTag {
+	position: absolute;
+	left: 50%;
+	bottom: 10px;
+	transform: translateX(-50%);
+}
+
+.resultsScreen > .info > .points > .progress {
+	position: relative;
+	display: block;
+	margin-top: 3px;
+	margin-bottom: 40px;
+
+	background-color: rgb(230, 230, 230);
+}
+
+.resultsScreen > .info > .points > .progress > .bar {
+	position: relative;
+	display: block;
+	width: 60%;
+	height: 26px;
+
+	/* --start: hsl(200, 100%, 70%);
+	--end: hsl(90, 100%, 70%); */
+	--start: hsl(200, 100%, 70%);
+	--end: hsl(90, 84%, 59%);
+	background: linear-gradient(to right, var(--start), var(--end));
+}
+
+.resultsScreen > .info > .points > .progress > .bar > .value {
+	position: absolute;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	top: 100%;
+	right: 0;
+	padding-top: 10px;
+	transform: translateX(50%);
+}
+
+.resultsScreen > .info > .points > .progress > .bar > .value::before {
+	content: "";
+	position: absolute;
+
+	top: 1px;
+	right: calc(50% - 5px);
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 5px 5px 5px;
+	border-color: transparent transparent var(--osc-color-blue) transparent;
+}
+
+.resultsScreen > .info > .points > .progress > .bar > .value > .generalTag {
+	background-color: #6dccfc;
+}
+
+.resultsScreen > .info > .points > .progress > .bar > .value > .point {
+	margin-left: 5px;
+	font-family: Nunito;
+	font-size: 20px;
+}
+
+.resultsScreen > .info > .stats {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+
+	margin: 10px 10px 10px 20px;
+}
+
+.resultsScreen > .info > .stats > .grades,
+.resultsScreen > .info > .stats > .other {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.resultsScreen > .info > .stats > .other {
+	margin-top: 10px;
+}
+
+.resultsScreen > .info > .stats > .grades > .item,
+.resultsScreen > .info > .stats > .other > .item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	margin-left: 5px;
+}
+
+.resultsScreen > .info > .stats > .grades > .item > .generalTag {
+	min-width: 40px;
+	text-align: center;
+}
+
+.resultsScreen > .info > .stats > .grades > .item.F > .generalTag {
+	color: rgb(245, 245, 245);
+	background-color: rgb(72, 72, 72);
+}
+
+.resultsScreen > .info > .stats > .grades > .item > .value,
+.resultsScreen > .info > .stats > .other > .item > .value {
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.resultsScreen > table {
+	position: relative;
+	display: block;
+	flex-grow: 1;
+
+	margin-top: 10px;
+	padding: 0 10px;
+	box-sizing: border-box;
+}
+
+.resultsScreen > table::after {
+	content: "";
+	display: block;
+	width: 100%;
+	margin-bottom: 100px;
+}
+
+.resultsScreen > table > tbody > tr {
+	counter-increment: resultsTableNth;
+}
+
+.resultsScreen > table > thead > tr > th[key="stt"],
+.resultsScreen > table > tbody > tr > td[key="stt"] {
+	width: 20px;
+}
+
+.resultsScreen > table > tbody > tr > td:first-child::before {
+	content: counter(resultsTableNth);
+	font-size: 12px;
+	font-weight: bold;
+	color: inherit;
+}
+
+.resultsScreen > table > thead > tr > th[key="subject"],
+.resultsScreen > table > tbody > tr > td[key="subject"] {
+	width: 320px;
+}
+
+.resultsScreen > table > tbody > tr > td[key="subject"] {
+	font-family: Nunito;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: .2px;
+}
+
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span {
+	min-width: 16px;
+	text-align: center;
+}
+
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="A+"],
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="A"] {
+	background-color: var(--color-green);
+}
+
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="B+"],
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="B"] {
+	background-color: var(--color-blue);
+}
+
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="C+"],
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="C"] {
+	background-color: var(--color-yellow);
+}
+
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="D+"],
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="D"] {
+	background-color: var(--color-red);
+}
+
+.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="F"] {
+	color: rgb(245, 245, 245);
+	background-color: rgb(72, 72, 72);
+}

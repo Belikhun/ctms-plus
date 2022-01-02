@@ -283,7 +283,7 @@ const api = {
 	 * @param		{Object}		credentials
 	 * @param		{String}		credentials.username		Tên người dùng/email
 	 * @param		{String}		credentials.password		Mật khẩu
-	 * @returns		{APIResponse}
+	 * @returns		{Promise<APIResponse>}
 	 */
 	async login({
 		username,
@@ -378,6 +378,7 @@ const api = {
 
 	/**
 	 * Lấy kết quả học tập của sinh viên kèm theo thông tin cơ bản
+	 * @returns		{Promise<APIResponse & Results>}
 	 */
 	async results() {
 		let response = await this.request({
@@ -397,6 +398,7 @@ const api = {
 			mode: response.dom.getElementById("leftcontent").childNodes.item(2).wholeText.trim().replace("\n", " "),
 			results: [],
 			cpa: 0,
+			credits: 0,
 			grade: "Yếu"
 		}
 
@@ -442,6 +444,7 @@ const api = {
 			response.info.results.push(data);
 		}
 
+		response.info.credits = totalCredits;
 		response.info.cpa = totalGrade / totalCredits;
 
 		if (response.info.cpa >= 3.6)
@@ -1232,4 +1235,39 @@ const api = {
  * @type		{Object}
  * @property	{SubscribeEntry[]}		waiting
  * @property	{SubscribeEntry[]}		subscribed
+ */
+
+/**
+ * Result object
+ * @typedef		Result
+ * @type		{Object}
+ * @property	{String}				subject
+ * @property	{Number}				credits
+ * @property	{String}				classID
+ * @property	{String}				teacher
+ * @property	{Number}				diemCC
+ * @property	{Number}				diemDK
+ * @property	{Number}				diemHK
+ * @property	{Number}				average
+ * @property	{String}				grade
+ */
+
+/**
+ * Results object
+ * @typedef		Results
+ * @type		{Object}
+ * @property	{Object}				info
+ * @property	{String}				name
+ * @property	{String}				brithday
+ * @property	{String}				tForm
+ * @property	{String}				studentID
+ * @property	{String}				faculty
+ * @property	{String}				department
+ * @property	{String}				course
+ * @property	{String}				classroom
+ * @property	{String}				mode
+ * @property	{Result[]}				results
+ * @property	{Number}				cpa
+ * @property	{Number}				credits
+ * @property	{String}				grade
  */

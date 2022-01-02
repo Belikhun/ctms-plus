@@ -311,7 +311,7 @@ core.screen = {
 			let today = new Date();
 			let foundNextDay = false;
 
-			let table = makeTree("table", ["generalTable", "scheduleTable"], {
+			let table = makeTree("table", ["generalTable", "scheduleTable", "noBackground"], {
 				thead: { tag: "thead", child: {
 					row: { tag: "tr", child: {
 						state: { tag: "th" },

@@ -752,14 +752,18 @@ function parseTime(t = 0, {
  */
 function humanReadableTime(date, {
 	beautify = false,
+	onlyDate = false,
 	alwayShowSecond = false
 } = {}) {
-	let timeString = `${pleft(date.getHours(), 2)}:${pleft(date.getMinutes(), 2)}`;
+	let dateString = `${pleft(date.getDate(), 2)}/${pleft(date.getMonth() + 1, 2)}/${date.getFullYear()}`;
 
+	if (onlyDate)
+		return dateString;
+
+	let timeString = `${pleft(date.getHours(), 2)}:${pleft(date.getMinutes(), 2)}`;
 	if (date.getSeconds() > 0 || alwayShowSecond)
 		timeString += `:${pleft(date.getSeconds(), 2)}`;
 
-	let dateString = `${pleft(date.getDate(), 2)}/${pleft(date.getMonth() + 1, 2)}/${date.getFullYear()}`;
 	return beautify
 		? `<b>${timeString}</b> ${dateString}`
 		: `${timeString} ${dateString}`;
@@ -1623,6 +1627,20 @@ function oscColor(color) {
 	}
 
 	return (clist[color]) ? clist[color] : clist.dark;
+}
+
+/**
+ * Scale value from range [a, b] to [c, d]
+ * 
+ * @param	{Number}		value		Value to scale
+ * @param	{Number[]}		from		Contain 2 points of input value range. Ex: [0, 1]
+ * @param	{Number[]}		to			Target scale range of input value. Ex: [50, 100]
+ * @returns	{Number}		Scaled value
+ */
+function scaleValue(value, from, to) {
+	let scale = (to[1] - to[0]) / (from[1] - from[0]);
+	let capped = Math.min(from[1], Math.max(from[0], value)) - from[0];
+	return capped * scale + to[0];
 }
 
 /**
@@ -2802,6 +2820,93 @@ function createTimer(time = 0, {
 		toggleMs: (show) => {
 			ms.style.display = (show) ? null : "none";
 		}
+	}
+}
+
+function createProgressBar({
+	transition = true,
+	warningZone = 0,
+	blink,
+	duration,
+	color = "blue",
+	progress = 0,
+	left,
+	right
+} = {}) {
+	let container = document.createElement("div");
+	container.classList.add("progressBar");
+
+	let bar = document.createElement("bar");
+	bar.classList.add("bar");
+
+	let leftNode = document.createElement("bar");
+	leftNode.classList.add("left");
+
+	let rightNode = document.createElement("bar");
+	rightNode.classList.add("right");
+
+	let warning = document.createElement("div");
+	warning.classList.add("warningZone");
+
+	container.append(bar, warning, leftNode, rightNode);
+
+	const set = ({
+		transition,
+		warningZone,
+		blink,
+		duration,
+		color,
+		progress,
+		left,
+		right
+	} = {}) => {
+		if (typeof transition === "boolean")
+			container.classList[transition ? "remove" : "add"]("noTransition");
+
+		if (typeof warningZone === "number")
+			if (warningZone > 0) {
+				warning.style.display = null;
+				warning.style.width = `${warningZone}%`;
+			} else
+				warning.style.display = "none";
+
+		if (typeof blink === "string")
+			bar.dataset.blink = blink;
+
+		if (typeof duration === "number")
+			bar.dataset.slow = number;
+
+		if (typeof color === "string")
+			bar.dataset.color = color;
+
+		if (typeof progress === "number")
+			bar.style.width = `${progress}%`;
+
+		if (typeof left === "string")
+			leftNode.innerHTML = left;
+
+		if (typeof right === "string")
+			rightNode.innerHTML = right;
+	}
+
+	set({
+		transition,
+		warningZone,
+		blink,
+		duration,
+		color,
+		progress
+	});
+
+	return {
+		group: container,
+		set,
+
+		/**
+		 * Set ProgressBar's Progress
+		 * @param		{Number}	progress	Number in %
+		 */
+		progress: (progress) => set({ progress })
 	}
 }
 

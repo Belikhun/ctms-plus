@@ -16,18 +16,6 @@
 
 /**? ------------ SCREEN.SCHEDULE.TABLE ------------ */
 
-table.scheduleTable.scheduleTable > tbody > tr > td {
-	background-color: transparent;
-}
-
-table.scheduleTable.scheduleTable > tbody > tr.odd > td {
-	background-color: rgba(250, 250, 250, 0.8);
-}
-
-table.scheduleTable.scheduleTable > tbody > tr.row:hover > td {
-	background-color: rgb(226, 226, 226);
-}
-
 table.scheduleTable.scheduleTable > tbody > .header:not(:first-child) > td {
 	padding-top: 40px;
 }
@@ -527,18 +515,6 @@ body.dark .scheduleList {
 	--schedule-gray: #5a5a5a;
 	--schedule-green: var(--color-green);
 	--schedule-blue: var(--color-blue);
-}
-
-body.dark table.scheduleTable.scheduleTable > tbody > tr > td {
-	background-color: transparent;
-}
-
-body.dark table.scheduleTable.scheduleTable > tbody > tr.odd > td {
-	background-color: rgba(38, 38, 38, 0.8);
-}
-
-body.dark table.scheduleTable.scheduleTable > tbody > tr.row:hover > td {
-	background-color: rgb(46, 46, 46);
 }
 
 body.dark .scheduleList > .listItem > .items::before {

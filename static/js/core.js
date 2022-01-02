@@ -967,8 +967,11 @@ const core = {
 					save: "schedule.autoChangeRenderer",
 					defaultValue: true,
 					onChange: (v) => {
-						core.screen.home.setAutoChangeRenderer(v)
-						core.screen.schedule.setAutoChangeRenderer(v);
+						if (core.screen.home)						
+							core.screen.home.setAutoChangeRenderer(v);
+
+						if (core.screen.schedule)
+							core.screen.schedule.setAutoChangeRenderer(v);
 					}
 				}, ux);
 
@@ -982,8 +985,11 @@ const core = {
 					save: "schedule.renderMode",
 					defaultValue: "table",
 					onChange: (v) => {
-						core.screen.home.setDefaultRenderMode(v);
-						core.screen.schedule.setDefaultRenderMode(v);
+						if (core.screen.home)
+							core.screen.home.setDefaultRenderMode(v);
+
+						if (core.screen.schedule)
+							core.screen.schedule.setDefaultRenderMode(v);
 					}
 				}, ux);
 			}

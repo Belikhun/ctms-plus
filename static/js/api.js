@@ -377,6 +377,52 @@ const api = {
 	},
 
 	/**
+	 * Calculate result data from list of results
+	 * @param	{Result[]}	results
+	 */
+	processResults(results) {
+		let grade;
+		let count = 0;
+		let totalCPA = 0;
+		let totalPoint = 0;
+		let totalCredits = 0;
+		let cpaCredits = 0;
+
+		for (let result of results) {
+			totalCredits += result.credits;
+
+			if (typeof result.average === "number") {
+				totalCPA += result.grade.point * result.credits;
+				cpaCredits += result.credits;
+				totalPoint += result.average;
+				count++;
+			}
+		}
+
+		let average = totalPoint / count;
+		let credits = totalCredits;
+		let cpa = totalCPA / cpaCredits;
+
+		if (cpa >= 3.6)
+			grade = "Xuất Xắc";
+		else if (cpa >= 3.2)
+			grade = "Giỏi";
+		else if (cpa >= 2.5)
+			grade = "Khá";
+		else if (cpa >= 2)
+			grade = "Trung Bình";
+		else
+			grade = "Yếu";
+
+		return {
+			average,
+			credits,
+			cpa,
+			grade
+		}
+	},
+
+	/**
 	 * Lấy kết quả học tập của sinh viên kèm theo thông tin cơ bản
 	 * @returns		{Promise<APIResponse & Results>}
 	 */
@@ -397,15 +443,14 @@ const api = {
 			classroom: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(4)`).innerText.replace(":\n", "").trim().replace("  ", " "),
 			mode: response.dom.getElementById("leftcontent").childNodes.item(2).wholeText.trim().replace("\n", " "),
 			results: [],
+			average: 0,
 			cpa: 0,
 			credits: 0,
 			grade: "Yếu"
 		}
 
 		let resultTableRows = [ ...response.dom.querySelectorAll(`#leftcontent > table.RowEffect.CenterElement > tbody > tr`) ]
-		
-		let totalGrade = 0;
-		let totalCredits = 0;
+
 		let __procPoint = (node) => {
 			let v = node.innerText.trim();
 
@@ -437,26 +482,15 @@ const api = {
 			if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
 				data.average = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
 				data.grade = this.resultGrading(data.average);
-				totalGrade += data.grade.point * data.credits;
-				totalCredits += data.credits;
 			}
 
 			response.info.results.push(data);
 		}
 
-		response.info.credits = totalCredits;
-		response.info.cpa = totalGrade / totalCredits;
-
-		if (response.info.cpa >= 3.6)
-			response.info.grade = "Xuất Xắc"
-		else if (response.info.cpa >= 3.2)
-			response.info.grade = "Giỏi"
-		else if (response.info.cpa >= 2.5)
-			response.info.grade = "Khá"
-		else if (response.info.cpa >= 2)
-			response.info.grade = "Trung Bình"
-		else
-			response.info.grade = "Yếu"
+		response.info.results = Object.assign(
+			response.info.results,
+			this.processResults(response.info.results)
+		);
 
 		await this.__handleResponse("results", response);
 		return response;
@@ -1249,7 +1283,9 @@ const api = {
  * @property	{Number}				diemDK
  * @property	{Number}				diemHK
  * @property	{Number}				average
- * @property	{String}				grade
+ * @property	{Object}				grade
+ * @property	{Number}				grade.point
+ * @property	{String}				grade.letter
  */
 
 /**
@@ -1257,17 +1293,18 @@ const api = {
  * @typedef		Results
  * @type		{Object}
  * @property	{Object}				info
- * @property	{String}				name
- * @property	{String}				brithday
- * @property	{String}				tForm
- * @property	{String}				studentID
- * @property	{String}				faculty
- * @property	{String}				department
- * @property	{String}				course
- * @property	{String}				classroom
- * @property	{String}				mode
- * @property	{Result[]}				results
- * @property	{Number}				cpa
- * @property	{Number}				credits
- * @property	{String}				grade
+ * @property	{String}				info.name
+ * @property	{String}				info.brithday
+ * @property	{String}				info.tForm
+ * @property	{String}				info.studentID
+ * @property	{String}				info.faculty
+ * @property	{String}				info.department
+ * @property	{String}				info.course
+ * @property	{String}				info.classroom
+ * @property	{String}				info.mode
+ * @property	{Result[]}				info.results
+ * @property	{Number}				info.average
+ * @property	{Number}				info.cpa
+ * @property	{Number}				info.credits
+ * @property	{String}				info.grade
  */

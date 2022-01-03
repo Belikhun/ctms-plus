@@ -977,6 +977,11 @@ const core = {
 			group: smenu.Group.prototype,
 
 			init() {
+				if (typeof core.screen.schedule !== "object") {
+					this.log("WARN", `core.screen.schedule module is missing! init cancelled.`);
+					return false;
+				}
+
 				this.group = new smenu.Group({ label: "lịch học", icon: "calendarWeek" });
 
 				let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
@@ -986,12 +991,9 @@ const core = {
 					color: "pink",
 					save: "schedule.autoChangeRenderer",
 					defaultValue: true,
-					onChange: (v) => {
-						if (core.screen.home)						
-							core.screen.home.setAutoChangeRenderer(v);
-
-						if (core.screen.schedule)
-							core.screen.schedule.setAutoChangeRenderer(v);
+					onChange: (v) => {					
+						core.screen.home.setAutoChangeRenderer(v);
+						core.screen.schedule.setAutoChangeRenderer(v);
 					}
 				}, ux);
 
@@ -1005,13 +1007,43 @@ const core = {
 					save: "schedule.renderMode",
 					defaultValue: "table",
 					onChange: (v) => {
-						if (core.screen.home)
-							core.screen.home.setDefaultRenderMode(v);
-
-						if (core.screen.schedule)
-							core.screen.schedule.setDefaultRenderMode(v);
+						core.screen.home.setDefaultRenderMode(v);
+						core.screen.schedule.setDefaultRenderMode(v);
 					}
 				}, ux);
+			}
+		},
+
+		results: {
+			group: smenu.Group.prototype,
+
+			init() {
+				if (typeof core.screen.results !== "object") {
+					this.log("WARN", `core.screen.results module is missing! init cancelled.`);
+					return false;
+				}
+
+				this.group = new smenu.Group({ label: "kết quả học", icon: "poll" });
+				let grouping = new smenu.Child({ label: "Sắp Xếp Nhóm" }, this.group);
+
+				new smenu.components.Slider({
+					label: `Số tuần quét mỗi kì`,
+					min: 2,
+					max: 6,
+					defaultValue: 2,
+					unit: "tuần",
+					save: "results.scanPerSemester",
+					onChange: (v) => core.screen.results.scanPerSemester = v
+				}, grouping);
+
+				let data = new smenu.Child({ label: "Dữ Liệu" }, this.group);
+
+				new smenu.components.Button({
+					label: "xóa dữ liệu nhóm",
+					color: "red",
+					complex: true,
+					onClick: () => core.screen.results.clearGroupingData()
+				}, data);
 			}
 		},
 

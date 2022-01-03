@@ -20,6 +20,7 @@ core.screen = {
 		currentCPA: 0,
 		timing: (t) => (1 - Math.pow(2, -14 * t)),
 
+		scanPerSemester: 2,
 		view: null,
 		loaded: false,
 
@@ -540,7 +541,8 @@ core.screen = {
 				}
 			}
 
-			this.log("DEBG", `scan(): scanning list:`, list);
+			steps *= this.scanPerSemester;
+			this.log("DEBG", `scan(): scanning list:`, list, `(${steps} steps)`);
 
 			for (let item of list) {
 				for (let semester of item.semester) {
@@ -548,7 +550,7 @@ core.screen = {
 					this.log("INFO", `scan(): scanning subjects of year ${year} semester ${semester}`);
 					
 					let isK20 = startYear === 2020;
-					let dates = this.getScanDates({ year, semester, isK20 });
+					let dates = this.getScanDates({ year, semester, isK20, count: this.scanPerSemester });
 
 					for (let date of dates) {
 						if (cancelled)
@@ -598,6 +600,11 @@ core.screen = {
 			// Save changes
 			localStorage.setItem("results.grouping", JSON.stringify(groupingData));
 			popup.hide();
+			this.render(undefined, true);
+		},
+
+		clearGroupingData() {
+			localStorage.removeItem("results.grouping");
 			this.render(undefined, true);
 		},
 

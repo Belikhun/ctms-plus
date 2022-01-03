@@ -192,6 +192,26 @@ core.screen = {
 				description: "xem toàn bộ kết quả học tập của các môn!"
 			});
 
+			let scanButton = createButton("QUÉT", {
+				icon: "search",
+				color: "orange",
+				style: "round",
+				complex: true
+			});
+
+			this.screen.addButton(scanButton);
+			scanButton.addEventListener("click", async () => {
+				scanButton.loading(true);
+
+				try {
+					await this.scan();
+				} catch(e) {
+					errorHandler(e);
+				}
+
+				scanButton.loading(false);
+			});
+			
 			this.screen.content = this.view;
 
 			this.onLogout();
@@ -426,7 +446,30 @@ core.screen = {
 							progress: (step / steps) * 100
 						});
 
-						await delayAsync(4000);
+						let response = await api.schedule(date, { triggerEvents: false });
+						let index;
+
+						// Find location of current group in the stored grouping data,
+						// we will create one if not exist.
+						for (let i = 0; i < groupingData.length; i++)
+							if (groupingData[i].year === year && groupingData[i].semester === semester) {
+								index = i;
+								break;
+							}
+
+						// Create new group
+						if (typeof index !== "number") {
+							index = groupingData.push({
+								year,
+								semester,
+								classID: []
+							}) - 1;
+						}
+
+						for (let day of response.info)
+							for (let subject of day.rows)
+								if (!groupingData[index].classID.includes(subject.classID))
+									groupingData[index].classID.push(subject.classID);
 
 						if (cancelled)
 							return;
@@ -434,6 +477,8 @@ core.screen = {
 				}
 			}
 
+			// Save changes
+			localStorage.setItem("results.grouping", JSON.stringify(groupingData));
 			popup.hide();
 		},
 

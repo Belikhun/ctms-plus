@@ -695,10 +695,10 @@ const api = {
 	/**
 	 * Lấy lịch học với ngày đầu tuần (hoặc ngày trong tuần) cho trước
 	 * 
-	 * @param		{Date}					date	Thời gian trong tuần cần xem
+	 * @param		{Date}		date	Thời gian trong tuần cần xem
 	 * @returns		{Promise<APIResponse & Schedule>}
 	 */
-	async schedule(date) {
+	async schedule(date, { triggerEvents = true } = {}) {
 		/** @type {APIResponse & Schedule} */
 		let response;
 		
@@ -794,7 +794,9 @@ const api = {
 			response.info.push(item);
 		}
 
-		await this.__handleResponse("schedule", response);
+		if (triggerEvents)
+			await this.__handleResponse("schedule", response);
+		
 		return response;
 	},
 

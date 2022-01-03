@@ -223,6 +223,98 @@
 	margin-bottom: 100px;
 }
 
+.resultsScreen > table > tbody > .header:not(:first-child) > td {
+	padding-top: 40px;
+}
+
+.resultsScreen > table > tbody > .header > td {
+	padding-bottom: 8px;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .inner {
+	font-family: Nunito;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 28px;
+	letter-spacing: .4px;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .inner > b {
+	font-weight: 800;
+	letter-spacing: 0;
+	text-transform: capitalize;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .tags {
+	display: inline-flex;
+	flex-direction: row;
+	margin-left: 20px;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .tags > .item {
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding-left: 20px;
+	--p-color: white;
+	z-index: 1;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .tags > .item > .label {
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .tags > .item > .value {
+	position: relative;
+	margin-left: 10px;
+	padding: 2px 15px;
+
+	font-family: Nunito;
+	font-size: 16px;
+	color: black;
+	--p-color: var(--color-gray);
+}
+
+.resultsScreen > table > tbody > .header > .label > .wrapper > .tags > .item[key="cpa"] > .value {
+	color: white;
+	--p-color: var(--osc-color-pink);
+}
+
+.resultsScreen > table > tbody > .header > .label
+ > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Yếu"] {
+	--p-color: var(--color-red);
+}
+
+.resultsScreen > table > tbody > .header > .label
+ > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Trung Bình"] {
+	--p-color: var(--color-orange);
+}
+
+.resultsScreen > table > tbody > .header > .label
+ > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Khá"] {
+	--p-color: var(--color-blue);
+}
+
+.resultsScreen > table > tbody > .header > .label
+ > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Giỏi"] {
+	--p-color: var(--color-green);
+}
+
+.resultsScreen > table > tbody > .header > .label
+ > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Xuất Xắc"] {
+	--p-color: var(--color-yellow);
+}
+
 .resultsScreen > table > thead > tr > th[key="stt"],
 .resultsScreen > table > tbody > tr > td[key="stt"] {
 	width: 20px;
@@ -274,4 +366,12 @@
 .resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="F"] {
 	color: rgb(245, 245, 245);
 	background-color: rgb(72, 72, 72);
+}
+
+
+
+/** ==================== DARK ==================== */
+
+body.dark .resultsScreen > table > tbody > .header > .label > .wrapper > .tags > .item {
+	--p-color: rgb(50, 50, 50);
 }

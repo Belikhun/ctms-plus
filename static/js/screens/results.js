@@ -539,6 +539,7 @@ core.screen = {
 			// Save changes
 			localStorage.setItem("results.grouping", JSON.stringify(groupingData));
 			popup.hide();
+			this.render(undefined, true);
 		},
 
 		/**
@@ -600,7 +601,8 @@ core.screen = {
 
 			// Sort by date descending
 			data.groups = data.groups.sort((a, b) => {
-				return ((b.year * 10) + b.semester) - ((a.year * 10) + a.semester);
+				return ((b.year * 10) + [3, 1, 2][b.semester - 1])
+					 - ((a.year * 10) + [3, 1, 2][a.semester - 1]);
 			});
 
 			return data;
@@ -631,11 +633,32 @@ core.screen = {
 				// this.view.info.points.grade.value.innerText = response.info.grade;
 
 				for (let group of [ ...groups.groups, groups.other ]) {
-					let headerLabel = `<b>HK${group.semester}</b> ${group.year}-${group.year + 1}`;
+					let yearString = (group.semester === 1)
+						? `${group.year} - ${group.year + 1}`
+						: `${group.year - 1} - ${group.year}`;
+
+					let headerLabel = `<b>HK${group.semester}</b> ${yearString}`;
+					
 					let header = makeTree("tr", "header", {
 						label: { tag: "td", class: "label", colSpan: 11, child: {
 							wrapper: { tag: "span", class: "wrapper", child: {
-								inner: { tag: "t", class: "inner", html: headerLabel }
+								inner: { tag: "t", class: "inner", html: headerLabel },
+
+								...(group.cpa ?
+									{
+										tags: { tag: "span", class: "tags", child: {
+											cpa: { tag: "span", class: ["item", "parallelogram"], child: {
+												label: { tag: "t", class: "label", text: "CPA" },
+												value: { tag: "span", class: ["parallelogram", "value"], text: group.cpa.toFixed(2) }
+											}},
+
+											grade: { tag: "span", class: ["item", "parallelogram"], child: {
+												label: { tag: "t", class: "label", text: "Xếp Loại" },
+												value: { tag: "span", class: ["parallelogram", "value"], data: { grade: group.grade }, text: group.grade }
+											}}
+										}}
+									} : {}
+								)
 							}}
 						}},
 					});

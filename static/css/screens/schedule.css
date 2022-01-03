@@ -16,19 +16,19 @@
 
 /**? ------------ SCREEN.SCHEDULE.TABLE ------------ */
 
-table.scheduleTable.scheduleTable > tbody > .header:not(:first-child) > td {
+table.scheduleTable > tbody > .header:not(:first-child) > td {
 	padding-top: 40px;
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .state,
-table.scheduleTable.scheduleTable > tbody > .row > .state {
+table.scheduleTable > tbody > .header > .state,
+table.scheduleTable > tbody > .row > .state {
 	width: 40px;
 	padding-right: 5px;
 	text-align: center;
 	vertical-align: middle;
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .state::before {
+table.scheduleTable > tbody > .header > .state::before {
 	content: "\f017";
 	position: relative;
 	display: block;
@@ -40,22 +40,22 @@ table.scheduleTable.scheduleTable > tbody > .header > .state::before {
 	color: var(--schedule-gray);
 }
 
-table.scheduleTable.scheduleTable > tbody > .header.today > .state::before {
+table.scheduleTable > tbody > .header.today > .state::before {
 	color: var(--schedule-blue);
 }
 
-table.scheduleTable.scheduleTable > tbody > .header.passed > .state::before {
+table.scheduleTable > tbody > .header.passed > .state::before {
 	color: var(--schedule-green);
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper {
+table.scheduleTable > tbody > .header > .label > .wrapper {
 	position: relative;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .inner {
+table.scheduleTable > tbody > .header > .label > .wrapper > .inner {
 	font-family: Nunito;
 	font-weight: 600;
 	font-size: 16px;
@@ -63,26 +63,26 @@ table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .inner
 	letter-spacing: .4px;
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .inner > b {
+table.scheduleTable > tbody > .header > .label > .wrapper > .inner > b {
 	font-weight: 800;
 	letter-spacing: 0;
 	text-transform: capitalize;
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .tags {
+table.scheduleTable > tbody > .header > .label > .wrapper > .tags {
 	margin-left: 10px;
 	margin-bottom: 3px;
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .tags > .today {
+table.scheduleTable > tbody > .header > .label > .wrapper > .tags > .today {
 	background-color: var(--color-orange);
 }
 
-table.scheduleTable.scheduleTable > tbody > .header > .label > .wrapper > .tags > .next {
+table.scheduleTable > tbody > .header > .label > .wrapper > .tags > .next {
 	background-color: var(--color-pink);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > .state::before {
+table.scheduleTable > tbody > .row > .state::before {
 	content: "\f192";
 	display: block;
 
@@ -92,71 +92,71 @@ table.scheduleTable.scheduleTable > tbody > .row > .state::before {
 	color: var(--schedule-gray);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row.passed > .state::before {
+table.scheduleTable > tbody > .row.passed > .state::before {
 	content: "\f058";
 	color: var(--schedule-green);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row.inProgress > .state::before {
+table.scheduleTable > tbody > .row.inProgress > .state::before {
 	content: "\f304";
 	color: var(--schedule-blue);
 }
 
-table.scheduleTable.scheduleTable > thead > .row > th[key="stt"],
-table.scheduleTable.scheduleTable > tbody > .row > td[key="stt"] {
+table.scheduleTable > thead > .row > th[key="stt"],
+table.scheduleTable > tbody > .row > td[key="stt"] {
 	width: 20px;
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Học"] {
+table.scheduleTable > tbody > .row > .status > span[data-status="Học"] {
 	background-color: var(--color-green);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Học trực tuyến"] {
+table.scheduleTable > tbody > .row > .status > span[data-status="Học trực tuyến"] {
 	background-color: var(--color-blue);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Nghỉ"] {
+table.scheduleTable > tbody > .row > .status > span[data-status="Nghỉ"] {
 	background-color: var(--color-yellow);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Thi"] {
+table.scheduleTable > tbody > .row > .status > span[data-status="Thi"] {
 	background-color: var(--color-red);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > .status > span[data-status="Ngoại khoá"] {
+table.scheduleTable > tbody > .row > .status > span[data-status="Ngoại khoá"] {
 	background-color: var(--color-orange);
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > td[key="status"] {
+table.scheduleTable > tbody > .row > td[key="status"] {
 	width: 120px;
 }
 
-table.scheduleTable.scheduleTable > thead > .row > th[key="subject"],
-table.scheduleTable.scheduleTable > tbody > .row > td[key="subject"] {
+table.scheduleTable > thead > .row > th[key="subject"],
+table.scheduleTable > tbody > .row > td[key="subject"] {
 	width: 320px;
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > td[key="subject"] {
+table.scheduleTable > tbody > .row > td[key="subject"] {
 	font-family: Nunito;
 	font-size: 15px;
 	font-weight: 800;
 	letter-spacing: .3px;
 }
 
-table.scheduleTable.scheduleTable > tbody > .row > td[key="subject"] > .openNote {
+table.scheduleTable > tbody > .row > td[key="subject"] > .openNote {
 	margin-left: 5px;
 	cursor: pointer;
 }
 
-table.scheduleTable.scheduleTable > thead > .row > th[key="classroom"],
-table.scheduleTable.scheduleTable > tbody > .row > td[key="classroom"] {
+table.scheduleTable > thead > .row > th[key="classroom"],
+table.scheduleTable > tbody > .row > td[key="classroom"] {
 	width: 60px;
 }
 
-table.scheduleTable.scheduleTable > thead > .row > th[key="classID"],
-table.scheduleTable.scheduleTable > thead > .row > th[key="listID"],
-table.scheduleTable.scheduleTable > tbody > .row > td[key="classID"],
-table.scheduleTable.scheduleTable > tbody > .row > td[key="listID"] {
+table.scheduleTable > thead > .row > th[key="classID"],
+table.scheduleTable > thead > .row > th[key="listID"],
+table.scheduleTable > tbody > .row > td[key="classID"],
+table.scheduleTable > tbody > .row > td[key="listID"] {
 	width: 120px;
 }
 

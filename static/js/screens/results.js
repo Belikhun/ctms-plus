@@ -115,7 +115,7 @@ core.screen = {
 
 				table: {
 					tag: "table",
-					class: "generalTable",
+					class: ["generalTable", "noBackground"],
 					child: {
 						thead: {
 							tag: "thead",
@@ -442,6 +442,7 @@ core.screen = {
 					years.push(match[1]);
 			}
 
+			years = years.map(Number);
 			this.log("DEBG", "core.screen.results.scan(): list of years needed to scan:", years);
 			let steps = years.length * 3 * 2;
 			let step = 0;
@@ -571,6 +572,7 @@ core.screen = {
 		/**
 		 * Render results handler
 		 * @param	{APIResponse & Results}		data
+		 * @param	{Boolean}					force
 		 */
 		render(data, force = false) {
 			let newData = false;
@@ -586,20 +588,36 @@ core.screen = {
 				emptyNode(this.view.table.tbody);
 
 				this.screen.set({ subTitle: data.info.mode });
+				let groups = this.group(data.info.results);
 
 				// this.view.info.points.cpa.value.innerText = response.info.cpa.toFixed(3);
 				// this.view.info.points.grade.value.innerText = response.info.grade;
 
-				for (let item of data.info.results)
-					this.addListItem(item);
+				for (let group of [ ...groups.groups, groups.other ]) {
+					let headerLabel = `<b>HK${group.semester}</b> ${group.year}-${group.year + 1}`;
+					let header = makeTree("tr", "header", {
+						label: { tag: "td", class: "label", colSpan: 11, child: {
+							wrapper: { tag: "span", class: "wrapper", child: {
+								inner: { tag: "t", class: "inner", html: headerLabel }
+							}}
+						}},
+					});
+
+					this.view.table.tbody.appendChild(header);
+					let nth = 0;
+
+					for (let result of group.results)
+						this.addListItem(++nth, result);
+				}
 			}
 		},
 
 		/**
 		 * Add item row to table
+		 * @param	{Number}	stt
 		 * @param	{Result}	result
 		 */
-		addListItem({
+		addListItem(stt, {
 			subject,
 			credits,
 			classID,
@@ -610,8 +628,8 @@ core.screen = {
 			average,
 			grade
 		} = {}) {
-			let row = makeTree("tr", "item", {
-				stt: { tag: "td", class: ["bold", "right"] },
+			let row = makeTree("tr", ["item", (stt % 2 === 0) ? "even" : "odd"], {
+				stt: { tag: "td", class: ["bold", "right"], text: stt },
 				subject: { tag: "td", text: subject },
 				credits: { tag: "td", class: "right", text: credits },
 				classID: { tag: "td", class: ["bold", "right"], text: classID },

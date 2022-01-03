@@ -69,11 +69,14 @@ class CoreScreen {
 					subTitle: { tag: "t", class: "subTitle", html: subTitle }
 				}},
 
-				reload: createButton("TẢI LẠI", {
-					style: "round",
-					icon: "reload",
-					complex: true
-				})
+				buttons: { tag: "span", class: "buttons", child: {
+
+					reload: createButton("TẢI LẠI", {
+						style: "round",
+						icon: "reload",
+						complex: true
+					})
+				}}
 			}},
 
 			content: { tag: "div", class: "content" }
@@ -82,8 +85,9 @@ class CoreScreen {
 		if (applyScrollable)
 			new Scrollable(this.view, { content: this.view.content });
 
-		this.view.header.reload.addEventListener("click", async () => {
-			this.view.header.reload.disabled = true;
+		this.view.header.buttons.reload.style.display = "none";
+		this.view.header.buttons.reload.addEventListener("click", async () => {
+			this.view.header.buttons.reload.loading(true);
 
 			try {
 				for (let f of this.reloadHandlers)
@@ -92,7 +96,7 @@ class CoreScreen {
 				errorHandler(error);
 			}
 
-			this.view.header.reload.disabled = false;
+			this.view.header.buttons.reload.loading(false);
 		});
 
 		this.view.overlay.style.display = "none";
@@ -137,7 +141,23 @@ class CoreScreen {
 		if (typeof f !== "function")
 			throw { code: -1, description: `CoreScreen(${this.id}).onReload(): not a valid function` }
 
+		// Show the reload button because we know
+		// it's in use now.
+		this.view.header.buttons.reload.style.display = null;
 		this.reloadHandlers.push(f);
+	}
+
+	/**
+	 * Add a new button on the header. The button will be appended on the left
+	 * side of other buttons.
+	 * 
+	 * @param		{HTMLButtonElement}		button
+	 */
+	addButton(button) {
+		if (typeof button !== "object" || !button.tagName)
+			throw { code: -1, description: `CoreScreen(${this.id}).addButton(): not a valid node` }
+
+		this.view.header.buttons.insertBefore(button, this.view.header.buttons.firstChild);
 	}
 
 	/**
@@ -993,6 +1013,11 @@ const core = {
 			group: smenu.Group.prototype,
 
 			init() {
+				if (typeof core.screen.schedule !== "object") {
+					this.log("WARN", `core.screen.schedule module is missing! init cancelled.`);
+					return false;
+				}
+
 				this.group = new smenu.Group({ label: "lịch học", icon: "calendarWeek" });
 
 				let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
@@ -1002,8 +1027,8 @@ const core = {
 					color: "pink",
 					save: "schedule.autoChangeRenderer",
 					defaultValue: true,
-					onChange: (v) => {
-						core.screen.home.setAutoChangeRenderer(v)
+					onChange: (v) => {					
+						core.screen.home.setAutoChangeRenderer(v);
 						core.screen.schedule.setAutoChangeRenderer(v);
 					}
 				}, ux);
@@ -1022,6 +1047,39 @@ const core = {
 						core.screen.schedule.setDefaultRenderMode(v);
 					}
 				}, ux);
+			}
+		},
+
+		results: {
+			group: smenu.Group.prototype,
+
+			init() {
+				if (typeof core.screen.results !== "object") {
+					this.log("WARN", `core.screen.results module is missing! init cancelled.`);
+					return false;
+				}
+
+				this.group = new smenu.Group({ label: "kết quả học", icon: "poll" });
+				let grouping = new smenu.Child({ label: "Sắp Xếp Nhóm" }, this.group);
+
+				new smenu.components.Slider({
+					label: `Số tuần quét mỗi kì`,
+					min: 2,
+					max: 6,
+					defaultValue: 2,
+					unit: "tuần",
+					save: "results.scanPerSemester",
+					onChange: (v) => core.screen.results.scanPerSemester = v
+				}, grouping);
+
+				let data = new smenu.Child({ label: "Dữ Liệu" }, this.group);
+
+				new smenu.components.Button({
+					label: "xóa dữ liệu nhóm",
+					color: "red",
+					complex: true,
+					onClick: () => core.screen.results.clearGroupingData()
+				}, data);
 			}
 		},
 
@@ -1689,8 +1747,23 @@ const core = {
 			}
 		},
 
+		/**
+		 * Update user info from results api response.
+		 * @param	{APIResponse & Results}		response 
+		 */
 		updateInfo(response) {
-			this.userInfo = response.info;
+			this.userInfo = {
+				name: response.info.name,
+				birthday: response.info.birthday,
+				tForm: response.info.tForm,
+				studentID: response.info.studentID,
+				faculty: response.info.faculty,
+				department: response.info.department,
+				course: response.info.course,
+				classroom: response.info.classroom,
+				mode: response.info.mode
+			};
+
 			this.nameNode.innerText = response.info.name;
 			this.detailView.userCard.top.info.name.innerText = response.info.name;
 			this.detailView.userCard.top.info.studentID.innerText = response.info.studentID;

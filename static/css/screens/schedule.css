@@ -1,0 +1,543 @@
+/*
+? |-----------------------------------------------------------------------------------------------|
+? |  /static/css/screens/schedule.css                                                             |
+? |                                                                                               |
+? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
+? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+? |-----------------------------------------------------------------------------------------------|
+*/
+
+.scheduleTable,
+.scheduleList {
+	--schedule-gray: rgba(112, 112, 112, 0.6);
+	--schedule-green: rgb(4, 151, 78);
+	--schedule-blue: rgb(15, 124, 197);
+}
+
+/**? ------------ SCREEN.SCHEDULE.TABLE ------------ */
+
+table.scheduleTable > tbody > .header:not(:first-child) > td {
+	padding-top: 40px;
+}
+
+table.scheduleTable > tbody > .header > .state,
+table.scheduleTable > tbody > .row > .state {
+	width: 40px;
+	padding-right: 5px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+table.scheduleTable > tbody > .header > .state::before {
+	content: "\f017";
+	position: relative;
+	display: block;
+	margin-bottom: 2px;
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 19px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+table.scheduleTable > tbody > .header.today > .state::before {
+	color: var(--schedule-blue);
+}
+
+table.scheduleTable > tbody > .header.passed > .state::before {
+	color: var(--schedule-green);
+}
+
+table.scheduleTable > tbody > .header > .label > .wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+table.scheduleTable > tbody > .header > .label > .wrapper > .inner {
+	font-family: Nunito;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 28px;
+	letter-spacing: .4px;
+}
+
+table.scheduleTable > tbody > .header > .label > .wrapper > .inner > b {
+	font-weight: 800;
+	letter-spacing: 0;
+	text-transform: capitalize;
+}
+
+table.scheduleTable > tbody > .header > .label > .wrapper > .tags {
+	margin-left: 10px;
+	margin-bottom: 3px;
+}
+
+table.scheduleTable > tbody > .header > .label > .wrapper > .tags > .today {
+	background-color: var(--color-orange);
+}
+
+table.scheduleTable > tbody > .header > .label > .wrapper > .tags > .next {
+	background-color: var(--color-pink);
+}
+
+table.scheduleTable > tbody > .row > .state::before {
+	content: "\f192";
+	display: block;
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+table.scheduleTable > tbody > .row.passed > .state::before {
+	content: "\f058";
+	color: var(--schedule-green);
+}
+
+table.scheduleTable > tbody > .row.inProgress > .state::before {
+	content: "\f304";
+	color: var(--schedule-blue);
+}
+
+table.scheduleTable > thead > .row > th[key="stt"],
+table.scheduleTable > tbody > .row > td[key="stt"] {
+	width: 20px;
+}
+
+table.scheduleTable > tbody > .row > .status > span[data-status="Học"] {
+	background-color: var(--color-green);
+}
+
+table.scheduleTable > tbody > .row > .status > span[data-status="Học trực tuyến"] {
+	background-color: var(--color-blue);
+}
+
+table.scheduleTable > tbody > .row > .status > span[data-status="Nghỉ"] {
+	background-color: var(--color-yellow);
+}
+
+table.scheduleTable > tbody > .row > .status > span[data-status="Thi"] {
+	background-color: var(--color-red);
+}
+
+table.scheduleTable > tbody > .row > .status > span[data-status="Ngoại khoá"] {
+	background-color: var(--color-orange);
+}
+
+table.scheduleTable > tbody > .row > td[key="status"] {
+	width: 120px;
+}
+
+table.scheduleTable > thead > .row > th[key="subject"],
+table.scheduleTable > tbody > .row > td[key="subject"] {
+	width: 320px;
+}
+
+table.scheduleTable > tbody > .row > td[key="subject"] {
+	font-family: Nunito;
+	font-size: 15px;
+	font-weight: 800;
+	letter-spacing: .3px;
+}
+
+table.scheduleTable > tbody > .row > td[key="subject"] > .openNote {
+	margin-left: 5px;
+	cursor: pointer;
+}
+
+table.scheduleTable > thead > .row > th[key="classroom"],
+table.scheduleTable > tbody > .row > td[key="classroom"] {
+	width: 60px;
+}
+
+table.scheduleTable > thead > .row > th[key="classID"],
+table.scheduleTable > thead > .row > th[key="listID"],
+table.scheduleTable > tbody > .row > td[key="classID"],
+table.scheduleTable > tbody > .row > td[key="listID"] {
+	width: 120px;
+}
+
+/**? ------------ SCREEN.SCHEDULE.LIST ------------ */
+
+.scheduleList > .listItem {
+	position: relative;
+}
+
+.scheduleList > .listItem:last-child {
+	margin-bottom: 300px;
+}
+
+.scheduleList > .listItem > .label {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	margin-top: 20px;
+	padding-left: 24px;
+}
+
+.scheduleList > .listItem > .label::after {
+	content: "\f017";
+	position: absolute;
+	display: block;
+
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+.scheduleList > .listItem.today > .label::after {
+	color: var(--schedule-blue);
+}
+
+.scheduleList > .listItem.passed > .label::after {
+	color: var(--schedule-green);
+}
+
+.scheduleList > .listItem > .label > .inner {
+	font-family: Nunito;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 38px;
+	letter-spacing: .4px;
+}
+
+.scheduleList > .listItem > .label > .inner > b {
+	font-weight: 800;
+	letter-spacing: 0;
+}
+
+.scheduleList > .listItem > .label > .tags {
+	margin-left: 10px;
+	margin-bottom: 5px;
+}
+
+.scheduleList > .listItem > .label > .tags > .today {
+	background-color: var(--color-orange);
+}
+
+.scheduleList > .listItem > .label > .tags > .next {
+	background-color: var(--color-pink);
+}
+
+.scheduleList > .listItem > .items {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	padding-left: 24px;
+}
+
+.scheduleList > .listItem > .items > .item {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	background-color: white;
+	margin-bottom: 10px;
+	padding: 8px 10px;
+	border-radius: 12px;
+}
+
+.scheduleList > .listItem > .items > .item::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	top: 0;
+	left: 0;
+	width: 4px;
+	height: calc(100% + 10px);
+	transform: translateX(-18px);
+
+	background-color: var(--schedule-gray);
+}
+
+.scheduleList > .listItem > .items > .item.passed::before {
+	background-color: var(--schedule-green);
+}
+
+.scheduleList > .listItem > .items > .item.inProgress::before {
+	background-color: var(--schedule-blue);
+}
+
+.scheduleList > .listItem > .items > .item:last-child::before {
+	height: 50%;
+}
+
+.scheduleList > .listItem > .items > .item::after {
+	content: "\f192";
+	position: absolute;
+	display: block;
+
+	top: 50%;
+	left: 0;
+	padding: 8px 0;
+	transform: translate(-24px, -50%);
+	background-color: var(--global-background);
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--schedule-gray);
+}
+
+.scheduleList > .listItem > .items > .item.passed::after {
+	content: "\f058";
+	color: var(--schedule-green);
+}
+
+.scheduleList > .listItem > .items > .item.inProgress::after {
+	content: "\f304";
+	color: var(--schedule-blue);
+}
+
+.scheduleList > .listItem > .items > .item:last-child {
+	margin-bottom: 0;
+}
+
+.scheduleList > .listItem > .items > .item > .gradient {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+
+	border-radius: 12px;
+	overflow: hidden;
+	--color: rgb(202, 202, 202);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Học"] {
+	--color: var(--color-green);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Học trực tuyến"] {
+	--color: var(--color-blue);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Nghỉ"] {
+	--color: var(--color-yellow);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Thi"] {
+	--color: var(--color-red);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient::before {
+	content: "";
+	position: absolute;
+	display: block;
+
+	left: 0;
+	right: 0;
+	height: 3px;
+	z-index: 1;
+
+	background-color: var(--color);
+}
+
+.scheduleList > .listItem > .items > .item > .gradient::after {
+	content: "";
+	position: absolute;
+	display: block;
+
+	left: 0;
+	right: 0;
+	height: 60%;
+	opacity: 0.4;
+
+	box-shadow: inset 0 50px 55px -60px var(--color);
+}
+
+.scheduleList > .listItem > .items > .item > .top {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Học"] {
+	background-color: var(--color-green);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Học trực tuyến"] {
+	background-color: var(--color-blue);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Nghỉ"] {
+	background-color: var(--color-yellow);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Thi"] {
+	background-color: var(--color-red);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status[data-status="Ngoại khoá"] {
+	background-color: var(--color-orange);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .classroom {
+	flex-grow: 1;
+	margin: 0 10px;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 100%;
+}
+
+.scheduleList > .listItem > .items > .item > .top > .time {
+	font-weight: bold;
+}
+
+.scheduleList > .listItem > .items > .item > .subject {
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+}
+
+.scheduleList > .listItem > .items > .item > .subject > .inner {
+	font-family: Nunito;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.scheduleList > .listItem > .items > .item > .subject > .openNote {
+	cursor: pointer;
+	margin-left: 10px;
+}
+
+.scheduleList > .listItem > .items > .item > .teacher {
+	font-family: Calibri;
+    font-size: 18px;
+    font-weight: bold;
+	line-height: 16px;
+}
+
+.scheduleList > .listItem > .items > .item > .teacher::before {
+	content: "\f007";
+    margin-right: 5px;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.scheduleList > .listItem > .items > .item > .bottom {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-top: 8px;
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > span {
+	margin: 0 10px 2px;
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > span::before {
+	content: "/";
+	font-size: 13px;
+	font-weight: bold;
+	line-height: 14px;
+	color: rgb(56, 56, 56);
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > t {
+	font-size: 13px;
+	line-height: 14px;
+	color: rgb(56, 56, 56);
+}
+
+.scheduleList > .listItem > .items > .item > .bottom > t:empty::before {
+	content: "X";
+	font-weight: bold;
+	color: rgb(186, 186, 186);
+}
+
+/**? ------------ SCREEN.SCHEDULE MAIN STYLE ------------ */
+
+.scheduleScreen {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	width: 100%;
+	height: 100%;
+}
+
+.scheduleScreen > .control {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: space-between;
+
+	padding: 0 10px;
+	overflow: visible;
+	background-color: var(--global-background);
+	z-index: 1;
+}
+
+.scheduleScreen > .control > .sq-input {
+	margin: 10px 10px 10px 0;
+}
+
+.scheduleScreen > .list {
+	position: relative;
+	display: block;
+	flex-grow: 1;
+
+	margin-top: 20px;
+	padding: 0 10px;
+	box-sizing: border-box;
+	overflow: auto;
+}
+
+.scheduleScreen > .list:last-child {
+	padding-bottom: 200px;
+}
+
+
+
+/** ==================== DARK ==================== */
+
+body.dark .scheduleTable,
+body.dark .scheduleList {
+	--schedule-gray: #5a5a5a;
+	--schedule-green: var(--color-green);
+	--schedule-blue: var(--color-blue);
+}
+
+body.dark .scheduleList > .listItem > .items::before {
+	background-color: rgb(46, 46, 46);
+}
+
+body.dark .scheduleList > .listItem > .items > .item {
+	background-color: #242424;
+}
+
+body.dark .scheduleList > .listItem > .items > .item > .gradient {
+	display: block;
+}
+
+body.dark .scheduleList > .listItem > .items > .item > .bottom > t,
+body.dark .scheduleList > .listItem > .items > .item > .bottom > span::before {
+	color: rgb(214, 214, 214);
+}
+
+body.dark .scheduleList > .listItem > .items > .item > .bottom > t:empty::before {
+	color: rgb(85, 85, 85);
+}
+
+body.dark .subscribeScreen > .content > .item > .details > .right > div > span > .label {
+	color: rgb(170, 170, 170);
+}

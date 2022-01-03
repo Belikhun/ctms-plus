@@ -26,6 +26,11 @@
 		
 		<!-- Page Style -->
 		<link rel="stylesheet" type="text/css" media="screen" href="static/css/core.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="static/css/screens/home.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="static/css/screens/results.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="static/css/screens/schedule.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="static/css/screens/subscribe.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="static/css/screens/tests.css" />
 		<link rel="stylesheet" type="text/css" media="screen" href="static/css/dark.css" />
 		
 		<!-- Fonts -->
@@ -80,7 +85,7 @@
 						errorBox.innerHTML = errorLines.map(i => `<li>${i}</li>`).join("");
 
 						let action = await popup.show({
-							windowTitle: "Lỗi",
+							windowTitle: "Init Exception Handler",
 							title: "Toang rồi ông Giáo ạ!",
 							message: "Một Lỗi Không Mong Muốn Đã Xảy Ra",
 							description: "Hãy thử <b>tải lại</b> trang hoặc sử dụng thông tin dưới đây để gửi một báo cáo lỗi:",

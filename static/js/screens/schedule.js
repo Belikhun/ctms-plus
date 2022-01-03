@@ -54,7 +54,6 @@ core.screen = {
 			});
 
 			this.setLoading(true);
-			this.screen.view.header.reload.style.display = "none";
 			this.screen.content = this.view;
 			this.screen.onShow(() => this.load());
 			new Scrollable(this.view, { content: this.view.list });
@@ -301,7 +300,7 @@ core.screen = {
 			let today = new Date();
 			let foundNextDay = false;
 
-			let table = makeTree("table", ["generalTable", "scheduleTable"], {
+			let table = makeTree("table", ["generalTable", "scheduleTable", "noBackground"], {
 				thead: { tag: "thead", child: {
 					row: { tag: "tr", child: {
 						state: { tag: "th" },

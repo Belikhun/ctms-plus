@@ -283,7 +283,7 @@ const api = {
 	 * @param		{Object}		credentials
 	 * @param		{String}		credentials.username		Tên người dùng/email
 	 * @param		{String}		credentials.password		Mật khẩu
-	 * @returns		{APIResponse}
+	 * @returns		{Promise<APIResponse>}
 	 */
 	async login({
 		username,
@@ -343,41 +343,98 @@ const api = {
 	resultGrading(average) {
 		let point = 0;
 		let letter = "?";
+		let color = "dark";
 
 		if (average >= 9.0) {
 			point = 4.0;
 			letter = "A+";
+			color = "green";
 		} else if (average >= 8.5) {
 			point = 4.0;
 			letter = "A";
+			color = "green";
 		} else if (average >= 8.0) {
 			point = 3.5;
 			letter = "B+";
+			color = "blue";
 		} else if (average >= 7.0) {
 			point = 3.0;
 			letter = "B";
+			color = "blue";
 		} else if (average >= 6.5) {
 			point = 2.5;
 			letter = "C+";
+			color = "yellow";
 		} else if (average >= 5.5) {
 			point = 2.0;
 			letter = "C";
+			color = "yellow";
 		} else if (average >= 5.0) {
 			point = 1.5;
 			letter = "D+";
+			color = "orange";
 		} else if (average >= 4.0) {
 			point = 1.0;
 			letter = "D";
+			color = "orange";
 		} else {
 			point = 0;
 			letter = "F";
+			color = "red";
 		}
 
-		return { point, letter }
+		return { point, letter, color }
+	},
+
+	/**
+	 * Calculate result data from list of results
+	 * @param	{Result[]}	results
+	 */
+	processResults(results) {
+		let grade;
+		let count = 0;
+		let totalCPA = 0;
+		let totalPoint = 0;
+		let totalCredits = 0;
+		let cpaCredits = 0;
+
+		for (let result of results) {
+			totalCredits += result.credits;
+
+			if (typeof result.average === "number") {
+				totalCPA += result.grade.point * result.credits;
+				cpaCredits += result.credits;
+				totalPoint += result.average;
+				count++;
+			}
+		}
+
+		let average = totalPoint / count;
+		let credits = totalCredits;
+		let cpa = totalCPA / cpaCredits;
+
+		if (cpa >= 3.6)
+			grade = "Xuất Sắc";
+		else if (cpa >= 3.2)
+			grade = "Giỏi";
+		else if (cpa >= 2.5)
+			grade = "Khá";
+		else if (cpa >= 2)
+			grade = "Trung Bình";
+		else
+			grade = "Yếu";
+
+		return {
+			average,
+			credits,
+			cpa,
+			grade
+		}
 	},
 
 	/**
 	 * Lấy kết quả học tập của sinh viên kèm theo thông tin cơ bản
+	 * @returns		{Promise<APIResponse & Results>}
 	 */
 	async results() {
 		let response = await this.request({
@@ -396,14 +453,14 @@ const api = {
 			classroom: response.dom.querySelector(`#leftcontent > table.ThongtinSV > tbody > tr:nth-child(4) > td:nth-child(4)`).innerText.replace(":\n", "").trim().replace("  ", " "),
 			mode: response.dom.getElementById("leftcontent").childNodes.item(2).wholeText.trim().replace("\n", " "),
 			results: [],
+			average: 0,
 			cpa: 0,
+			credits: 0,
 			grade: "Yếu"
 		}
 
 		let resultTableRows = [ ...response.dom.querySelectorAll(`#leftcontent > table.RowEffect.CenterElement > tbody > tr`) ]
-		
-		let totalGrade = 0;
-		let totalCredits = 0;
+
 		let __procPoint = (node) => {
 			let v = node.innerText.trim();
 
@@ -435,25 +492,15 @@ const api = {
 			if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
 				data.average = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
 				data.grade = this.resultGrading(data.average);
-				totalGrade += data.grade.point * data.credits;
-				totalCredits += data.credits;
 			}
 
 			response.info.results.push(data);
 		}
 
-		response.info.cpa = totalGrade / totalCredits;
-
-		if (response.info.cpa >= 3.6)
-			response.info.grade = "Xuất Xắc"
-		else if (response.info.cpa >= 3.2)
-			response.info.grade = "Giỏi"
-		else if (response.info.cpa >= 2.5)
-			response.info.grade = "Khá"
-		else if (response.info.cpa >= 2)
-			response.info.grade = "Trung Bình"
-		else
-			response.info.grade = "Yếu"
+		response.info = Object.assign(
+			response.info,
+			this.processResults(response.info.results)
+		);
 
 		await this.__handleResponse("results", response);
 		return response;
@@ -658,10 +705,10 @@ const api = {
 	/**
 	 * Lấy lịch học với ngày đầu tuần (hoặc ngày trong tuần) cho trước
 	 * 
-	 * @param		{Date}					date	Thời gian trong tuần cần xem
+	 * @param		{Date}		date	Thời gian trong tuần cần xem
 	 * @returns		{Promise<APIResponse & Schedule>}
 	 */
-	async schedule(date) {
+	async schedule(date, { triggerEvents = true } = {}) {
 		/** @type {APIResponse & Schedule} */
 		let response;
 		
@@ -757,7 +804,9 @@ const api = {
 			response.info.push(item);
 		}
 
-		await this.__handleResponse("schedule", response);
+		if (triggerEvents)
+			await this.__handleResponse("schedule", response);
+		
 		return response;
 	},
 
@@ -1232,4 +1281,43 @@ const api = {
  * @type		{Object}
  * @property	{SubscribeEntry[]}		waiting
  * @property	{SubscribeEntry[]}		subscribed
+ */
+
+/**
+ * Result object
+ * @typedef		Result
+ * @type		{Object}
+ * @property	{String}				subject
+ * @property	{Number}				credits
+ * @property	{String}				classID
+ * @property	{String}				teacher
+ * @property	{Number}				diemCC
+ * @property	{Number}				diemDK
+ * @property	{Number}				diemHK
+ * @property	{Number}				average
+ * @property	{Object}				grade
+ * @property	{Number}				grade.point
+ * @property	{String}				grade.letter
+ * @property	{String}				grade.color
+ */
+
+/**
+ * Results object
+ * @typedef		Results
+ * @type		{Object}
+ * @property	{Object}				info
+ * @property	{String}				info.name
+ * @property	{String}				info.birthday
+ * @property	{String}				info.tForm
+ * @property	{String}				info.studentID
+ * @property	{String}				info.faculty
+ * @property	{String}				info.department
+ * @property	{String}				info.course
+ * @property	{String}				info.classroom
+ * @property	{String}				info.mode
+ * @property	{Result[]}				info.results
+ * @property	{Number}				info.average
+ * @property	{Number}				info.cpa
+ * @property	{Number}				info.credits
+ * @property	{String}				info.grade
  */

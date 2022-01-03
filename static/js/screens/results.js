@@ -15,6 +15,11 @@ core.screen = {
 		/** @type {APIResponse & Results} */
 		currentData: null,
 
+		/** @type {Animator} */
+		animator: undefined,
+		currentCPA: 0,
+		timing: (t) => (1 - Math.pow(2, -14 * t)),
+
 		view: null,
 		loaded: false,
 
@@ -82,12 +87,12 @@ core.screen = {
 									}},
 	
 									gradeD: { tag: "span", class: ["item", "D"], child: {
-										tag: { tag: "div", class: "generalTag", data: { color: "red" }, text: "D/D+" },
+										tag: { tag: "div", class: "generalTag", data: { color: "orange" }, text: "D/D+" },
 										value: { tag: "t", class: "value", text: "0" }
 									}},
 	
 									gradeF: { tag: "span", class: ["item", "F"], child: {
-										tag: { tag: "div", class: "generalTag", text: "F" },
+										tag: { tag: "div", class: "generalTag", data: { color: "red" }, text: "F" },
 										value: { tag: "t", class: "value", text: "0" }
 									}},
 	
@@ -192,7 +197,7 @@ core.screen = {
 				description: "xem toàn bộ kết quả học tập của các môn!"
 			});
 
-			let scanButton = createButton("QUÉT", {
+			let scanButton = createButton("XẾP NHÓM", {
 				icon: "search",
 				color: "orange",
 				style: "round",
@@ -271,6 +276,60 @@ core.screen = {
 				this.render(response);
 
 				this.screen.loading = false;
+			});
+		},
+
+		async updateCPA(cpa) {
+			// To prevent troll.
+			cpa = Math.min(cpa, 4);
+
+			if (cpa === this.currentCPA)
+				return;
+
+			if (this.animator)
+				this.animator.cancel();
+
+			let start = this.currentCPA;
+			let delta = cpa - start;
+			let duration = Math.sqrt(3.2 * Math.abs(delta));
+			let grade, color, pColor;
+			this.log("DEBG", `updateCPA(): changing to ${cpa} in ${duration}s`);
+
+			this.animator = new Animator(duration, this.timing, (t) => {
+				this.currentCPA = start + (delta * t);
+				this.view.info.points.progress.bar.style.width = `${(this.currentCPA / 4) * 100}%`;
+				this.view.info.points.progress.bar.value.point.innerText = this.currentCPA.toFixed(3);
+
+				if (this.currentCPA >= 3.6) {
+					grade = "Xuất Xắc";
+					color = "yellow";
+				} else if (this.currentCPA >= 3.2) {
+					grade = "Giỏi";
+					color = "green";
+				} else if (this.currentCPA >= 2.5) {
+					grade = "Khá";
+					color = "blue";
+				} else if (this.currentCPA >= 2) {
+					grade = "Trung Bình";
+					color = "orange";
+				} else {
+					grade = "Yếu";
+					color = "red";
+				}
+
+				let transform = 0.5;
+				if (this.currentCPA < 0.7)
+					transform = 1 - scaleValue(this.currentCPA, [0, 0.7], [0, 0.5]);
+				else if (this.currentCPA > 3.5)
+					transform = 4 - this.currentCPA;
+
+				this.view.info.points.progress.bar.value.style.transform = `translateX(${transform * 100}%)`;
+
+				if (color !== pColor) {
+					this.view.info.points.progress.bar.value.grade.innerText = grade;
+					this.view.info.points.progress.bar.value.grade.dataset.color = color;
+					pColor = color;
+				}
 			});
 		},
 
@@ -443,7 +502,7 @@ core.screen = {
 			let startYear = parseInt("20" + core.account.userInfo.course.substring(0, 2));
 			let currentYear = now.getFullYear();
 
-			this.log("DEBG", "core.screen.results.scan(): scanning year from ", startYear, "to", currentYear);
+			this.log("DEBG", "scan(): scanning year from ", startYear, "to", currentYear);
 			let steps = 0;
 			let step = 0;
 
@@ -481,12 +540,12 @@ core.screen = {
 				}
 			}
 
-			this.log("DEBG", `core.screen.results.scan(): scanning list:`, list);
+			this.log("DEBG", `scan(): scanning list:`, list);
 
 			for (let item of list) {
 				for (let semester of item.semester) {
 					let year = item.year;
-					this.log("INFO", `core.screen.results.scan(): scanning subjects of year ${year} semester ${semester}`);
+					this.log("INFO", `scan(): scanning subjects of year ${year} semester ${semester}`);
 					
 					let isK20 = startYear === 2020;
 					let dates = this.getScanDates({ year, semester, isK20 });
@@ -498,7 +557,7 @@ core.screen = {
 						step++;
 						let dateString = humanReadableTime(date, { onlyDate: true });
 
-						this.log("DEBG", `core.screen.results.scan(): fetching ${dateString}`);
+						this.log("DEBG", `scan(): fetching ${dateString}`);
 						popup.popupNode.popup.body.top.message.innerText = `Đang Quét ${year} HK${semester} (${dateString})`;
 						progress.set({
 							right: `${step}/${steps}`,
@@ -628,16 +687,23 @@ core.screen = {
 
 				this.screen.set({ subTitle: data.info.mode });
 				let groups = this.group(data.info.results);
+				let count = { A: 0, B: 0, C: 0, D: 0, F: 0, U: 0 }
 
-				// this.view.info.points.cpa.value.innerText = response.info.cpa.toFixed(3);
-				// this.view.info.points.grade.value.innerText = response.info.grade;
+				this.view.info.stats.other.avg10.value.innerText = data.info.average.toFixed(2);
+				this.view.info.stats.other.credits.value.innerText = data.info.credits;
+				this.updateCPA(data.info.cpa);
 
 				for (let group of [ ...groups.groups, groups.other ]) {
-					let yearString = (group.semester === 1)
-						? `${group.year} - ${group.year + 1}`
-						: `${group.year - 1} - ${group.year}`;
+					let headerLabel;
 
-					let headerLabel = `<b>HK${group.semester}</b> ${yearString}`;
+					if (group.year && group.semester) {
+						let yearString = (group.semester === 1)
+							? `${group.year} - ${group.year + 1}`
+							: `${group.year - 1} - ${group.year}`;
+	
+						headerLabel = `<b>HK${group.semester}</b> ${yearString}`;
+					} else
+						headerLabel = `Chưa Phân Loại`;
 					
 					let header = makeTree("tr", "header", {
 						label: { tag: "td", class: "label", colSpan: 11, child: {
@@ -666,9 +732,28 @@ core.screen = {
 					this.view.table.tbody.appendChild(header);
 					let nth = 0;
 
-					for (let result of group.results)
+					for (let result of group.results) {
 						this.addListItem(++nth, result);
+
+						if (typeof result.average !== "number" || result.average == NaN) {
+							count.U++;
+							continue;
+						}
+
+						if (result.average >= 8.5)		count.A++;
+						else if (result.average >= 7.0)	count.B++;
+						else if (result.average >= 5.5)	count.C++;
+						else if (result.average >= 4.0)	count.D++;
+						else							count.F++;
+					}
 				}
+
+				this.view.info.stats.grades.gradeA.value.innerText = count.A;
+				this.view.info.stats.grades.gradeB.value.innerText = count.B;
+				this.view.info.stats.grades.gradeC.value.innerText = count.C;
+				this.view.info.stats.grades.gradeD.value.innerText = count.D;
+				this.view.info.stats.grades.gradeF.value.innerText = count.F;
+				this.view.info.stats.grades.gradeU.value.innerText = count.U;
 			}
 		},
 
@@ -727,19 +812,14 @@ core.screen = {
 
 				average: { tag: "td", class: ["right", "bold"], text: average ? average.toFixed(2) : "" },
 				gradePoint: { tag: "td", class: ["right", "bold"], text: grade ? grade.point.toFixed(2) : "" },
-
-				gradeLetter: {
-					tag: "td",
-					class: "right",
-					child: {
-						inner: {
-							tag: "span",
-							class: "generalTag",
-							data: { grade: grade ? grade.letter : "?" },
-							text: grade ? grade.letter : "?"
-						}
+				gradeLetter: { tag: "td", class: "right", child: {
+					inner: {
+						tag: "span",
+						class: "generalTag",
+						data: { color: grade ? grade.color : "none" },
+						text: grade ? grade.letter : "?"
 					}
-				},
+				}},
 			});
 
 			this.view.table.tbody.appendChild(row);

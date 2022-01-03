@@ -1916,24 +1916,32 @@ const Easing = {
 	}
 }
 
-/**
- * Animate a value
- * @param {Number}		duration 			Animation Duration
- * @param {Function}	timingFunction 		Animation Timing Function
- * @param {Function}	animate 			Function To Animate
- */
-function Animator(duration, timingFunction, animate) {
-	let completeHandlers = []
-	let start = time();
-	let rAID = null;
+class Animator {
+	/**
+	 * Animate a value
+	 * @param {Number}		duration 			Animation Duration in Seconds
+	 * @param {Function}	timingFunction 		Animation Timing Function
+	 * @param {Function}	animate 			Function To Handle Animation
+	 */
+	constructor(duration, timingFunction, animate) {
+		this.duration = duration;
+		this.timingFunction = timingFunction;
+		this.animate = animate;
 
-	let update = () => {
-		let tPoint = (time() - start) / duration;
+		/** @type {Function[]} */
+		this.completeHandlers = []
+
+		this.start = time();
+		this.animationFrameID = requestAnimationFrame(() => this.update());
+	}
+
+	update() {
+		let tPoint = (time() - this.start) / this.duration;
 
 		// Safe executing update function to prevent stopping
 		// animation entirely
 		try {
-			if (animate(Math.min(timingFunction(tPoint), 1)) === false)
+			if (this.animate(Math.min(this.timingFunction(tPoint), 1)) === false)
 				// Stop Animator
 				tPoint = 1.1;
 		} catch (e) {
@@ -1942,26 +1950,26 @@ function Animator(duration, timingFunction, animate) {
 		}
 
 		if (tPoint <= 1)
-			rAID = requestAnimationFrame(update);
+			this.animationFrameID = requestAnimationFrame(() => this.update());
 		else {
-			animate(1);
-			completeHandlers.forEach(f => f());
+			this.animate(1);
+			this.completeHandlers.forEach(f => f());
 		}
 	}
 
-	rAID = requestAnimationFrame(() => update());
+	cancel() {
+		cancelAnimationFrame(this.animationFrameID);
+	}
 
-	return {
-		cancel() {
-			cancelAnimationFrame(rAID);
-		},
+	/**
+	 * Animation complete handler
+	 * @param	{Function}	f
+	 */
+	onComplete(f) {
+		if (!f || typeof f !== "function")
+			throw { code: -1, description: "Animator().onComplete(): not a valid function" }
 
-		onComplete(f) {
-			if (!f || typeof f !== "function")
-				throw { code: -1, description: "Animator().onComplete(): not a valid function" }
-
-			completeHandlers.push(f);
-		}
+		this.completeHandlers.push(f);
 	}
 }
 

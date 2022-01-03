@@ -1660,7 +1660,7 @@ body.dark a.sq-btn:not(.light) {
 }
 
 body.dark t:not(.light) {
-	color: rgb(214, 214, 214);
+	color: rgb(225, 225, 225);
 }
 
 body.dark dot:not(.light) {

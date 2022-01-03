@@ -343,37 +343,47 @@ const api = {
 	resultGrading(average) {
 		let point = 0;
 		let letter = "?";
+		let color = "dark";
 
 		if (average >= 9.0) {
 			point = 4.0;
 			letter = "A+";
+			color = "green";
 		} else if (average >= 8.5) {
 			point = 4.0;
 			letter = "A";
+			color = "green";
 		} else if (average >= 8.0) {
 			point = 3.5;
 			letter = "B+";
+			color = "blue";
 		} else if (average >= 7.0) {
 			point = 3.0;
 			letter = "B";
+			color = "blue";
 		} else if (average >= 6.5) {
 			point = 2.5;
 			letter = "C+";
+			color = "yellow";
 		} else if (average >= 5.5) {
 			point = 2.0;
 			letter = "C";
+			color = "yellow";
 		} else if (average >= 5.0) {
 			point = 1.5;
 			letter = "D+";
+			color = "orange";
 		} else if (average >= 4.0) {
 			point = 1.0;
 			letter = "D";
+			color = "orange";
 		} else {
 			point = 0;
 			letter = "F";
+			color = "red";
 		}
 
-		return { point, letter }
+		return { point, letter, color }
 	},
 
 	/**
@@ -404,7 +414,7 @@ const api = {
 		let cpa = totalCPA / cpaCredits;
 
 		if (cpa >= 3.6)
-			grade = "Xuất Xắc";
+			grade = "Xuất Sắc";
 		else if (cpa >= 3.2)
 			grade = "Giỏi";
 		else if (cpa >= 2.5)
@@ -487,8 +497,8 @@ const api = {
 			response.info.results.push(data);
 		}
 
-		response.info.results = Object.assign(
-			response.info.results,
+		response.info = Object.assign(
+			response.info,
 			this.processResults(response.info.results)
 		);
 
@@ -1288,6 +1298,7 @@ const api = {
  * @property	{Object}				grade
  * @property	{Number}				grade.point
  * @property	{String}				grade.letter
+ * @property	{String}				grade.color
  */
 
 /**

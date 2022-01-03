@@ -207,7 +207,7 @@ arr::before {
 	transform: translateX(20px);
 }
 
-#content > div {
+#content > .screen {
 	position: relative;
 	display: none;
 	flex-direction: column;
@@ -220,16 +220,16 @@ arr::before {
 	overflow: hidden;
 }
 
-#content[data-screen="schedule"] > div.schedule,
-#content[data-screen="tests"] > div.tests,
-#content[data-screen="results"] > div.results,
-#content[data-screen="subscribe"] > div.subscribe,
-#content[data-screen="home"] > div.home {
+#content[data-screen="schedule"] > .schedule,
+#content[data-screen="tests"] > .tests,
+#content[data-screen="results"] > .results,
+#content[data-screen="subscribe"] > .subscribe,
+#content[data-screen="home"] > .home {
 	display: flex;
 }
 
-#content > div:empty::before,
-#content > div .showEmpty:empty::before {
+#content > .screen:empty::before,
+#content > .screen .showEmpty:empty::before {
 	content: "\f51b";
 	position: absolute;
 	left: 50%;
@@ -241,8 +241,8 @@ arr::before {
 	color: rgb(175, 175, 175);
 }
 
-#content > div:empty::after,
-#content > div .showEmpty:empty::after {
+#content > .screen:empty::after,
+#content > .screen .showEmpty:empty::after {
 	content: "Không có dữ liệu";
 	position: absolute;
 	display: block;
@@ -255,7 +255,7 @@ arr::before {
 	color: rgb(145, 145, 145);
 }
 
-#content > div > .loading {
+#content > .screen > .loading {
 	position: absolute;
 	display: none;
 	align-items: center;
@@ -270,11 +270,11 @@ arr::before {
 	z-index: 12;
 }
 
-#content > div > .loading.show {
+#content > .screen > .loading.show {
 	display: flex;
 }
 
-#content > div > .overlay {
+#content > .screen > .overlay {
 	position: absolute;
 	display: flex;
 	flex-direction: column;
@@ -290,32 +290,32 @@ arr::before {
 	z-index: 10;
 }
 
-#content > div > .overlay > icon {
+#content > .screen > .overlay > icon {
 	margin-bottom: 20px;
 }
 
-#content > div > .overlay > icon::after {
+#content > .screen > .overlay > icon::after {
 	font-size: 92px;
 	line-height: normal;
 }
 
-#content > div > .overlay > icon[data-icon="exclamation"]::after {
+#content > .screen > .overlay > icon[data-icon="exclamation"]::after {
 	color:rgb(255, 57, 110);
 }
 
-#content > div > .overlay > .title {
+#content > .screen > .overlay > .title {
 	font-family: Nunito;
 	font-size: 25px;
 	font-weight: 900;
 	text-align: center;
 }
 
-#content > div > .overlay > .description {
+#content > .screen > .overlay > .description {
 	font-size: 15px;
 	text-align: center;
 }
 
-#content > div > .overlay > .buttons {
+#content > .screen > .overlay > .buttons {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
@@ -323,11 +323,11 @@ arr::before {
 	margin-top: 20px;
 }
 
-#content > div > .overlay > .buttons > .sq-btn {
+#content > .screen > .overlay > .buttons > .sq-btn {
 	margin: 5px;
 }
 
-#content > div > .header {
+#content > .screen > .header {
 	position: relative;
 	display: flex;
 	flex-direction: row;
@@ -343,34 +343,62 @@ arr::before {
 	z-index: 2;
 }
 
-#content > div > .header > icon {
+#content > .screen > .header > icon {
 	min-width: 45px;
 }
 
-#content > div > .header > icon::after {
+#content > .screen > .header > icon::after {
 	font-size: 38px;
 }
 
-#content > div > .header > .detail {
+#content > .screen > .header > .detail {
 	flex-grow: 1;
 	margin-left: 20px;
 }
 
-#content > div > .header > .detail > .title {
+#content > .screen > .header > .detail > .title {
 	font-family: Nunito;
 	font-weight: 300;
 	font-size: 34px;
 	line-height: 38px;
 }
 
-#content > div > .header > .detail > .subTitle {
+#content > .screen > .header > .detail > .subTitle {
 	font-family: Nunito;
 	font-weight: 600;
 	font-size: 15px;
 	letter-spacing: .3px;
 }
 
-#content > div > .content {
+#content > .screen > .header > .buttons {
+	display: flex;
+	flex-direction: row;
+}
+
+#content > .screen > .header > .buttons > button {
+	margin-left: 10px;
+}
+
+@media only screen and (max-width: 650px) {
+	#content > .screen > .header {
+		padding-top: 30px;
+	}
+
+	#content > .screen > .header > .detail > .title {
+		font-size: 28px;
+		line-height: 30px;
+	}
+
+	#content > .screen > .header > .buttons > .sq-btn > .text {
+		display: none;
+	}
+
+	#content > .screen > .header > .buttons > .sq-btn > icon {
+		margin-right: 0;
+	}
+}
+
+#content > .screen > .content {
 	position: relative;
 	display: block;
 	flex-grow: 1;

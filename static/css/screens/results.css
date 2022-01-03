@@ -27,7 +27,7 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 6;
-	margin: 10px 5px 10px 10px;
+	margin: 10px;
 }
 
 .resultsScreen > .info > .points > .ruler {
@@ -116,7 +116,7 @@
 .resultsScreen > .info > .points > .progress > .bar {
 	position: relative;
 	display: block;
-	width: 60%;
+	width: 0;
 	height: 26px;
 
 	/* --start: hsl(200, 100%, 70%);
@@ -124,6 +124,19 @@
 	--start: hsl(200, 100%, 70%);
 	--end: hsl(90, 84%, 59%);
 	background: linear-gradient(to right, var(--start), var(--end));
+}
+
+.resultsScreen > .info > .points > .progress > .bar::before {
+	content: "";
+	position: absolute;
+
+	bottom: -10px;
+	right: -5px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 5px 5px 5px;
+	border-color: transparent transparent var(--osc-color-blue) transparent;
 }
 
 .resultsScreen > .info > .points > .progress > .bar > .value {
@@ -135,24 +148,7 @@
 	top: 100%;
 	right: 0;
 	padding-top: 10px;
-	transform: translateX(50%);
-}
-
-.resultsScreen > .info > .points > .progress > .bar > .value::before {
-	content: "";
-	position: absolute;
-
-	top: 1px;
-	right: calc(50% - 5px);
-	width: 0;
-	height: 0;
-	border-style: solid;
-	border-width: 0 5px 5px 5px;
-	border-color: transparent transparent var(--osc-color-blue) transparent;
-}
-
-.resultsScreen > .info > .points > .progress > .bar > .value > .generalTag {
-	background-color: #6dccfc;
+	transform: translateX(100%);
 }
 
 .resultsScreen > .info > .points > .progress > .bar > .value > .point {
@@ -166,7 +162,7 @@
 	flex-grow: 1;
 	flex-direction: column;
 
-	margin: 10px 10px 10px 20px;
+	margin: 10px 10px 10px 30px;
 }
 
 .resultsScreen > .info > .stats > .grades,
@@ -195,7 +191,7 @@
 	text-align: center;
 }
 
-.resultsScreen > .info > .stats > .grades > .item.F > .generalTag {
+.resultsScreen > .info > .stats > .grades > .item.U > .generalTag {
 	color: rgb(245, 245, 245);
 	background-color: rgb(72, 72, 72);
 }
@@ -204,6 +200,33 @@
 .resultsScreen > .info > .stats > .other > .item > .value {
 	font-size: 13px;
 	font-weight: bold;
+}
+
+@media only screen and (max-width: 1000px) {
+	.resultsScreen > .info > .stats {
+		flex-grow: 0;
+	}
+
+	.resultsScreen > .info > .stats > .grades > .item > .generalTag {
+		min-width: 24px;
+	}
+}
+
+@media only screen and (max-width: 800px) {
+	.resultsScreen > .info {
+		position: sticky;
+		flex-direction: column;
+		right: 0;
+	}
+
+	.resultsScreen > .info > .stats {
+		align-items: center;
+		margin: 0 10px 10px;
+	}
+
+	.resultsScreen > .info > .stats > .grades > .item > .generalTag {
+		min-width: 40px;
+	}
 }
 
 .resultsScreen > table {
@@ -311,7 +334,7 @@
 }
 
 .resultsScreen > table > tbody > .header > .label
- > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Xuất Xắc"] {
+ > .wrapper > .tags > .item[key="grade"] > .value[data-grade="Xuất Sắc"] {
 	--p-color: var(--color-yellow);
 }
 
@@ -343,35 +366,19 @@
 	text-align: center;
 }
 
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="A+"],
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="A"] {
-	background-color: var(--color-green);
-}
-
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="B+"],
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="B"] {
-	background-color: var(--color-blue);
-}
-
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="C+"],
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="C"] {
-	background-color: var(--color-yellow);
-}
-
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="D+"],
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="D"] {
-	background-color: var(--color-red);
-}
-
-.resultsScreen > table > tbody > tr > td[key="gradeLetter"] > span[data-grade="F"] {
-	color: rgb(245, 245, 245);
-	background-color: rgb(72, 72, 72);
-}
-
 
 
 /** ==================== DARK ==================== */
 
+body.dark .resultsScreen > .info > .points > .progress {
+	background-color: rgb(48, 48, 48);
+}
+
 body.dark .resultsScreen > table > tbody > .header > .label > .wrapper > .tags > .item {
 	--p-color: rgb(50, 50, 50);
+}
+
+body.dark .resultsScreen > table > tbody > tr > td[key="gradeLetter"] > .generalTag[data-color="none"] {
+	color: rgb(245, 245, 245);
+    background-color: rgb(72, 72, 72);
 }

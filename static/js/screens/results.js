@@ -337,8 +337,15 @@ core.screen = {
 		reset() {
 			this.loaded = false;
 			emptyNode(this.view.table.tbody);
-			// this.view.info.points.cpa.value.innerText = "---";
-			// this.view.info.points.grade.value.innerText = "---";
+			this.view.info.stats.other.avg10.value.innerText = "---";
+			this.view.info.stats.other.credits.value.innerText = "---";
+			this.view.info.stats.grades.gradeA.value.innerText = "0";
+			this.view.info.stats.grades.gradeB.value.innerText = "0";
+			this.view.info.stats.grades.gradeC.value.innerText = "0";
+			this.view.info.stats.grades.gradeD.value.innerText = "0";
+			this.view.info.stats.grades.gradeF.value.innerText = "0";
+			this.view.info.stats.grades.gradeU.value.innerText = "0";
+			this.updateCPA(0);
 			this.screen.set({ subTitle: "" });
 		},
 

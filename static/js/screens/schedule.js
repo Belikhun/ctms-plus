@@ -74,9 +74,8 @@ core.screen = {
 					this.setInputNow(response.date);
 
 				// Check schedule data is current week or next week, first response
-				// always return current week data, so we can use this.loaded to
-				// determine is current data is from first request.
-				if (!this.loaded) {
+				// always return current week data.
+				if (!this.loaded && core.account.userInfo) {
 					this.log("INFO", `Updating schedule cache for`, {
 						text: core.account.userInfo.name,
 						color: oscColor("blue")
@@ -223,18 +222,9 @@ core.screen = {
 					}
 				}
 			} catch(e) {
-				let error = parseException(e);
-
 				this.reset();
 				this.view.control.confirm.disabled = true;
-				this.screen.overlay({
-					icon: "bomb",
-					title: "Toang Rồi Ông Giáo Ạ!",
-					description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
-					buttons: {
-						login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
-					}
-				});
+				this.screen.handleError(e, async () => await this.load());
 
 				this.setLoading(false);
 			}

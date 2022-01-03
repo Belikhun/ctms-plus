@@ -432,26 +432,56 @@ core.screen = {
 					cancelled = true;
 			});
 
-			let years = []
+			let now = new Date();
+			let startYear = parseInt("20" + core.account.userInfo.course.substring(0, 2));
+			let currentYear = now.getFullYear();
 
-			// Find years that needed scanning
-			for (let result of this.currentData.info.results) {
-				let match = /.+(\d{4})\.(\d+)/gm.exec(result.classID);
-
-				if (match && !years.includes(match[1]))
-					years.push(match[1]);
-			}
-
-			years = years.map(Number);
-			this.log("DEBG", "core.screen.results.scan(): list of years needed to scan:", years);
-			let steps = years.length * 3 * 2;
+			this.log("DEBG", "core.screen.results.scan(): scanning year from ", startYear, "to", currentYear);
+			let steps = 0;
 			let step = 0;
 
-			for (let year of years) {
-				for (let semester of [1, 2, 3]) {
+			let list = []
+
+			if (startYear === currentYear) {
+				list.push({
+					year: startYear,
+					semester: [1]
+				});
+
+				steps += 1;
+			} else {
+				for (let year = startYear; year <= currentYear; year++) {
+					let pos = list.push({
+						year,
+						semester: []
+					}) - 1;
+
+					if (year === startYear)
+						list[pos].semester = [1]
+					else if (year === currentYear) {
+						if (now.getMonth() > -1)
+							list[pos].semester.push(2);
+
+						if (now.getMonth() > 3)
+							list[pos].semester.push(3);
+
+						if (now.getMonth() > 7)
+							list[pos].semester.push(1);
+					} else
+						list[pos].semester = [2, 3, 1]
+
+					steps += list[pos].semester.length;
+				}
+			}
+
+			this.log("DEBG", `core.screen.results.scan(): scanning list:`, list);
+
+			for (let item of list) {
+				for (let semester of item.semester) {
+					let year = item.year;
 					this.log("INFO", `core.screen.results.scan(): scanning subjects of year ${year} semester ${semester}`);
 					
-					let isK20 = core.account.userInfo.course.substring(0, 4) === "2010";
+					let isK20 = startYear === 2020;
 					let dates = this.getScanDates({ year, semester, isK20 });
 
 					for (let date of dates) {

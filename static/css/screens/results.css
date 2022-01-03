@@ -135,7 +135,7 @@
 	width: 0;
 	height: 0;
 	border-style: solid;
-	border-width: 0 5px 5px 5px;
+	border-width: 0 5px 5px;
 	border-color: transparent transparent var(--osc-color-blue) transparent;
 }
 

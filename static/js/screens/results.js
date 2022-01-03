@@ -533,7 +533,7 @@ core.screen = {
 				if (groupData.classID) {
 					for (let i = 0; i < list.length; i++)
 						if (groupData.classID.includes(list[i].classID))
-							results.push(list.splice(i, 1)[0]);
+							results.push(list.splice(i--, 1)[0]);
 				} else
 					results = list;
 

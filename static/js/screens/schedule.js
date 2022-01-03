@@ -54,7 +54,6 @@ core.screen = {
 			});
 
 			this.setLoading(true);
-			this.screen.view.header.reload.style.display = "none";
 			this.screen.content = this.view;
 			this.screen.onShow(() => this.load());
 			new Scrollable(this.view, { content: this.view.list });

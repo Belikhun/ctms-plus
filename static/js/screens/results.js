@@ -227,8 +227,15 @@ core.screen = {
 			this.screen.onReload(async() => await this.load());
 
 			this.screen.onShow(async() => {
-				if (this.loaded)
+				if (this.loaded) {
+					// Replay animation
+					if (this.currentData) {
+						this.currentCPA = 0;
+						this.updateCPA(this.currentData.info.cpa);
+					}
+
 					return;
+				}
 
 				await this.load();
 			});
@@ -278,6 +285,62 @@ core.screen = {
 
 				this.screen.loading = false;
 			});
+
+			api.onResponse("schedule",
+				/**
+				 * Update grouping data when user fetch schedule data
+				 * @param	{APIResponse & Schedule}	response
+				 */
+				(response) => {
+					/** @type {ResultGroupStore[]} */
+					let groupingData = localStorage.getItem("results.grouping");
+					groupingData = (groupingData)
+						? JSON.parse(groupingData)
+						: [];
+
+					let year = response.date.getFullYear();
+					let month = response.date.getMonth() + 1;
+					let semester;
+
+					if (month <= 4)
+						semester = 2;
+					else if (month <= 8)
+						semester = 3;
+					else
+						semester = 1;
+
+					this.log("DEBG", `schedule handler: updating entries for year ${year} semester ${semester}`);
+					let index;
+
+					// Find location of current group in the stored grouping data,
+					// we will create one if not exist.
+					for (let i = 0; i < groupingData.length; i++)
+						if (groupingData[i].year === year && groupingData[i].semester === semester) {
+							index = i;
+							break;
+						}
+
+					// Create new group
+					if (typeof index !== "number") {
+						index = groupingData.push({
+							year,
+							semester,
+							classID: []
+						}) - 1;
+					}
+
+					for (let day of response.info)
+						for (let subject of day.rows)
+							if (!groupingData[index].classID.includes(subject.classID)) {
+								this.log("DEBG", "schedule handler: adding", subject.classID);
+								groupingData[index].classID.push(subject.classID);
+							}
+
+					// Save changes
+					localStorage.setItem("results.grouping", JSON.stringify(groupingData));
+					this.render(undefined, true);
+				}
+			);
 		},
 
 		async updateCPA(cpa) {
@@ -292,8 +355,14 @@ core.screen = {
 
 			let start = this.currentCPA;
 			let delta = cpa - start;
-			let duration = Math.sqrt(3.2 * Math.abs(delta));
 			let grade, color, pColor;
+
+			// Only play animation when screen is showing,
+			// otherwise we are just wasting resources.
+			let duration = (this.screen.showing)
+				? Math.sqrt(3.2 * Math.abs(delta))
+				: -1;
+
 			this.log("DEBG", `updateCPA(): changing to ${cpa} in ${duration}s`);
 
 			this.animator = new Animator(duration, this.timing, (t) => {
@@ -678,8 +747,10 @@ core.screen = {
 		 * @param	{Boolean}					force
 		 */
 		render(data, force = false) {
-			let newData = false;
+			if (!this.loaded)
+				return;
 
+			let newData = false;
 			if (typeof data === "object") {
 				newData = true;
 				this.currentData = data;

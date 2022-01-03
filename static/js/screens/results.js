@@ -348,7 +348,7 @@ core.screen = {
 				}
 			} else if (semester === 2) {
 				let dateDefault1 = new Date(`January 12, ${year}`);
-				dateDefault2 = new Date(`March 3, ${year}`);
+				let dateDefault2 = new Date(`March 3, ${year}`);
 				dateDefault1 = new Date(dateDefault1.setDate(dateDefault1.getDate() - dateDefault1.getDay() + 1));
 				dateDefault2 = new Date(dateDefault2.setDate(dateDefault2.getDate() - dateDefault2.getDay() + 1));
 
@@ -371,6 +371,13 @@ core.screen = {
 						dateDefault2 = new Date(dateDefault2.setDate(dateDefault2.getDate() + 7));
 						dates.push(dateDefault2);
 					}
+				}
+			} else {
+				let dateDefault = new Date(`July 7, ${year}`);
+				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
+				for (let i = 0; i < count; ++i) {
+					dates.push(dateDefault);
+					dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() + 7));
 				}
 			}
 

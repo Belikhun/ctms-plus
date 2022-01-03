@@ -175,6 +175,12 @@
     }
 }
 
+@media only screen and (max-width: 450px) {
+    .splash > .progressBar > .detail > .module {
+        display: none;
+    }
+}
+
 @keyframes splash-disapear {
     0% {
         opacity: 1;

@@ -257,11 +257,14 @@ core.screen = {
 				localStorage.setItem("cache.account", JSON.stringify({
 					email: core.account.email,
 					name: response.info.name,
-					studentID: response.info.studentID,
 					birthday: response.info.birthday,
-					classroom: response.info.classroom,
-					department: response.info.department,
 					tForm: response.info.tForm,
+					studentID: response.info.studentID,
+					faculty: response.info.faculty,
+					department: response.info.department,
+					course: response.info.course,
+					classroom: response.info.classroom,
+					mode: response.info.mode
 				}));
 
 				this.loaded = true;

@@ -1669,8 +1669,23 @@ const core = {
 			}
 		},
 
+		/**
+		 * Update user info from results api response.
+		 * @param	{APIResponse & Results}		response 
+		 */
 		updateInfo(response) {
-			this.userInfo = response.info;
+			this.userInfo = {
+				name: response.info.name,
+				birthday: response.info.birthday,
+				tForm: response.info.tForm,
+				studentID: response.info.studentID,
+				faculty: response.info.faculty,
+				department: response.info.department,
+				course: response.info.course,
+				classroom: response.info.classroom,
+				mode: response.info.mode
+			};
+
 			this.nameNode.innerText = response.info.name;
 			this.detailView.userCard.top.info.name.innerText = response.info.name;
 			this.detailView.userCard.top.info.studentID.innerText = response.info.studentID;

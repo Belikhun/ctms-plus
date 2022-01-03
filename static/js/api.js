@@ -1296,7 +1296,7 @@ const api = {
  * @type		{Object}
  * @property	{Object}				info
  * @property	{String}				info.name
- * @property	{String}				info.brithday
+ * @property	{String}				info.birthday
  * @property	{String}				info.tForm
  * @property	{String}				info.studentID
  * @property	{String}				info.faculty

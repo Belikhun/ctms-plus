@@ -330,31 +330,47 @@ core.screen = {
 		 * @param	{Object}    params
 		 * @param	{Number}	params.year			Year of semester want to get dates
 		 * @param	{Number}	params.semester		Semester want to get dates
+		 * @param	{Number}	params.isK20		If true, return dates that match schedule for K20 students
 		 * @param	{Number}	params.count		Number of dates that will return
 		 * @returns {Date[]}	An array of date
 		 */
-		getScanDates({ year, semester, count = 2 } = {}) {
-			let dates = []
+		getScanDates({ year, semester, isK20 = false, count = 2 } = {}) {
+			let dates = [];
 			if (semester === 1) {
-				let dateDefault = new Date(`October 1, ${year}`);
+				let dateDefault = (isK20 && year === 2020)
+					? new Date(`November 1, ${year}`)
+					: new Date(`October 1, ${year}`);
 				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
+				
 				for (let i = 0; i < count; ++i) {
 					dates.push(dateDefault);
 					dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() + 7));
 				}
 			} else if (semester === 2) {
-				let dateDefault = new Date(`January 12, ${year}`);
-				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-				dates.push(dateDefault);
-				dateDefault = new Date(`March 3, ${year}`);
-				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-				dates.push(dateDefault);
-			} else {
-				let dateDefault = new Date(`July 7, ${year}`);
-				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
-				for (let i = 0; i < count; ++i) {
-					dates.push(dateDefault);
-					dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() + 7));
+				let dateDefault1 = new Date(`January 12, ${year}`);
+				dateDefault2 = new Date(`March 3, ${year}`);
+				dateDefault1 = new Date(dateDefault1.setDate(dateDefault1.getDate() - dateDefault1.getDay() + 1));
+				dateDefault2 = new Date(dateDefault2.setDate(dateDefault2.getDate() - dateDefault2.getDay() + 1));
+
+				if (count < 3) {
+					dates.push(dateDefault1);
+					dates.push(dateDefault2);
+				} else if (count === 3) {
+					for (let i = 0; i < count - 2; ++i) {
+						dateDefault2 = new Date(dateDefault2.setDate(dateDefault2.getDate() + 7));
+						dates.push(dateDefault2);
+					}
+				} else {
+					let count2 = Math.floor((count - 2) / 2);
+					for (let i = 0; i < count2; ++i) {
+						dateDefault1 = new Date(dateDefault1.setDate(dateDefault1.getDate() + 7));
+						dates.push(dateDefault1);
+					}
+
+					for (let i = 0; i < count - count2; ++i) {
+						dateDefault2 = new Date(dateDefault2.setDate(dateDefault2.getDate() + 7));
+						dates.push(dateDefault2);
+					}
 				}
 			}
 
@@ -434,7 +450,9 @@ core.screen = {
 			for (let year of years) {
 				for (let semester of [1, 2, 3]) {
 					this.log("INFO", `core.screen.results.scan(): scanning subjects of year ${year} semester ${semester}`);
-					let dates = this.getScanDates({ year, semester });
+					
+					let isK20 = core.account.userInfo.course.substring(0, 4) === "2010";
+					let dates = this.getScanDates({ year, semester, isK20 });
 
 					for (let date of dates) {
 						if (cancelled)
@@ -515,7 +533,7 @@ core.screen = {
 				if (groupData.classID) {
 					for (let i = 0; i < list.length; i++)
 						if (groupData.classID.includes(list[i].classID))
-							results.push(list.splice(i, 1)[0]);
+							results.push(list.splice(i--, 1)[0]);
 				} else
 					results = list;
 
@@ -668,3 +686,4 @@ core.screen = {
 		}
 	}
 }
+

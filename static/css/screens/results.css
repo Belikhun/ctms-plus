@@ -223,17 +223,12 @@
 	margin-bottom: 100px;
 }
 
-.resultsScreen > table > tbody > tr {
-	counter-increment: resultsTableNth;
-}
-
 .resultsScreen > table > thead > tr > th[key="stt"],
 .resultsScreen > table > tbody > tr > td[key="stt"] {
 	width: 20px;
 }
 
-.resultsScreen > table > tbody > tr > td:first-child::before {
-	content: counter(resultsTableNth);
+.resultsScreen > table > tbody > tr > td[key="stt"]::before {
 	font-size: 12px;
 	font-weight: bold;
 	color: inherit;

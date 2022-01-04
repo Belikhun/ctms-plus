@@ -346,7 +346,7 @@ const api = {
 		let color = "dark";
 
 		if (roundTo > 0)
-			average = round(average, roundTo);
+			average = round(round(average, roundTo + 1), roundTo);
 
 		if (average >= 9.0) {
 			point = 4.0;

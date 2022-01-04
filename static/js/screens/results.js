@@ -790,7 +790,7 @@ core.screen = {
 									{
 										tags: { tag: "span", class: "tags", child: {
 											cpa: { tag: "span", class: ["item", "parallelogram"], child: {
-												label: { tag: "t", class: "label", text: "CPA" },
+												label: { tag: "t", class: "label", text: "GPA" },
 												value: { tag: "span", class: ["parallelogram", "value"], text: group.cpa.toFixed(2) }
 											}},
 
@@ -886,8 +886,18 @@ core.screen = {
 							"")
 				},
 
-				average: { tag: "td", class: ["right", "bold"], text: average ? average.toFixed(2) : "" },
-				gradePoint: { tag: "td", class: ["right", "bold"], text: grade ? grade.point.toFixed(2) : "" },
+				average: {
+					tag: "td",
+					class: ["right", "bold"],
+					...(average) ? {
+						text: average ? round(average, 1).toFixed(1) : "",
+						title: `raw score: ${average}`
+					} : {
+						text: ""
+					}
+				},
+
+				gradePoint: { tag: "td", class: ["right", "bold"], text: grade ? grade.point.toFixed(1) : "" },
 				gradeLetter: { tag: "td", class: "right", child: {
 					inner: {
 						tag: "span",

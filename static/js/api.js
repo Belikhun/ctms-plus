@@ -340,10 +340,13 @@ const api = {
 	 * Chuyển điểm hệ số 10 sang hệ số 4 và xếp loại
 	 * @param {Number} average 
 	 */
-	resultGrading(average) {
+	resultGrading(average, roundTo = 1) {
 		let point = 0;
 		let letter = "?";
 		let color = "dark";
+
+		if (roundTo > 0)
+			average = round(average, roundTo);
 
 		if (average >= 9.0) {
 			point = 4.0;

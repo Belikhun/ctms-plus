@@ -890,7 +890,7 @@ core.screen = {
 					tag: "td",
 					class: ["right", "bold"],
 					...(average) ? {
-						text: average ? round(average, 1).toFixed(1) : "",
+						text: average ? round(round(average, 2), 1).toFixed(1) : "",
 						title: `raw score: ${average}`
 					} : {
 						text: ""

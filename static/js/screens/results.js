@@ -846,6 +846,7 @@ core.screen = {
 			diemCC,
 			diemDK,
 			diemHK,
+			rawAverage,
 			average,
 			grade
 		} = {}) {
@@ -890,8 +891,8 @@ core.screen = {
 					tag: "td",
 					class: ["right", "bold"],
 					...(average) ? {
-						text: average ? round(round(average, 2), 1).toFixed(1) : "",
-						title: `raw score: ${average}`
+						text: average ? average.toFixed(1) : "",
+						title: `raw score: ${rawAverage}`
 					} : {
 						text: ""
 					}

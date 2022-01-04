@@ -340,13 +340,10 @@ const api = {
 	 * Chuyển điểm hệ số 10 sang hệ số 4 và xếp loại
 	 * @param {Number} average 
 	 */
-	resultGrading(average, roundTo = 1) {
+	resultGrading(average) {
 		let point = 0;
 		let letter = "?";
 		let color = "dark";
-
-		if (roundTo > 0)
-			average = round(round(average, roundTo + 1), roundTo);
 
 		if (average >= 9.0) {
 			point = 4.0;
@@ -407,7 +404,7 @@ const api = {
 			if (typeof result.average === "number") {
 				totalCPA += result.grade.point * result.credits;
 				cpaCredits += result.credits;
-				totalPoint += round(round(result.average, 2), 1);
+				totalPoint += result.average;
 				count++;
 			}
 		}
@@ -484,6 +481,7 @@ const api = {
 				diemCC: __procPoint(row.children[4]),
 				diemDK: __procPoint(row.children[5]),
 				diemHK: __procPoint(row.children[6]),
+				rawAverage: undefined,
 				average: undefined,
 				grade: undefined,
 
@@ -493,7 +491,8 @@ const api = {
 			}
 
 			if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
-				data.average = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
+				data.rawAverage = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
+				data.average = round(round(data.rawAverage, 2), 1);
 				data.grade = this.resultGrading(data.average);
 			}
 
@@ -1297,6 +1296,7 @@ const api = {
  * @property	{Number}				diemCC
  * @property	{Number}				diemDK
  * @property	{Number}				diemHK
+ * @property	{Number}				rawAverage
  * @property	{Number}				average
  * @property	{Object}				grade
  * @property	{Number}				grade.point

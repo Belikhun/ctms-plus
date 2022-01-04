@@ -345,6 +345,7 @@ arr::before {
 
 #content > .screen > .header > icon {
 	min-width: 45px;
+	justify-content: flex-start;
 }
 
 #content > .screen > .header > icon::after {
@@ -353,7 +354,7 @@ arr::before {
 
 #content > .screen > .header > .detail {
 	flex-grow: 1;
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 #content > .screen > .header > .detail > .title {
@@ -406,8 +407,7 @@ arr::before {
 	width: var(--content-width);
 	max-width: 100%;
 
-	margin: 0 auto;
-	box-sizing: border-box;
+	padding: 0 calc(50vw - (var(--content-width) / 2));
 	overflow: auto;
 }
 

@@ -407,7 +407,7 @@ const api = {
 			if (typeof result.average === "number") {
 				totalCPA += result.grade.point * result.credits;
 				cpaCredits += result.credits;
-				totalPoint += result.average;
+				totalPoint += round(round(result.average, 2), 1);
 				count++;
 			}
 		}

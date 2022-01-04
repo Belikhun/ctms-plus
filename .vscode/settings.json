@@ -1,11 +1,13 @@
 {
-	"liveServer.settings.file": "index.html",
-	"liveServer.settings.ignoreFiles": [
-		".vscode/**",
-		"**/*.py",
-		"**/*.pyc",
-		"**/*.log",
-		"**/*.js"
-	],
-	"liveServer.settings.port": 5501
+  "liveServer.settings.file": "index.html",
+  "liveServer.settings.ignoreFiles": [
+    ".vscode/**",
+    "**/*.py",
+    "**/*.pyc",
+    "**/*.log",
+    "**/*.js"
+  ],
+  "liveServer.settings.port": 5501,
+  "editor.formatOnSave": false,
+  "files.trimTrailingWhitespace": false,
 }

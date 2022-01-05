@@ -117,17 +117,8 @@ core.screen = {
 				this.loading = false;
 				this.screen.loading = false;
 			} catch(e) {
-				let error = parseException(e);
-
 				this.reset();
-				this.screen.overlay({
-					icon: "bomb",
-					title: "Toang Rồi Ông Giáo Ạ!",
-					description: `<pre class="break">[${error.code}] >>> ${error.description}</pre>`,
-					buttons: {
-						login: { text: "THỬ LẠI", color: "pink", icon: "reload", onClick: () => this.load() }
-					}
-				});
+				this.screen.handleError(e, async () => await this.load());
 
 				this.screen.loading = false;
 			}

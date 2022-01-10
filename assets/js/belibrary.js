@@ -127,8 +127,9 @@ function myajax({
 
 		let xhr = new XMLHttpRequest();
 		let formData = null;
+		method = method.toUpperCase();
 
-		if (method.toUpperCase() === "POST") {
+		if (method !== "GET") {
 			if (formEncodeURL) {
 				formData = Array();
 
@@ -307,7 +308,7 @@ function myajax({
 		for (let key of Object.keys(header))
 			xhr.setRequestHeader(key, header[key]);
 
-		if (method === "POST") {
+		if (method !== "GET") {
 			if (formEncodeURL)
 				xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 	

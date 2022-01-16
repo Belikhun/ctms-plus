@@ -338,7 +338,11 @@ core.screen = {
 
 					// Save changes
 					localStorage.setItem("results.grouping", JSON.stringify(groupingData));
-					this.render(undefined, true);
+
+					// Only re-render when data is avilable and loaded,
+					// This is to prevent results data to load on startup.
+					if (this.currentData)
+						this.render(undefined, true);
 				}
 			);
 		},

@@ -565,7 +565,7 @@ const core = {
 		container: $("#navbar"),
 
 		title: navbar.title({
-			icon: "./assets/img/icon.png",
+			icon: "./static/img/icon.png",
 			title: APPNAME
 		}),
 
@@ -1191,7 +1191,7 @@ const core = {
 				// Project Info View
 				let projectInfo = makeTree("div", "projectInfo", {
 					header: { tag: "div", class: "header", child: {
-						icon: new lazyload({ source: "./assets/img/icon.png", classes: "icon" })
+						icon: new lazyload({ source: "./static/img/icon.png", classes: "icon" })
 					}},
 
 					pTitle: { tag: "t", class: "title", text: APPNAME },
@@ -1272,7 +1272,7 @@ const core = {
 				});
 
 				new smenu.components.Footer({
-					icon: "./assets/img/icon.png",
+					icon: "./static/img/icon.png",
 					appName: APPNAME,
 					version: `${VERSION} - ${STATE}`
 				}, project);
@@ -1479,7 +1479,7 @@ const core = {
 			this.background = triBg(container, { color: "darkBlue", scale: 1, triangleCount: 8, speed: 6 });
 
 			this.avatarNode = new lazyload({
-				source: "./assets/img/guest.png",
+				source: "./static/img/guest.png",
 				classes: ["avatar", "light"]
 			});
 
@@ -1576,7 +1576,7 @@ const core = {
 				userCard: { tag: "div", class: "userCard", child: {
 					top: { tag: "div", class: "top", child: {
 						avatar: new lazyload({
-							source: "./assets/img/guest.png",
+							source: "./static/img/guest.png",
 							classes: "avatar"
 						}),
 
@@ -1703,7 +1703,7 @@ const core = {
 				this.userInfo = undefined;
 				
 				this.nameNode.innerText = "Khách";
-				this.avatarNode.src = this.detailView.userCard.top.avatar.src = "./assets/img/guest.png";
+				this.avatarNode.src = this.detailView.userCard.top.avatar.src = "./static/img/guest.png";
 				this.detailView.userCard.top.info.email.innerText = "";
 				this.navtip.set({ description: `nhấn để đăng nhập!` });
 				this.background.setColor("darkRed");

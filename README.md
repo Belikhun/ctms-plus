@@ -32,6 +32,38 @@ Repo này chứa mã nguồn của `CTMS+` và `middleware API` được sử d�
  + 🔮 Branch `production`: Chứa mã nguồn đã được thay đổi để phù hợp cho việc deploy site tới một host nào đó
  + 🌿 Branch khác: Chứa mã nguồn với các tính năng đang trong thời gian hoàn thiện, các commit sẽ được thực hiện tại đây trước khi được nhập vào `main`
 
+### 🖨 Cloning
+
+Repo này có chứa submodule, vì vậy bạn sẽ phải thực hiện clone đệ quy để tải toàn bộ code:
+
+```bash
+git clone --recursive https://github.com/Belikhun/ctms-plus.git
+```
+
+Để lấy update từ remote về máy, sử dụng:
+
+```bash
+git pull --recurse-submodules
+```
+
+### 🚀 Running
+
+Để chạy, bạn chỉ cần khởi động một máy chủ HTTP đơn giản tại thư mục gốc của project:
+
+```bash
+#? Using Python
+py -m SimpleHTTPServer 8001
+# or
+python3 -m SimpleHTTPServer 8001
+
+#? Using PHP
+php -S localhost:8001
+```
+
+Hoặc sử dụng [Live Server Extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) trong VSCode để nhanh chóng khởi động máy chủ web.
+
+Sau khi khởi động, đi tới http://locahost:8001 để mở trang web.
+
 ### 😇 Đóng góp
 
 Mọi đóng góp về code, ý tưởng hoặc góp ý đều được chào mừng!

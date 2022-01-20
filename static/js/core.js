@@ -110,7 +110,11 @@ class CoreScreen {
 
 	__show() {
 		this.showing = true;
-		core.screen.container.dataset.screen = this.id;
+		
+		if (core.activeScreen)
+			core.activeScreen.hide();
+
+		this.view.classList.add("show");
 		this.showHandlers.forEach(f => f());
 	}
 
@@ -127,6 +131,7 @@ class CoreScreen {
 
 	__hide() {
 		this.showing = false;
+		this.view.classList.remove("show");
 		this.hideHandlers.forEach(f => f());
 	}
 
@@ -284,6 +289,12 @@ class CoreScreen {
 const core = {
 	container: $("#container"),
 	content: $("#content"),
+
+	/**
+	 * Currently active screen
+	 * @type {CoreScreen}
+	 */
+	activeScreen: null,
 
 	/**
 	 * Initialize CTMS+ Core

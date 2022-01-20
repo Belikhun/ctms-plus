@@ -220,11 +220,7 @@ arr::before {
 	overflow: hidden;
 }
 
-#content[data-screen="schedule"] > .schedule,
-#content[data-screen="tests"] > .tests,
-#content[data-screen="results"] > .results,
-#content[data-screen="subscribe"] > .subscribe,
-#content[data-screen="home"] > .home {
+#content > .screen.show {
 	display: flex;
 }
 

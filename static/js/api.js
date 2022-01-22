@@ -101,7 +101,8 @@ const api = {
 		target = "",
 		argument = "",
 		renewSession = false,
-		ignoreAnnouncement = false
+		ignoreAnnouncement = false,
+		accept = "application/json"
 	} = {}) {
 		if (method === "POST") {
 			form.__EVENTTARGET = target;
@@ -123,9 +124,10 @@ const api = {
 				url: `${this.MIDDLEWARE}/api/middleware`,
 				method,
 				header: {
-					"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+					"Accept": accept,
 					"Session-Cookie-Key": "ASP.NET_SessionId",
 					"Session-Cookie-Value": localStorage.getItem("session") || "",
+					"Set-Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 					"Set-Host": "ctms.fithou.net.vn",
 					"Set-Origin": this.HOST,
 					"Set-Referer": `${this.HOST}${path}`,

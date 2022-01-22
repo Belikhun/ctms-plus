@@ -209,7 +209,7 @@ arr::before {
 
 #content > .screen {
 	position: relative;
-	display: none;
+	display: flex;
 	flex-direction: column;
 
 	width: 100%;
@@ -218,10 +218,6 @@ arr::before {
 
 	--content-width: 1200px;
 	overflow: hidden;
-}
-
-#content > .screen.show {
-	display: flex;
 }
 
 #content > .screen:empty::before,

@@ -100,7 +100,6 @@ class CoreScreen {
 		});
 
 		this.view.overlay.style.display = "none";
-		core.screen.container.appendChild(this.view);
 		this.button.click.setHandler((a) => a ? this.__show() : this.__hide());
 	}
 
@@ -108,13 +107,16 @@ class CoreScreen {
 		this.button.click.active = true;
 	}
 
-	__show() {
+	async __show() {
 		this.showing = true;
 		
 		if (core.activeScreen)
 			core.activeScreen.hide();
 
-		this.view.classList.add("show");
+		// Wait for screen to actually clear.
+		await delayAsync();
+
+		core.screen.container.appendChild(this.view);
 		this.showHandlers.forEach(f => f());
 	}
 
@@ -131,7 +133,7 @@ class CoreScreen {
 
 	__hide() {
 		this.showing = false;
-		this.view.classList.remove("show");
+		core.screen.container.removeChild(this.view);
 		this.hideHandlers.forEach(f => f());
 	}
 
@@ -1866,6 +1868,7 @@ const core = {
 	},
 
 	screen: {
+		/** @type {HTMLDivElement} */
 		container: $("#content"),
 		priority: 3,
 

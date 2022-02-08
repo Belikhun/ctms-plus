@@ -1466,6 +1466,8 @@ const core = {
 		background: null,
 		email: undefined,
 		password: undefined,
+
+		/** @type {UserInfo} */
 		userInfo: undefined,
 
 		/** @type {HTMLElement} */

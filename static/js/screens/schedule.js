@@ -65,6 +65,10 @@ core.screen = {
 			});
 
 			core.account.onLogout(() => {
+				// Disable confirm button to prevent confusion
+				this.view.control.confirm.loading(false);
+				this.view.control.confirm.disabled = true;
+
 				if (!this.haveCacheData)
 					this.onLogout()
 			});
@@ -75,19 +79,29 @@ core.screen = {
 
 				// Check schedule data is current week or next week, first response
 				// always return current week data.
-				if (!this.loaded && core.account.userInfo) {
-					this.log("INFO", `Updating schedule cache for`, {
-						text: core.account.userInfo.name,
-						color: oscColor("blue")
-					});
-
-					// Update schedule cache
-					localStorage.setItem("cache.schedule", JSON.stringify({
-						name: core.account.userInfo.name,
-						date: response.date,
-						stored: new Date(),
-						info: response.info
-					}));
+				if (!this.loaded) {
+					// Warp this inside a async function so the code bellow can
+					// continue to execute.
+					(async () => {
+						// Wait for user info data to be available
+						if (!core.account.userInfo) {
+							this.log("DEBG", "userInfo is not available! waiting for it...");
+							await waitFor(() => core.account.userInfo);
+						}
+	
+						this.log("INFO", `Updating schedule cache for`, {
+							text: core.account.userInfo.name,
+							color: oscColor("blue")
+						});
+	
+						// Update schedule cache
+						localStorage.setItem("cache.schedule", JSON.stringify({
+							name: core.account.userInfo.name,
+							date: response.date,
+							stored: new Date(),
+							info: response.info
+						}));
+					})()
 				}
 				
 				this.loaded = true;

@@ -46,6 +46,17 @@ const api = {
 	 */
 	__EVENTVALIDATION: undefined,
 
+	/**
+	 * @typedef		ResponseHandler
+	 * @type		{Object}
+	 * @property	{Function}		handler
+	 * @property	{Boolean}		lock
+	 */
+
+	/** 
+	 * Store API handlers
+	 * @type {Object.<string, ResponseHandler[]>}
+	 */
 	responseHandlers: {},
 
 	onResponse(type, f, { lock = false } = {}) {
@@ -1302,6 +1313,21 @@ const api = {
  * @property	{Number}				grade.point
  * @property	{String}				grade.letter
  * @property	{String}				grade.color
+ */
+
+/**
+ * UserInfo object
+ * @typedef		UserInfo
+ * @type		{Object}
+ * @property	{String}				name
+ * @property	{String}				birthday
+ * @property	{String}				tForm
+ * @property	{String}				studentID
+ * @property	{String}				faculty
+ * @property	{String}				department
+ * @property	{String}				course
+ * @property	{String}				classroom
+ * @property	{String}				mode
  */
 
 /**

@@ -177,12 +177,12 @@ core.screen = {
 			
 			this.screen.addButton(nextWeekButton);
 			nextWeekButton.addEventListener("click", async () => {
-				this.load(this.getInputNextWeek())
+				this.load(this.getNextWeek())
 			});
 
 			this.screen.addButton(lastWeekButton);
 			lastWeekButton.addEventListener("click", async () => {
-				this.load(this.getInputLastWeek())
+				this.load(this.getLastWeek())
 			});
 		},	
 

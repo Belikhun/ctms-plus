@@ -167,11 +167,12 @@ core.screen = {
 				style: "round",
 				complex: true
 			});
-			let nextWeekButton = createButtonIconRight("Tuần Sau", {
+			let nextWeekButton = createButton("Tuần Sau", {
 				icon: "nextWeek",
 				color: "orange",
 				style: "round",
-				complex: true
+				complex: true,
+				align: "right"
 			});
 			
 			this.screen.addButton(nextWeekButton);
@@ -261,13 +262,13 @@ core.screen = {
 			return new Date(this.view.control.dateInput.input.value);
 		},
 
-		getInputNextWeek() {
+		getNextWeek() {
 			let date = this.getInputDate();
 			date.setDate(date.getDate() + 7);
 			return date;
 		},
 
-		getInputLastWeek() {
+		getLastWeek() {
 			let date = this.getInputDate();
 			date.setDate(date.getDate() - 7);
 			return date;

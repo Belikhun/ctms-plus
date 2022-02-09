@@ -160,7 +160,30 @@ core.screen = {
 
 			this.setInputNow();
 			this.screen.show();
-		},
+
+			let lastWeekButton = createButton("Tuần Trước", {
+				icon: "lastWeeK",
+				color: "orange",
+				style: "round",
+				complex: true
+			});
+			let nextWeekButton = createButtonIconRight("Tuần Sau", {
+				icon: "nextWeek",
+				color: "orange",
+				style: "round",
+				complex: true
+			});
+			
+			this.screen.addButton(nextWeekButton);
+			nextWeekButton.addEventListener("click", async () => {
+				this.load(this.getInputNextWeek())
+			});
+
+			this.screen.addButton(lastWeekButton);
+			lastWeekButton.addEventListener("click", async () => {
+				this.load(this.getInputLastWeek())
+			});
+		},	
 
 		reset() {
 			this.loaded = false;
@@ -236,6 +259,18 @@ core.screen = {
 
 		getInputDate() {
 			return new Date(this.view.control.dateInput.input.value);
+		},
+
+		getInputNextWeek() {
+			let date = this.getInputDate();
+			date.setDate(date.getDate() + 7);
+			return date;
+		},
+
+		getInputLastWeek() {
+			let date = this.getInputDate();
+			date.setDate(date.getDate() - 7);
+			return date;
 		},
 
 		setAutoChangeRenderer(enabled) {

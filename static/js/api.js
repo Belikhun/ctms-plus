@@ -1246,7 +1246,8 @@ const api = {
  * @property	{String}			subject
  * @property	{String}			teacher
  * @property	{String|String[]}	classID
- * @property	{String}			listID
+ * @property	{?String}			listID
+ * @property	{?Number}			checkInID
  * @property	{String}			status
  * @property	{String}			noteID
  */

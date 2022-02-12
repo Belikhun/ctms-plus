@@ -785,6 +785,7 @@ const api = {
 			
 			for (let row of [ ...rows ]) {
 				let classCol = row.children[5].innerHTML.trim().split("<br>");
+				let checkInID = undefined;
 
 				let noteID = null;
 				let note = row.children[6].querySelector(":scope > span > a[href]");
@@ -801,6 +802,13 @@ const api = {
 						noteID = parseInt(noteRe[1]);
 				}
 
+				// Check for check-in list link.
+				let checkInTest = /InDsDiemdanh\.aspx\?loptcID=(\d+)\" title=""\>([^<>]+)\<\/a>/gm.exec(classCol[0]);
+				if (checkInTest) {
+					classCol[0] = checkInTest[2];
+					checkInID = parseInt(checkInTest[1]);
+				}
+
 				item.rows.push({
 					time: rowTime,
 					date: [startDate, endDate],
@@ -809,6 +817,7 @@ const api = {
 					teacher: row.children[4].innerText.trim(),
 					classID: classCol[0],
 					listID: classCol[1],
+					checkInID,
 					status: row.children[6].innerText.trim(),
 					noteID
 				});

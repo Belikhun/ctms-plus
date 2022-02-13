@@ -44,7 +44,7 @@ core.screen = {
 					prev: createButton(undefined, {
 						icon: "backward",
 						color: "blue",
-						classes: "controlWeek-left",
+						classes: "controlWeekLeft",
 						complex: true,
 						disabled: true,
 					}),
@@ -53,7 +53,7 @@ core.screen = {
 						icon: "forward",
 						color: "blue",
 						align: "right",
-						classes: "controlWeek-right",
+						classes: "controlWeekRight",
 						complex: true,
 						disabled: true
 					})
@@ -179,7 +179,7 @@ core.screen = {
 
 			this.setInputNow();
 			this.screen.show();
-		},	
+		},
 
 		reset() {
 			this.loaded = false;

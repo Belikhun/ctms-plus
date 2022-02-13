@@ -269,8 +269,9 @@ core.screen = {
 		/**
 		 * Render schedule handler
 		 * @param 	{ScheduleWeekRow[]}		data
+		 * @param 	{Boolean}				force	Force re-render
 		 */
-		render(data) {
+		render(data, force = false) {
 			let renderer = this.defaultRenderMode;
 			let newData = false;
 
@@ -289,7 +290,7 @@ core.screen = {
 
 			// Only re-render when render mode changed or we have
 			// updated data to render
-			if (this.currentRenderer !== renderer || newData) {
+			if (this.currentRenderer !== renderer || newData || force) {
 				this.log("DEBG", `render(${renderer}): re-rendering`);
 				emptyNode(this.view.list);
 
@@ -414,6 +415,20 @@ core.screen = {
 						tableRow.subject.appendChild(note);
 					}
 
+					if (row.checkInID) {
+						tableRow.classID.classList.add("clickable");
+						tableRow.classID.addEventListener(
+							"click",
+							() => this.viewCheckIn(row.checkInID, row.subject)
+						);
+
+						let checkInData = localStorage.getItem(`cache.checkin.${row.checkInID}`);
+						if (checkInData) {
+							checkInData = JSON.parse(checkInData);
+							tableRow.classID.innerText += ` (STT ${checkInData.nth})`;
+						}
+					}
+
 					table.tbody.appendChild(tableRow);
 				}
 			}
@@ -533,6 +548,62 @@ core.screen = {
 				message: "",
 				description: "",
 				customNode: noteContent,
+				buttonList: {
+					close: { text: "Đóng" }
+				}
+			});
+		},
+
+		async viewCheckIn(id, title) {
+			this.screen.loading = true;
+			let response;
+
+			try {
+				response = await api.getCheckIn(id);
+
+				// Save to cache for rendering nth in schedule.
+				localStorage.setItem(`cache.checkin.${id}`, JSON.stringify(response.data));
+				this.render(undefined, true);
+			} catch(e) {
+				errorHandler(e);
+				this.screen.loading = false;
+				return;
+			}
+
+			this.screen.loading = false;
+			let view = makeTree("div", "checkInView", {
+				header: { tag: "div", class: "header", child: {
+					nth: { tag: "span", class: "item", child: {
+						label: { tag: "t", class: "label", text: "MÃ DANH SÁCH" },
+						value: { tag: "span", class: "value", text: response.data.nth }
+					}},
+
+					healthDeclared: { tag: "span", class: "item", child: {
+						label: { tag: "t", class: "label", text: "KHAI Y TẾ" },
+						value: { tag: "span", class: ["value", "check"], data: { checked: response.data.healthDeclared } }
+					}}
+				}},
+
+				checkIn: { tag: "div", class: "checkIn" }
+			}, "view");
+
+			for (let check of response.data.checkIn) {
+				let item = makeTree("span", "item", {
+					label: { tag: "t", class: "label", text: check.label },
+					check: { tag: "div", class: "check", data: { status: check.status } }
+				});
+
+				view.checkIn.appendChild(item);
+			}
+
+			await popup.show({
+				windowTitle: `Danh Sách Điểm Danh ${id}`,
+				title,
+				icon: "table",
+				level: "offline",
+				message: "",
+				description: "",
+				customNode: view,
 				buttonList: {
 					close: { text: "Đóng" }
 				}

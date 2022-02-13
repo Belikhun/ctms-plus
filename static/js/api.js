@@ -873,9 +873,6 @@ const api = {
 	 * @returns	{Promise<APIResponse & CheckIn>}
 	 */
 	async getCheckIn(id, studentID) {
-		if (!this.__SCHEDULE_DATE || !this.__SCHEDULE_EVENTVALIDATION)
-			throw { code: -1, description: `api.getCheckIn(): a prefetch request to api.schedule() is required to use this api` }
-
 		let response = await this.request({
 			path: `/InDsDiemdanh.aspx?loptcID=${id}`,
 			method: "GET"

@@ -160,6 +160,12 @@ table.scheduleTable > tbody > .row > td[key="listID"] {
 	width: 120px;
 }
 
+table.scheduleTable > tbody > .row > td[key="classID"].clickable {
+	cursor: pointer;
+	color: rgb(0, 0, 177);
+	text-decoration: underline;
+}
+
 /**? ------------ SCREEN.SCHEDULE.LIST ------------ */
 
 .scheduleList > .listItem {
@@ -506,7 +512,117 @@ table.scheduleTable > tbody > .row > td[key="listID"] {
 	padding-bottom: 200px;
 }
 
+/**? ------------ CHECK-IN VIEW STYLE ------------ */
 
+.checkInView > .header {
+	display: flex;
+	flex-direction: row;
+}
+
+.checkInView > .header > .item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex-grow: 1;
+}
+
+.checkInView > .header > .item > .label {
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: .4px;
+}
+
+.checkInView > .header > .item > .value {
+	font-family: Nunito;
+	font-size: 46px;
+}
+
+.checkInView > .header > .item > .value.check {
+	position: relative;
+	width: 42px;
+	height: 42px;
+	border-radius: 12px;
+
+	margin-top: 10px;
+	background-color: rgb(202, 202, 202);
+}
+
+.checkInView > .header > .item > .value.check::before {
+	content: "\f128";
+	position: absolute;
+	display: inline-block;
+
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 18px;
+	font-weight: 600;
+	color: black;
+}
+
+.checkInView > .header > .item > .value.check[data-checked="false"] {
+	background-color: rgb(255, 185, 197);
+}
+
+.checkInView > .header > .item > .value.check[data-checked="false"]::before {
+	content: "\f00d";
+}
+
+.checkInView > .header > .item > .value.check[data-checked="true"] {
+	background-color: rgb(69, 247, 128);
+}
+
+.checkInView > .header > .item > .value.check[data-checked="true"]::before {
+	content: "\f00c";
+}
+
+.checkInView > .checkIn {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+	justify-content: center;
+
+	margin-top: 10px;
+}
+
+.checkInView > .checkIn > .item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-right: 5px;
+}
+
+.checkInView > .checkIn > .item > .label {
+	font-size: 13px;
+	writing-mode: vertical-lr;
+}
+
+.checkInView > .checkIn > .item > .check {
+	position: relative;
+	width: 18px;
+	height: 18px;
+	border-radius: 12px;
+
+	margin-top: 5px;
+	background-color: rgb(202, 202, 202);
+}
+
+.checkInView > .checkIn > .item > .check::before {
+	content: "\f128";
+	position: absolute;
+	display: inline-block;
+
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	font-family: "Font Awesome 5 Free";
+	font-size: 9px;
+	font-weight: 600;
+	color: black;
+}
 
 /** ==================== DARK ==================== */
 
@@ -515,6 +631,10 @@ body.dark .scheduleList {
 	--schedule-gray: #5a5a5a;
 	--schedule-green: var(--color-green);
 	--schedule-blue: var(--color-blue);
+}
+
+body.dark table.scheduleTable > tbody > .row > td[key="classID"].clickable {
+	color: rgb(194, 194, 255);
 }
 
 body.dark .scheduleList > .listItem > .items::before {

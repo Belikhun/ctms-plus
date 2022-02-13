@@ -835,7 +835,8 @@ const api = {
 	/**
 	 * Lấy ghi chú với id cho trước
 	 * 
-	 * @param	{Number} id	Note ID
+	 * @param	{Number}	id	Note ID
+	 * @returns	{Promise<APIResponse & ScheduleNote>}
 	 */
 	async getNote(id) {
 		if (!this.__SCHEDULE_DATE || !this.__SCHEDULE_EVENTVALIDATION)
@@ -863,6 +864,68 @@ const api = {
 		response.data = { content: cleanRes }
 		await this.__handleResponse("getNote", response);
 		return response;	
+	},
+
+	/**
+	 * Lấy danh sách điểm danh với id cho trước
+	 * @param	{Number}	id			Class ID
+	 * @param	{String}	studentID	Student ID for extra data validation
+	 * @returns	{Promise<APIResponse & CheckIn>}
+	 */
+	async getCheckIn(id, studentID) {
+		if (!this.__SCHEDULE_DATE || !this.__SCHEDULE_EVENTVALIDATION)
+			throw { code: -1, description: `api.getCheckIn(): a prefetch request to api.schedule() is required to use this api` }
+
+		let response = await this.request({
+			path: `/InDsDiemdanh.aspx?loptcID=${id}`,
+			method: "GET"
+		});
+
+		/** @type {HTMLTableRowElement} */
+		let row;
+		let table = response.dom.querySelector("table.CenterElement");
+
+		if (!table)
+			throw { code: -1, description: `api.getCheckIn(): could not find target table!` }
+
+		// If Student ID is supplied, find row for that ID,
+		// else we will just need the first row.
+		if (studentID) {
+			let rows = table.querySelectorAll(":scope > tbody > tr");
+
+			for (let r of rows) {
+				if (r.children[1].innerText.trim() === studentID) {
+					row = r;
+					break;
+				}
+			}
+		} else {
+			row = table.querySelector(":scope > tbody > tr");
+		}
+
+		if (!row)
+			throw { code: -1, description: `api.getCheckIn(${studentID || ""}): could not find matching row data` }
+
+		// Length is total column minus first 7 columns.
+		let checkInLength = row.children.length - 7;
+		let checkIn = []
+
+		for (let i = 0; i < checkInLength; i++) {
+			// For now we don't have any idea what goes in here, so pass in
+			// unknown item.
+			checkIn.push({
+				status: "unknown",
+				label: "?"
+			});
+		}
+
+		response.data = {
+			nth: parseInt(row.children[0].innerText),
+			healthDeclared: row.children[6].children[0].checked,
+			checkIn
+		}
+
+		return response;
 	},
 
 	// For current tests viewstate, we can use them if
@@ -1261,6 +1324,32 @@ const api = {
  * @property	{String}				dateString
  * @property	{String}				weekDay
  * @property	{ScheduleSubject[]}		rows
+ */
+
+/**
+ * Schedule note object
+ * @typedef		ScheduleNote
+ * @type		{Object}
+ * @property	{Object}				data
+ * @property	{String}				data.content
+ */
+
+/**
+ * CheckIn Object
+ * @typedef		CheckIn
+ * @type		{Object}
+ * @property	{Object}				data
+ * @property	{Number}				data.nth
+ * @property	{Boolean}				data.healthDeclared
+ * @property	{CheckInDay[]}			data.checkIn
+ */
+
+/**
+ * CheckInDay Object
+ * @typedef		CheckInDay
+ * @type		{Object}
+ * @property	{String}				status
+ * @property	{String}				label
  */
 
 /**

@@ -503,6 +503,17 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	margin: 10px 10px 10px 0;
 }
 
+.scheduleScreen > .control > .controlWeekLeft {
+	padding: 14px;
+	margin-left: 10px;
+	border-radius: 4px 0 0 4px;
+}
+
+.scheduleScreen > .control > .controlWeekRight {
+	padding: 14px;
+	border-radius: 0 4px 4px 0;
+}
+
 .scheduleScreen > .list {
 	position: relative;
 	display: block;

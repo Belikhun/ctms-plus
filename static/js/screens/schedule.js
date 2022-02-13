@@ -39,6 +39,23 @@ core.screen = {
 						style: "round",
 						complex: true,
 						disabled: true
+					}),
+
+					prev: createButton(undefined, {
+						icon: "backward",
+						color: "blue",
+						classes: "controlWeekLeft",
+						complex: true,
+						disabled: true,
+					}),
+
+					next: createButton(undefined, {
+						icon: "forward",
+						color: "blue",
+						align: "right",
+						classes: "controlWeekRight",
+						complex: true,
+						disabled: true
 					})
 				}},
 
@@ -59,6 +76,8 @@ core.screen = {
 			new Scrollable(this.view, { content: this.view.list });
 
 			this.view.control.confirm.addEventListener("click", () => this.load(this.getInputDate()));
+			this.view.control.next.addEventListener("click", () => this.load(this.getNextWeek()));
+			this.view.control.prev.addEventListener("click", () => this.load(this.getLastWeek()));
 			core.account.onLogin(async () => {
 				if (this.screen.showing)
 					this.load();
@@ -186,9 +205,13 @@ core.screen = {
 			if (this.screen.overlayShowing) {
 				this.screen.loading = loading;
 				this.view.control.confirm.loading(false);
+				this.view.control.next.loading(false);
+				this.view.control.prev.loading(false);
 			} else {
 				this.screen.loading = false;
 				this.view.control.confirm.loading(loading);
+				this.view.control.next.disabled = loading;
+				this.view.control.prev.disabled = loading;
 			}
 		},
 
@@ -250,6 +273,18 @@ core.screen = {
 
 		getInputDate() {
 			return new Date(this.view.control.dateInput.input.value);
+		},
+
+		getNextWeek() {
+			let date = this.getInputDate();
+			date.setDate(date.getDate() + 7);
+			return date;
+		},
+
+		getLastWeek() {
+			let date = this.getInputDate();
+			date.setDate(date.getDate() - 7);
+			return date;
 		},
 
 		setAutoChangeRenderer(enabled) {

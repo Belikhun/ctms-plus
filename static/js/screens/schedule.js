@@ -493,7 +493,14 @@ core.screen = {
 						teacher: { tag: "t", class: "teacher", text: row.teacher },
 	
 						bottom: { tag: "div", class: "bottom", child: {
-							classID: { tag: "t", class: "classID", text: row.classID },
+							classID: {
+								tag: "t",
+								class: "classID",
+								text: (typeof row.classID === "object")
+									? row.classID.join("<br>")
+									: row.classID
+							},
+
 							separator: { tag: "span" },
 							listID: { tag: "t", class: "listID", text: row.listID }
 						}}
@@ -513,6 +520,20 @@ core.screen = {
 						note.addEventListener("click", () => this.viewNote(row.noteID));
 	
 						item.subject.appendChild(note);
+					}
+
+					if (row.checkInID) {
+						item.bottom.classID.classList.add("clickable");
+						item.bottom.classID.addEventListener(
+							"click",
+							() => this.viewCheckIn(row.checkInID, row.subject)
+						);
+
+						let checkInData = localStorage.getItem(`cache.checkin.${row.checkInID}`);
+						if (checkInData) {
+							checkInData = JSON.parse(checkInData);
+							item.bottom.classID.innerText += ` (STT ${checkInData.nth})`;
+						}
 					}
 	
 					group.items.appendChild(item);

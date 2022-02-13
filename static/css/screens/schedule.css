@@ -466,6 +466,12 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	color: rgb(186, 186, 186);
 }
 
+.scheduleList > .listItem > .items > .item > .bottom > .classID.clickable {
+	cursor: pointer;
+	color: rgb(0, 0, 177);
+	text-decoration: underline;
+}
+
 /**? ------------ SCREEN.SCHEDULE MAIN STYLE ------------ */
 
 .scheduleScreen {
@@ -633,7 +639,8 @@ body.dark .scheduleList {
 	--schedule-blue: var(--color-blue);
 }
 
-body.dark table.scheduleTable > tbody > .row > td[key="classID"].clickable {
+body.dark table.scheduleTable > tbody > .row > td[key="classID"].clickable,
+body.dark .scheduleList > .listItem > .items > .item > .bottom > .classID.clickable {
 	color: rgb(194, 194, 255);
 }
 

@@ -1060,6 +1060,15 @@ const core = {
 						core.screen.schedule.setDefaultRenderMode(v);
 					}
 				}, ux);
+
+				let data = new smenu.Child({ label: "Dữ Liệu" }, this.group);
+
+				new smenu.components.Button({
+					label: "xóa dữ liệu điểm danh",
+					color: "red",
+					complex: true,
+					onClick: () => core.screen.schedule.clearCheckInData()
+				}, data);
 			}
 		},
 

@@ -709,6 +709,18 @@ core.screen = {
 					close: { text: "Đóng" }
 				}
 			});
+		},
+
+		clearCheckInData() {
+			for (let key of Object.keys(localStorage)) {
+				if (!key.startsWith("cache.checkin"))
+					continue;
+
+				this.log("DEBG", `Clearing ${key}`);
+				localStorage.removeItem(key);
+			}
+
+			this.render(undefined, true);
 		}
 	}
 }

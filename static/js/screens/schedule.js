@@ -461,6 +461,29 @@ core.screen = {
 						if (checkInData) {
 							checkInData = JSON.parse(checkInData);
 							tableRow.classID.innerText += ` (STT ${checkInData.nth})`;
+
+							if (!row.subject.toLocaleLowerCase().includes("thực hành")) {
+								let isOffline;
+								let methodBadge = document.createElement("span");
+								methodBadge.classList.add("generalTag");
+								methodBadge.style.marginLeft = "5px";
+
+								// Odd-Even date to determine online or offline.
+								if (date.getDate() % 2 === 0)
+									isOffline = (checkInData.nth % 2 === 0);
+								else
+									isOffline = (checkInData.nth % 2 === 1);
+								
+								if (isOffline) {
+									methodBadge.dataset.color = "orange";
+									methodBadge.innerText = "offline";
+								} else {
+									methodBadge.dataset.color = "pink";
+									methodBadge.innerText = "online";
+								}
+
+								tableRow.status.appendChild(methodBadge);
+							}
 						}
 					}
 
@@ -568,6 +591,28 @@ core.screen = {
 						if (checkInData) {
 							checkInData = JSON.parse(checkInData);
 							item.bottom.classID.innerText += ` (STT ${checkInData.nth})`;
+
+							if (!row.subject.toLocaleLowerCase().includes("thực hành")) {
+								let methodBadge = document.createElement("span");
+								methodBadge.classList.add("generalTag");
+								methodBadge.style.marginLeft = "5px";
+
+								// Odd-Even date to determine online or offline.
+								if (date.getDate() % 2 === 0)
+									isOffline = (checkInData.nth % 2 === 0);
+								else
+									isOffline = (checkInData.nth % 2 === 1);
+								
+								if (isOffline) {
+									methodBadge.dataset.color = "orange";
+									methodBadge.innerText = "offline";
+								} else {
+									methodBadge.dataset.color = "pink";
+									methodBadge.innerText = "online";
+								}
+
+								item.top.insertBefore(methodBadge, item.top.classroom);
+							}
 						}
 					}
 	

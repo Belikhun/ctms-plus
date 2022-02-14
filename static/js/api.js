@@ -1316,8 +1316,8 @@ const api = {
  * Schedule week row object
  * @typedef		ScheduleWeekRow
  * @type		{Object}
- * @property	{String[]}				time
- * @property	{Date[]}				date
+ * @property	{String}				time
+ * @property	{Date}					date
  * @property	{String}				dateString
  * @property	{String}				weekDay
  * @property	{ScheduleSubject[]}		rows

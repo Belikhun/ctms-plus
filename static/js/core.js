@@ -1019,6 +1019,13 @@ const core = {
 					defaultValue: false,
 					disabled: true
 				}, other);
+
+				new smenu.components.Checkbox({
+					label: "super triangles! (mobile)",
+					color: "blue",
+					save: "display.supertriangles",
+					defaultValue: false
+				}, other);
 			}
 		},
 
@@ -1884,5 +1891,19 @@ const core = {
 		priority: 3,
 
 		init() {}
+	}
+}
+
+// Wrap createButton to prevent adding complex background
+// on mobile to reduce 'lag'.
+if (localStorage.getItem("display.supertriangles") !== "true") {
+	if (window && typeof window.createButton === "function") {
+		window.__createButton = window.createButton;
+		window.createButton = (text, options = {}) => {
+			if (checkAgentMobile() && options.complex)
+				options.triangleCount = 3;
+	
+			return window.__createButton(text, options);
+		}
 	}
 }

@@ -160,16 +160,19 @@ core.screen = {
 						this.render(cache.info);
 	
 						// Render notice for user
+						let mess = `
+							*) Đây là dữ liệu lịch học của tuần từ ngày
+							<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
+							của tài khoản <b>${cache.name}</b>.<br>
+							&emsp;Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai!<br>
+						`
+						if (typeof billTuitionAlert !== "null")
+							mess += "*) Cảnh báo bạn còn hóa đơn học phí chưa được thanh toán!";
+
 						let note = createNote({
 							level: "warning",
 							style: "round",
-							message: `
-								Đây là dữ liệu lịch học của tuần từ ngày
-								<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
-								của tài khoản <b>${cache.name}</b>.<br>
-								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai!<br>
-								Hãy <a href="javascript:core.account.subWindow.show()">đăng nhập</a> để cập nhật dữ liệu!
-							`
+							message: mess
 						});
 	
 						note.group.style.marginBottom = "30px";

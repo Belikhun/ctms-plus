@@ -724,6 +724,7 @@ const api = {
 	async schedule(date, { triggerEvents = true } = {}) {
 		/** @type {APIResponse & Schedule} */
 		let response;
+		let billTuitionAlert = document.getElementById("LeftCol_pnlMessage");
 		
 		if (typeof date !== "undefined") {
 			this.__SCHEDULE_DATE = `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`;

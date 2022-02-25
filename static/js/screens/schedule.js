@@ -124,7 +124,7 @@ core.screen = {
 				}
 				
 				this.loaded = true;
-				this.render(response.info);
+				this.render(response);
 			});
 
 			// Event listener to update current render mode
@@ -157,22 +157,19 @@ core.screen = {
 							}
 						}
 	
-						this.render(cache.info);
+						this.render({ info: cache.info });
 	
 						// Render notice for user
-						let mess = `
-							*) Đây là dữ liệu lịch học của tuần từ ngày
-							<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
-							của tài khoản <b>${cache.name}</b>.<br>
-							&emsp;Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai!<br>
-						`
-						if (typeof billTuitionAlert !== "null")
-							mess += "*) Cảnh báo bạn còn hóa đơn học phí chưa được thanh toán!";
-
 						let note = createNote({
 							level: "warning",
 							style: "round",
-							message: mess
+							message: `
+								Đây là dữ liệu lịch học của tuần từ ngày
+								<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
+								của tài khoản <b>${cache.name}</b>.<br>
+								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai! <br>
+								Hãy <a href="javascript:core.account.subWindow.show()">đăng nhập</a> để cập nhật dữ liệu!
+							`
 						});
 	
 						note.group.style.marginBottom = "30px";
@@ -306,11 +303,14 @@ core.screen = {
 
 		/**
 		 * Render schedule handler
-		 * @param 	{ScheduleWeekRow[]}		data
+		 * @param 	{Object}				data
+		 * @param 	{Boolean}				data.billAlert				
+		 * @param 	{ScheduleWeekRow[]}		data.info				
 		 * @param 	{Boolean}				force	Force re-render
 		 */
-		render(data, force = false) {
+		render({ info, billAlert = false } = {}, force = false) {
 			let renderer = this.defaultRenderMode;
+			let data = info;
 			let newData = false;
 
 			if (typeof data === "object" && typeof data.length === "number") {
@@ -331,6 +331,18 @@ core.screen = {
 			if (this.currentRenderer !== renderer || newData || force) {
 				this.log("DEBG", `render(${renderer}): re-rendering`);
 				emptyNode(this.view.list);
+
+				if (billAlert) {
+					let note = createNote({
+						level: "warning",
+						style: "round",
+						message: `
+							Cảnh báo bạn còn hóa đơn học phí chưa thanh toán!
+						`
+					})
+
+					this.view.list.appendChild(note.group);
+				}
 
 				if (renderer === "table")
 					this.view.list.appendChild(this.renderTable(data));

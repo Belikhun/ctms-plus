@@ -336,10 +336,8 @@ core.screen = {
 					let note = createNote({
 						level: "warning",
 						style: "round",
-						message: `
-							Cảnh báo bạn còn hóa đơn học phí chưa thanh toán!
-						`
-					})
+						message: 'Cảnh báo bạn còn hóa đơn học phí chưa thanh toán!'
+					});
 
 					this.view.list.appendChild(note.group);
 				}

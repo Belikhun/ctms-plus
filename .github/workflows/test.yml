@@ -18,7 +18,6 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        chromedriver-version: [96.0.4664.45]
 
     steps:
       - name: 📁 Checkout Repo
@@ -36,10 +35,8 @@ jobs:
           pip install selenium==4.0.0.b4
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: 🧭 Setting Up Chrome Driver ${{ matrix.chromedriver-version }}
+      - name: 🧭 Setting Up Chrome Driver
         uses: nanasess/setup-chromedriver@master
-        with:
-          chromedriver-version: ${{ matrix.chromedriver-version }}
 
       - name: 📜 Run Test
         run: python build/test.py

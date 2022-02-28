@@ -718,13 +718,14 @@ const api = {
 	/**
 	 * Lấy lịch học với ngày đầu tuần (hoặc ngày trong tuần) cho trước
 	 * 
-	 * @param		{Date}		date	Thời gian trong tuần cần xem
+	 * @param		{Date}		date 	Thời gian trong tuần cần xem
+	 * @param		{tuition}	tuition	
 	 * @returns		{Promise<APIResponse & Schedule>}
 	 */
 	async schedule(date, { triggerEvents = true } = {}) {
 		/** @type {APIResponse & Schedule} */
 		let response;
-		
+
 		if (typeof date !== "undefined") {
 			this.__SCHEDULE_DATE = `${date.getFullYear()}-${pleft(date.getMonth() + 1, 2)}-${date.getDate()}`;
 
@@ -760,6 +761,9 @@ const api = {
 			dateInput = dateInput.value.split("-");
 			response.date = new Date(dateInput[0], dateInput[1] - 1, dateInput[2], 0, 0, 0);
 		}
+
+		// Check if there is Tuition bill alert in the document.
+		data.billAlert = !!response.dom.getElementById("LeftCol_pnlMessage");
 
 		// Parse schedule table
 		// The loop from 0 to 8 is just to make sure we parse all table
@@ -1292,8 +1296,9 @@ const api = {
  * Schedule object
  * @typedef		Schedule
  * @type		{Object}
- * @property	{Date}					date	Schedule start date, will be the first day of that week.
- * @property	{ScheduleWeekRow[]}		info	Contain each day of week
+ * @property	{Date}					date		Schedule start date, will be the first day of that week.
+ * @property	{Boolean}				billAlert	Tuition bill alert
+ * @property	{ScheduleWeekRow[]}		info		Contain each day of week1
  */
 
 /**

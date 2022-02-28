@@ -105,7 +105,7 @@ core.screen = {
 						// Wait for user info data to be available
 						if (!core.account.userInfo) {
 							this.log("DEBG", "userInfo is not available! waiting for it...");
-							await waitFor(() => core.account.userInfo);
+							await waitFor(() => (typeof core.account.userInfo === "object"), () => {}, 120, 1000);
 						}
 	
 						this.log("INFO", `Updating schedule cache for`, {

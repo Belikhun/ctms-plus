@@ -332,12 +332,12 @@ const core = {
 
 	serviceWorker: {
 		init() {
-			if (!"serviceWorker" in navigator)
+			if (!navigator 
+				|| !navigator.serviceWorker
+				|| typeof navigator.serviceWorker.register !== "function")
 				return false;
 
-			navigator.serviceWorker.register("/service-worker.js", {
-				scope: "/"
-			})
+			navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
 				.then((res) => this.log("OKAY", "Service Worker registered", res))
 				.catch((e) => this.log("ERRR", e));
 		}

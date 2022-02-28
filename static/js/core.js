@@ -308,7 +308,7 @@ const core = {
 		// Disable connection state change
 		__connection__.enabled = false;
 
-		await this.initGroup(this, "core", ({ p, m, d }) => {
+		await initGroup(this, "core", ({ p, m, d }) => {
 			clog("DEBG", {
 				color: oscColor("pink"),
 				text: truncateString(m, 34),
@@ -328,118 +328,6 @@ const core = {
 			padding: 34,
 			separate: true
 		}, `CTMS+ Core Loaded In ${time() - start}s`);
-	},
-
-	/**
-	 * Initialize A Group Object
-	 * @param {Object}		group			The Target Object
-	 * @param {String}		name			Group Name
-	 * @param {Function}	set				Report Progress to Initializer
-	 */
-	async initGroup(group, name, set = () => {}) {
-		let modulesList = []
-
-		// Search for modules and initialize it
-		set({ p: 0, m: name, d: `Scanning Modules Of ${name}` });
-
-		for (let key of Object.keys(group)) {
-			if (key === "super")
-				continue;
-
-			let item = group[key];
-			if (item && !item.initialized && typeof item.init === "function") {
-				// Set Up Module Constants
-				item.__NAME__ = key;
-				item.super = group;
-
-				item.log = (level, ...args) => clog(level, {
-					color: oscColor("pink"),
-					text: truncateString(`${name}.${item.__NAME__}`, 34),
-					padding: 34,
-					separate: true
-				}, ...args);
-
-				// Push To Queues
-				modulesList.push(item);
-			}
-		}
-
-		if (modulesList.length === 0)
-			return;
-
-		// Sort modules by priority
-		// The lower the value is, the higher the priority
-		set({ p: 5, m: name, d: `Sorting Modules By Priority` });
-		modulesList = modulesList.sort((a, b) => (a.priority || 0) - (b.priority || 0));
-		
-		if (modulesList.length > 0) {
-			clog("DEBG", {
-				color: oscColor("pink"),
-				text: truncateString(name, 34),
-				padding: 34,
-				separate: true
-			}, `Modules of`, {
-				text: name,
-				color: oscColor("pink")
-			}, `(initialize from top to bottom)`);
-	
-			for (let [i, module] of modulesList.entries())
-				clog("DEBG", {
-					color: oscColor("pink"),
-					text: truncateString(name, 34),
-					padding: 34,
-					separate: true
-				}, " + ", pleft(i, 2), pleft(module.__NAME__, 38), pleft(module.priority || 0, 3));
-		}
-
-		// Initialize modules
-		for (let i = 0; i < modulesList.length; i++) {
-			let moduleStart = time();
-			let item = modulesList[i];
-			let path = `${name}.${item.__NAME__}`;
-			let mP = 5 + (i / modulesList.length) * 95;
-
-			set({ p: mP, m: path, d: `Initializing` });
-			try {
-				let returnValue = await item.init(({ p, m, d }) => set({
-					p: mP + (p * (1 / modulesList.length) * 0.95),
-					m: (m) ? `${path}.${m}` : path,
-					d
-				}), { clog: item.log });
-
-				if (returnValue === false) {
-					clog("INFO", {
-						color: oscColor("pink"),
-						text: truncateString(path, 34),
-						padding: 34,
-						separate: true
-					}, `Module DISABLED! Skipping all Submodules`);
-
-					item.initialized = false;
-					continue;
-				}
-
-				item.initialized = true;
-
-				// Try to find and initialize submodules
-				await this.initGroup(item, path, ({ p, m, d }) => set({ m, d }));
-			} catch(error) {
-				if (error.code === 12)
-					throw error;
-
-				let e = parseException(error);
-				throw { code: 12, description: `core.initGroup(${path}): ${e.description}`, data: error }
-			}
-
-			clog("OKAY", {
-				color: oscColor("pink"),
-				text: truncateString(path, 34),
-				padding: 34,
-				separate: true
-			}, `Initialized in ${time() - moduleStart}s`);
-		}
-
-		delete modulesList;
 	},
 
 	serviceWorker: {

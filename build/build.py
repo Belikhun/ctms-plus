@@ -24,7 +24,7 @@ def logStatus(text, status, overWrite = False):
 	statusText = [f"{Fore.RED}✗ ERRR", f"{Fore.YELLOW}● WAIT", f"{Fore.GREEN}✓ OKAY"]
 	logStatus = ["ERRR", "INFO", "OKAY"]
 
-	log(logStatus[status + 1], "{:48}{}{}".format(text, statusText[status + 1], Fore.RESET), resetCursor = (not overWrite))
+	log(logStatus[status + 1], "{:66}{}{}".format(text, statusText[status + 1], Fore.RESET), resetCursor = (not overWrite))
 
 
 logStatus("Lấy Thông Tin Dự Án", 0)
@@ -39,22 +39,33 @@ with open("metadata.json", "r", encoding="utf-8") as file:
 
 logStatus("Lấy Thông Tin Dự Án", 1, True)
 
+repos = [
+	"Belikhun/ctms-plus",
+	"Belikhun/libraries",
+	"Belikhun/ctms-plus-middleware",
+	"Belikhun/ctms-plus-middleware-node"
+]
 
-logStatus("Cập Nhật Danh Sách Người Đóng Góp", 0)
-contributors = requests.get("https://api.github.com/repos/Belikhun/ctms-plus/contributors")
-contributorsData = contributors.json()
+for repo in repos:
+	logStatus(f"Cập Nhật Danh Sách Người Đóng Góp ({repo})", 0)
+	contributors = requests.get(f"https://api.github.com/repos/{repo}/contributors")
+	contributorsData = contributors.json()
 
-if (contributors.status_code != 200):
-	logStatus("Cập Nhật Danh Sách Người Đóng Góp", -1, True)
-	log("ERRR", "{} → Reason: ({}) {}".format(Fore.LIGHTRED_EX, str(contributors.status_code), contributorsData["message"]))
-	exit(-1)
+	if (contributors.status_code != 200):
+		logStatus(f"Cập Nhật Danh Sách Người Đóng Góp ({repo})", -1, True)
+		log("ERRR", "{} → Reason: ({}) {}".format(Fore.LIGHTRED_EX, str(contributors.status_code), contributorsData["message"]))
+		exit(-1)
 
-logStatus("Cập Nhật Danh Sách Người Đóng Góp", 1)
-for user in contributorsData:
-	log("DEBG", "User {}: {} contributions".format(user["login"], user["contributions"]))
-	metadata["contributors"][user["login"]] = {
-		"contributions": user["contributions"]
-	}
+	logStatus(f"Cập Nhật Danh Sách Người Đóng Góp ({repo})", 1, True)
+	for user in contributorsData:
+		log("DEBG", "User {}: {} contributions".format(user["login"], user["contributions"]))
+
+		try:
+			metadata["contributors"][user["login"]]["contributions"] += user["contributions"]
+		except KeyError:
+			metadata["contributors"][user["login"]] = {
+				"contributions": user["contributions"]
+			}
 
 if (os.environ.get("CI")):
 	log("INFO", "CI Environment Detected! Updaing Optional Data")

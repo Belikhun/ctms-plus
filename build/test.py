@@ -88,7 +88,7 @@ class MyServer(Thread):
 		def log_message(self, logFormat, *args):
 			try:
 				if (int(args[0]) >= 400):
-					log("WARN", f"HTTP {int(args[0])} {args[1]}")
+					log("WARN", f"HTTP {int(args[0])} {args[1]} {self.path}")
 					return
 			except ValueError:
 				return

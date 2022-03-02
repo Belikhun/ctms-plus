@@ -172,8 +172,8 @@ arr::before {
 
 	top: 0;
 	left: 0;
-	width: 100vw;
-	height: calc(100vh - 40px);
+	width: 100%;
+	height: calc(100% - 40px);
 	margin-top: 40px;
 
 	box-sizing: border-box;
@@ -181,6 +181,7 @@ arr::before {
 
 	--global-background: #f0f0f0;
 	background-color: var(--global-background);
+	zoom: 1;
 
 	transition:
 		transform 0.4s ease,
@@ -399,7 +400,7 @@ arr::before {
 	width: var(--content-width);
 	max-width: 100%;
 
-	padding: 0 calc(50vw - (var(--content-width) / 2));
+	padding: 0 calc(50% - (var(--content-width) / 2));
 	overflow: auto;
 }
 

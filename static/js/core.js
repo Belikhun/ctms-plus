@@ -865,6 +865,10 @@ const core = {
 		display: {
 			group: smenu.Group.prototype,
 
+			/** @type {Animator} */
+			animator: null,
+			currentZoom: 1,
+
 			init() {
 				this.group = new smenu.Group({ label: "hiển thị", icon: "window" });
 
@@ -898,6 +902,17 @@ const core = {
 					}
 				}, ux);
 
+				new smenu.components.Slider({
+					label: "Kích cỡ giao diện",
+					color: "blue",
+					min: 0.6,
+					max: 1.2,
+					step: 0.1,
+					defaultValue: 1,
+					save: "display.scale",
+					onInput: (v) => this.changeZoom(v)
+				}, ux);
+
 				let other = new smenu.Child({ label: "Khác" }, this.group);
 
 				new smenu.components.Checkbox({
@@ -914,6 +929,21 @@ const core = {
 					save: "display.supertriangles",
 					defaultValue: false
 				}, other);
+			},
+
+			changeZoom(zoom) {
+				if (this.animator)
+					this.animator.cancel();
+
+				let begin = this.currentZoom;
+				let delta = zoom - this.currentZoom;
+
+				this.animator = new Animator(1, Easing.OutQuart, (v) => {
+					this.currentZoom = begin + (delta * v);
+					core.container.style.zoom = this.currentZoom;
+				});
+
+				this.animator.onComplete(() => this.animator = null);
 			}
 		},
 

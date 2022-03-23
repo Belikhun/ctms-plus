@@ -49,7 +49,7 @@ arr::before {
 	position: relative;
 	margin: 0 5px;
 
-    font-family: "Font Awesome 5 Free";
+    font-family: "Font Awesome Free";
     font-size: 15px;
     font-weight: 600;
 	text-align: center;
@@ -228,7 +228,7 @@ arr::before {
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, calc(-50% - 22px));
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-weight: 900;
 	font-size: 72px;
 	color: rgb(175, 175, 175);
@@ -550,7 +550,7 @@ arr::before {
 	position: relative;
 	margin-right: 5px;
 
-    font-family: "Font Awesome 5 Free";
+    font-family: "Font Awesome Free";
     font-size: 15px;
     font-weight: 600;
 	text-align: center;
@@ -696,7 +696,7 @@ arr::before {
 .component.ctmsStatus > .item.network > .nodes > .node > .status > t::before {
 	content: "\f058";
 	margin-right: 3px;
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-weight: 900;
 	font-size: 14px;
 }

@@ -34,7 +34,7 @@ table.scheduleTable > tbody > .header > .state::before {
 	display: block;
 	margin-bottom: 2px;
 
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-size: 19px;
 	font-weight: bold;
 	color: var(--schedule-gray);
@@ -86,7 +86,7 @@ table.scheduleTable > tbody > .row > .state::before {
 	content: "\f192";
 	display: block;
 
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-size: 16px;
 	font-weight: bold;
 	color: var(--schedule-gray);
@@ -195,7 +195,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	left: 0;
 	transform: translateY(-50%);
 
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-size: 16px;
 	font-weight: bold;
 	color: var(--schedule-gray);
@@ -290,7 +290,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	transform: translate(-24px, -50%);
 	background-color: var(--global-background);
 
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-size: 16px;
 	font-weight: bold;
 	color: var(--schedule-gray);
@@ -430,7 +430,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 .scheduleList > .listItem > .items > .item > .teacher::before {
 	content: "\f007";
     margin-right: 5px;
-    font-family: "Font Awesome 5 Free";
+    font-family: "Font Awesome Free";
     font-weight: 900;
     font-size: 14px;
 }
@@ -583,7 +583,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	left: 50%;
 	transform: translate(-50%, -50%);
 
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-size: 18px;
 	font-weight: 600;
 	color: black;
@@ -645,7 +645,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	left: 50%;
 	transform: translate(-50%, -50%);
 
-	font-family: "Font Awesome 5 Free";
+	font-family: "Font Awesome Free";
 	font-size: 9px;
 	font-weight: 600;
 	color: black;

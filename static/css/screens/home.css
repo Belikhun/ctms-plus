@@ -73,7 +73,7 @@
 }
 
 .emptyClassIDsNotice > .title {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 32px;
 	font-weight: 900;
 	text-align: center;
@@ -189,7 +189,7 @@
 	height: 220px;
 	padding: 5px 10px;
 
-	font-family: "Consolas";
+	font-family: var(--code-font);
 	font-size: 19px;
 	font-weight: bold;
 	tab-size: 4;

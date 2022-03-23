@@ -1154,7 +1154,7 @@ const core = {
 
 					contributorLabel: { tag: "t", class: "label", child: {
 						content: { tag: "span", text: "Người Đóng Góp" },
-						tip: { tag: "tip", title: `<div style="white-space: normal;">Tên của bạn sẽ xuất hiện trong danh sách này nếu bạn có đóng góp cho dự án (bằng cách tạo commit hoặc pull request)</div>` }
+						tip: { tag: "tip", title: `Tên của bạn sẽ xuất hiện trong danh sách này nếu bạn có đóng góp cho dự án (bằng cách tạo commit hoặc pull request)` }
 					}},
 
 					contributors: { tag: "span", class: "contributor" },

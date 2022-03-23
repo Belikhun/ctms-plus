@@ -106,7 +106,7 @@
     max-width: 60vw;
     transform: translateY(-50%);
 
-    font-family: Consolas;
+    font-family: var(--code-font);
     font-size: 17px;
     font-weight: bold;
 	text-align: left;
@@ -143,7 +143,7 @@
 .splash > .progressBar > .detail > .module {
     margin-right: 6px;
 
-    font-family: Consolas;
+    font-family: var(--code-font);
     font-size: 17px;
     font-weight: bold;
     color: rgb(0, 0, 0);

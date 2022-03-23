@@ -71,7 +71,7 @@
 
 .testsScreen > table > tbody > tr > td[key="subject"] {
 	width: 100%;
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 15px;
 	font-weight: 700;
 	letter-spacing: .2px;

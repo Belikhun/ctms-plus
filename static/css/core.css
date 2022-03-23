@@ -33,7 +33,7 @@
 body {
 	position: relative;
 	background-color: #ffffff;
-	font-family: "Open Sans", "Segoe UI", "Calibri", Tahoma, Geneva, Verdana, sans-serif;
+	font-family: "Open Sans", var(--primary-font), "Calibri", Tahoma, Geneva, Verdana, sans-serif;
 	margin: 0 0 20px;
 	overflow: hidden;
 	width: 100vw;
@@ -78,7 +78,7 @@ arr::before {
 
 .infoCard > .value {
 	margin-top: 15px;
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 34px;
 	font-weight: 300;
 	line-height: 30px;
@@ -110,7 +110,7 @@ arr::before {
 	padding: 2px 10px 0;
 	border-radius: 22px;
 	
-	font-family: Nunito;
+	font-family: var(--secondary-font);
     font-weight: 900;
     font-size: 11px;
     font-style: normal;
@@ -297,7 +297,7 @@ arr::before {
 }
 
 #content > .screen > .overlay > .title {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 25px;
 	font-weight: 900;
 	text-align: center;
@@ -351,14 +351,14 @@ arr::before {
 }
 
 #content > .screen > .header > .detail > .title {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-weight: 300;
 	font-size: 34px;
 	line-height: 38px;
 }
 
 #content > .screen > .header > .detail > .subTitle {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-weight: 600;
 	font-size: 15px;
 	letter-spacing: .3px;
@@ -455,7 +455,7 @@ arr::before {
 
 .userDetailView > .label {
 	margin-bottom: 10px;
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 17px;
 	font-weight: 900;
 	text-align: center;
@@ -495,7 +495,7 @@ arr::before {
 }
 
 .userDetailView > .userCard > .top > .info > .name {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 23px;
 	font-weight: 800;
 	font-style: italic;
@@ -506,7 +506,7 @@ arr::before {
 	padding: 2px 10px 0;
 	border-radius: 22px;
 	
-	font-family: Nunito;
+	font-family: var(--secondary-font);
     font-weight: 900;
     font-size: 11px;
     font-style: normal;
@@ -654,7 +654,7 @@ arr::before {
 }
 
 .component.ctmsStatus > .item.network > .nodes > .node > .label {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 13px;
 	font-weight: 800;
 	letter-spacing: .2px;
@@ -722,7 +722,7 @@ arr::before {
 }
 
 .component.ctmsServices > .list > .infoCard > .value > timer {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 28px;
 	font-weight: 300;
 	line-height: 30px;
@@ -833,7 +833,7 @@ arr::before {
 }
 
 .projectInfo > .title {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 32px;
 	font-weight: 900;
 	text-align: center;
@@ -885,7 +885,7 @@ arr::before {
 }
 
 .projectInfo > .author > .item > .name {
-	font-family: Nunito;
+	font-family: var(--secondary-font);
 	font-size: 18px;
 	font-weight: 800;
 	font-style: italic;

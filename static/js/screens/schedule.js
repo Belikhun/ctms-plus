@@ -26,6 +26,12 @@ core.screen = {
 
 		async init() {
 			this.view = makeTree("div", "scheduleScreen", {
+				note: createNote({
+					level: "warning",
+					message: "",
+					style: "round"
+				}),
+
 				control: { tag: "div", class: "control", child: {
 					dateInput: createInput({
 						type: "date",
@@ -70,6 +76,7 @@ core.screen = {
 				applyScrollable: false
 			});
 
+			this.view.note.group.style.display = "none";
 			this.setLoading(true);
 			this.screen.content = this.view;
 			this.screen.onShow(() => this.load());
@@ -78,6 +85,7 @@ core.screen = {
 			this.view.control.confirm.addEventListener("click", () => this.load(this.getInputDate()));
 			this.view.control.next.addEventListener("click", () => this.load(this.getNextWeek()));
 			this.view.control.prev.addEventListener("click", () => this.load(this.getLastWeek()));
+
 			core.account.onLogin(async () => {
 				if (this.screen.showing)
 					this.load();
@@ -123,6 +131,7 @@ core.screen = {
 					})()
 				}
 				
+				this.view.note.group.style.display = "none";
 				this.loaded = true;
 				this.render(response);
 			});
@@ -160,20 +169,17 @@ core.screen = {
 						this.render({ info: cache.info });
 	
 						// Render notice for user
-						let note = createNote({
-							level: "warning",
-							style: "round",
+						this.view.note.set({
 							message: `
 								Đây là dữ liệu lịch học của tuần từ ngày
 								<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
 								của tài khoản <b>${cache.name}</b>.<br>
-								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy nó có thể đã bị thay đổi trong tương lai! <br>
+								Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy thông tin đã có thể được cập nhật!<br>
 								Hãy <a href="javascript:core.account.subWindow.show()">đăng nhập</a> để cập nhật dữ liệu!
 							`
 						});
 	
-						note.group.style.marginBottom = "30px";
-						this.view.list.insertBefore(note.group, this.view.list.firstChild);
+						this.view.note.group.style.display = null;
 						this.screen.overlay({ show: false });
 	
 						let autoLogin = localStorage.getItem("autoLogin.enabled");
@@ -333,13 +339,13 @@ core.screen = {
 				emptyNode(this.view.list);
 
 				if (billAlert) {
-					let note = createNote({
-						level: "warning",
-						style: "round",
-						message: 'Cảnh báo bạn còn hóa đơn học phí chưa thanh toán!'
+					this.view.note.set({
+						message: `
+							<h3>Cảnh báo</h3>
+							Bạn còn hóa đơn học phí chưa thanh toán!`
 					});
 
-					this.view.list.appendChild(note.group);
+					this.view.note.group.style.display = null;
 				}
 
 				if (renderer === "table")

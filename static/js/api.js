@@ -763,7 +763,7 @@ const api = {
 		}
 
 		// Check if there is Tuition bill alert in the document.
-		data.billAlert = !!response.dom.getElementById("LeftCol_pnlMessage");
+		response.billAlert = !!response.dom.getElementById("LeftCol_pnlMessage");
 
 		// Parse schedule table
 		// The loop from 0 to 8 is just to make sure we parse all table

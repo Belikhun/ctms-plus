@@ -484,6 +484,15 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	height: 100%;
 }
 
+.scheduleScreen > .note {
+	width: auto;
+	margin: 0 10px 20px;
+}
+
+.scheduleScreen > .note > .inner > h3 {
+	margin: 10px 0 0;
+}
+
 .scheduleScreen > .control {
 	position: relative;
 	display: flex;

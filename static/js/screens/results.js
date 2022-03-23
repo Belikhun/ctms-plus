@@ -266,7 +266,7 @@ core.screen = {
 				if (!this.loaded)
 					this.screen.overlay({ show: false });
 
-				// Cache user info for applying in the future
+				// Cache user info for using in the future
 				localStorage.setItem("cache.account", JSON.stringify({
 					email: core.account.email,
 					name: response.info.name,
@@ -348,7 +348,7 @@ core.screen = {
 		},
 
 		async updateCPA(cpa) {
-			// To prevent troll.
+			// To prevent weird data.
 			cpa = Math.min(cpa, 4);
 
 			if (cpa === this.currentCPA)

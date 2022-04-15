@@ -365,6 +365,7 @@ const core = {
 				window.VERSION = response.version;
 				window.STATE = response.branch;
 				window.REPORT_ERROR = response.link.report;
+				window.SERVER = { REPORT_ERROR: window.REPORT_ERROR };
 				window.REPO_ADDRESS = response.link.repo;
 				window.DEBUG = (META.branch === "development");
 

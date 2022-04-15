@@ -1458,7 +1458,8 @@ const core = {
 
 				note: createNote({
 					level: "warning",
-					message: "This is a sample warning"
+					message: "This is a sample warning",
+					style: "round"
 				}),
 
 				username: createInput({

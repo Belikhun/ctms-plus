@@ -356,7 +356,7 @@ const api = {
 		let letter = "?";
 		let color = "dark";
 
-		if (average >= 9.0) {
+		if (average >= 9.5) {
 			point = 4.0;
 			letter = "A+";
 			color = "green";

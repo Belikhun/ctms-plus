@@ -765,6 +765,7 @@ arr::before {
 }
 
 .middlewareStatus > tbody > .row > .middleware > .host {
+	max-width: 280px;
 	font-size: 13px;
 }
 

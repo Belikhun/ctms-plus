@@ -305,10 +305,16 @@ core.screen = {
 						errorHandler(e);
 					}
 
-					this.itemList[classID].actions.right.toggle.loading(false);
+					if (action.command === "subscribe") {
+						// Temporary append to Subscribed without removing loading
+						// indicator.
+						this.itemList[classID].actions.right.toggle.dataset.triColor = "orange";
+						this.view.subscribed.appendChild(this.itemList[classID]);
+					}
 
 					try {
 						await api.subscribe({ action: "subscribed" });
+						this.itemList[classID].actions.right.toggle.loading(false);
 					} catch(e) {
 						errorHandler(e);
 					}

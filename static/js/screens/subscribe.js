@@ -317,6 +317,8 @@ core.screen = {
 					} catch(e) {
 						errorHandler(e);
 					}
+					
+					this.itemList[classID].actions.right.toggle.loading(false);
 				});
 			}
 

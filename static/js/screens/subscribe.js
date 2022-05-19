@@ -301,20 +301,19 @@ core.screen = {
 
 					try {
 						await api.subscribe({ action: action.command, classID: action.classID });
+
+						if (action.command === "subscribe") {
+							// Temporary append to Subscribed without removing loading
+							// indicator.
+							this.itemList[classID].actions.right.toggle.dataset.triColor = "orange";
+							this.view.subscribed.appendChild(this.itemList[classID]);
+						}
 					} catch(e) {
 						errorHandler(e);
 					}
 
-					if (action.command === "subscribe") {
-						// Temporary append to Subscribed without removing loading
-						// indicator.
-						this.itemList[classID].actions.right.toggle.dataset.triColor = "orange";
-						this.view.subscribed.appendChild(this.itemList[classID]);
-					}
-
 					try {
 						await api.subscribe({ action: "subscribed" });
-						this.itemList[classID].actions.right.toggle.loading(false);
 					} catch(e) {
 						errorHandler(e);
 					}

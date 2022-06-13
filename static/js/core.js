@@ -758,7 +758,7 @@ const core = {
 							liveTime(this.container.value, time(timeData.to), {
 								type: "minimal",
 								count: "down",
-								ended: "VỪA HẾT HẠN!"
+								ended: "ĐÃ HẾT HẠN!"
 							});
 						} else {
 							// TODO: Enable buy services button after implementing buying

@@ -406,23 +406,19 @@ const api = {
 		let count = 0;
 		let totalCPA = 0;
 		let totalPoint = 0;
-		let totalCredits = 0;
-		let cpaCredits = 0;
+		let credits = 0;
 
 		for (let result of results) {
-			totalCredits += result.credits;
-
-			if (typeof result.average === "number") {
+			if (typeof result.average === "number" && result.average >= 4) {
 				totalCPA += result.grade.point * result.credits;
-				cpaCredits += result.credits;
+				credits += result.credits;
 				totalPoint += result.average;
 				count++;
 			}
 		}
 
 		let average = totalPoint / count;
-		let credits = totalCredits;
-		let cpa = totalCPA / cpaCredits;
+		let cpa = totalCPA / credits;
 
 		if (cpa >= 3.6)
 			grade = "Xuất Sắc";

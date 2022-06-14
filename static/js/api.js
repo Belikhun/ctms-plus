@@ -349,12 +349,14 @@ const api = {
 
 	/**
 	 * Chuyển điểm hệ số 10 sang hệ số 4 và xếp loại
-	 * @param {Number} average 
+	 * @param 	{Number}		average
+	 * @return	{ResultGrade}
 	 */
 	resultGrading(average) {
 		let point = 0;
 		let letter = "?";
 		let color = "dark";
+		let passed = true;
 
 		if (average >= 9.5) {
 			point = 4.0;
@@ -392,9 +394,10 @@ const api = {
 			point = 0;
 			letter = "F";
 			color = "red";
+			passed = false;
 		}
 
-		return { point, letter, color }
+		return { point, letter, color, passed }
 	},
 
 	/**
@@ -409,7 +412,7 @@ const api = {
 		let credits = 0;
 
 		for (let result of results) {
-			if (typeof result.average === "number" && result.average >= 4) {
+			if (result.grade && result.grade.passed) {
 				totalCPA += result.grade.point * result.credits;
 				credits += result.credits;
 				totalPoint += result.average;
@@ -1406,10 +1409,17 @@ const api = {
  * @property	{Number}				diemHK
  * @property	{Number}				rawAverage
  * @property	{Number}				average
- * @property	{Object}				grade
- * @property	{Number}				grade.point
- * @property	{String}				grade.letter
- * @property	{String}				grade.color
+ * @property	{ResultGrade}			grade
+ */
+
+/**
+ * Result Grading object
+ * @typedef		ResultGrade
+ * @type		{Object}
+ * @property	{Number}				point
+ * @property	{String}				letter
+ * @property	{String}				color
+ * @property	{Bool}					passed
  */
 
 /**

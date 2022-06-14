@@ -913,6 +913,16 @@ core.screen = {
 				}},
 			});
 
+			// Add ignored badge
+			if (grade && !grade.passed) {
+				let ignoredBadge = document.createElement("span");
+				ignoredBadge.classList.add("generalTag");
+				ignoredBadge.dataset.color = "orange";
+				ignoredBadge.style.marginLeft = "8px";
+				ignoredBadge.innerText = "Nợ";
+				row.subject.appendChild(ignoredBadge);
+			}
+
 			this.view.table.tbody.appendChild(row);
 		}
 	}

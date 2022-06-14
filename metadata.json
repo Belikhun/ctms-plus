@@ -1,7 +1,7 @@
 {
     "name": "CTMS+",
-    "version": "0.1",
-    "branch": "development",
+    "version": "0.1.170/06cda0a",
+    "branch": "refs/heads/main",
     "link": {
         "repo": "https://github.com/Belikhun/ctms-plus",
         "report": "https://github.com/Belikhun/ctms-plus/issues",
@@ -13,17 +13,14 @@
             "name": "maylockhongkhi (Node)",
             "default": true
         },
-
         "heroku-node": {
             "host": "https://ctmsmw-node.herokuapp.com",
             "name": "Heroku Middleware (Node)"
         },
-
         "heroku": {
             "host": "https://ctmsmw.herokuapp.com",
             "name": "Heroku Middleware"
         },
-        
         "local": {
             "host": "http://localhost:21075",
             "name": "localhost"
@@ -37,5 +34,18 @@
             "role": "Core Developer"
         }
     },
-    "contributors": {}
+    "contributors": {
+        "Belikhun": {
+            "contributions": 374
+        },
+        "kakashi250802": {
+            "contributions": 30
+        },
+        "evakhai": {
+            "contributions": 16
+        },
+        "pcldev": {
+            "contributions": 2
+        }
+    }
 }

@@ -17,6 +17,12 @@ log("OKAY", "Imported: requests")
 import json
 log("OKAY", "Imported: json")
 
+from glob import glob
+log("OKAY", "Imported: glob.glob")
+
+import shutil
+log("OKAY", "Imported: shutil")
+
 import re
 log("OKAY", "Imported: re")
 
@@ -100,4 +106,14 @@ with open("index.html", "r", encoding="utf-8") as file:
 		fileWrite.write(content)
 
 logStatus("Cập Nhật Phiên Bản Các Liên Kết", 1, True)
+
+
+logStatus("Cài Mã Xác Minh", 0)
+
+for path in glob("build/verification/*.html"):
+	name = os.path.basename(path)
+	shutil.copyfile(path, name)
+
+logStatus("Cài Mã Xác Minh", 1, True)
+
 exit(0)

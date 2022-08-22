@@ -172,12 +172,12 @@ const api = {
 			} else {
 				error.c2m = start.tick();
 				await this.__handleResponse("error", error);
-				throw { code: -1, description: `api.request(): invalid middleware response (middleware: ${this.MIDDLEWARE})`, data: error }
+				throw { code: -1, description: `api.request(${path}): invalid middleware response (middleware: ${this.MIDDLEWARE})`, data: error }
 			}
 		}
 
 		if (response.data.session) {
-			clog("DEBG", "api.request(): session", { text: response.data.session, color: oscColor("blue") });
+			clog("DEBG", `api.request(${path}): session`, { text: response.data.session, color: oscColor("blue") });
 			localStorage.setItem("session", response.data.session);
 		}
 
@@ -189,7 +189,7 @@ const api = {
 			if (!renewSession)
 				throw { code: -1, description: `Phiên làm việc hết hạn hoặc bạn không có quyền truy cập chức năng này!` }
 
-			clog("WARN", `api.request(): session expired! requesting new session`);
+			clog("WARN", `api.request(${path}): session expired! requesting new session`);
 			localStorage.removeItem("session");
 			localStorage.removeItem("session.username");
 			return await this.request(arguments[0]);
@@ -200,17 +200,17 @@ const api = {
 		let __ev = dom.content.getElementById("__EVENTVALIDATION");
 
 		if (__vs && __vs.value !== "") {
-			clog("DEBG", `api.request(): update __VIEWSTATE`, { text: truncateString(__vs.value, 60), color: oscColor("pink") });
+			clog("DEBG", `api.request(${path}): update __VIEWSTATE`, { text: truncateString(__vs.value, 60), color: oscColor("pink") });
 			this.__VIEWSTATE = __vs.value;
 		}
 
 		if (__vsg && __vsg.value !== "") {
-			clog("DEBG", `api.request(): update __VIEWSTATEGENERATOR`, { text: __vsg.value, color: oscColor("pink") });
+			clog("DEBG", `api.request(${path}): update __VIEWSTATEGENERATOR`, { text: __vsg.value, color: oscColor("pink") });
 			this.__VIEWSTATEGENERATOR = __vsg.value;
 		}
 
 		if (__ev && __ev.value !== "") {
-			clog("DEBG", `api.request(): update __EVENTVALIDATION`, { text: __ev.value, color: oscColor("pink") });
+			clog("DEBG", `api.request(${path}): update __EVENTVALIDATION`, { text: __ev.value, color: oscColor("pink") });
 			this.__EVENTVALIDATION = __ev.value;
 		}
 
@@ -228,7 +228,7 @@ const api = {
 				// Nothing needed here.
 			}
 
-			throw { code: -1, description: `api.request(): CTMS yêu cầu bạn thay đổi mật khẩu, vui lòng thực hiện hành động này trên trang chủ của CTMS` }
+			throw { code: -1, description: `api.request(${path}): CTMS yêu cầu bạn thay đổi mật khẩu, vui lòng thực hiện hành động này trên trang chủ của CTMS` }
 		}
 
 		// Check for announcement
@@ -938,7 +938,7 @@ const api = {
 	/**
 	 * API Lấy lịch thi
 	 * 
-	 * @param	{String}	type
+	 * @param	{"all" | "ended" | "coming"}	type
 	 * Loại danh sách cần lấy. Chấp nhận:
 	 * + `all`:		Tất cả
 	 * + `ended`:	Đã thi/Đã kết thúc
@@ -1154,9 +1154,9 @@ const api = {
 	/**
 	 * API Đăng kí tín chỉ
 	 * 
-	 * @param	{Object}	option
-	 * @param	{String}	option.action
-	 * @param	{String}	option.classID
+	 * @param	{Object}													option
+	 * @param	{"getmodule" | "subscribe" | "unsubscribe" | "subscribed"}	option.action
+	 * @param	{String}													option.classID
 	 * @returns	{Promise<APIResponse & Subscribe>}
 	 */
 	async subscribe({
@@ -1192,7 +1192,7 @@ const api = {
 		switch (action) {
 			case "getmodule":
 				callID = "__Page";
-				args = `${action}:${this.__SUBS_STUDENTID}`;
+				args = `getmodule:${this.__SUBS_STUDENTID}`;
 				break;
 
 			case "subscribe":

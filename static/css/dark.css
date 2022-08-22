@@ -19,10 +19,6 @@ body.dark .infoCard {
 	background-color: #242424;
 }
 
-body.dark #content > div > .loading {
-	background-color: rgba(24, 24, 24, 0.8);
-}
-
 body.dark .generalTag[data-color="light"] {
 	background-color: rgb(228, 228, 228);
 }

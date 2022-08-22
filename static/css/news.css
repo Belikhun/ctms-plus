@@ -300,6 +300,28 @@
 	background-color: var(--icon-color);
 }
 
+#news > .listing > .loading {
+	display: block;
+	background-color: var(--background);
+}
+
+#news > .listing > .loading > .simpleSpinner {
+	display: block;
+	margin: 0 auto;
+	padding: 8px 80px;
+	border-radius: 16px;
+	background-color: rgb(240, 240, 240);
+}
+
+#news > .listing > .loading > .simpleSpinner::before {
+	width: 16px;
+	height: 16px;
+}
+
+#news > .listing > :last-child {
+	padding-bottom: 120px;
+}
+
 @media screen and (min-width: 1500px) {
 	#news > .listing > .articles {
 		display: grid;
@@ -511,10 +533,12 @@ body.dark #news > .listing > .cats > .item > .counts {
 	color: rgb(155, 155, 155);
 }
 
+body.dark #news > .listing > .loading,
 body.dark #news > .listing > .articles {
 	background-color: #24222A;
 }
 
+body.dark #news > .listing > .loading > .simpleSpinner,
 body.dark #news > .listing > .articles > .article > .content {
 	background-color: #302E38;
 }

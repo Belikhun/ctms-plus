@@ -30,13 +30,18 @@ core.news = {
 
 	loaded: false,
 	activeCID: undefined,
+	activePage: 0,
 	activeMaxPage: 0,
+	catLoading: false,
 
 	/** @type {WaveContainer} */
 	container: undefined,
 
 	/** @type {TreeDOM} */
 	content: undefined,
+	
+	/** @type {HTMLElement} */
+	loadIndicator: undefined,
 
 	/**
 	 * @typedef {{
@@ -118,6 +123,10 @@ core.news = {
 			emptyNode(this.content.viewer.content);
 		});
 
+		this.loadIndicator = document.createElement("div");
+		this.loadIndicator.classList.add("loading");
+		this.loadIndicator.innerHTML = `<div class="simpleSpinner"></div>`;
+
 		for (let [id, value] of Object.entries(this.categories)) {
 			let item = makeTree("span", "item", {
 				line: { tag: "div", class: "line" },
@@ -149,6 +158,7 @@ core.news = {
 		});
 
 		this.container.setToggler(this.button);
+		this.container.onScroll((e) => this.check(e));
 		this.container.onToggle((active) => {
 			if (active && !this.loaded)
 				this.category(3);
@@ -225,7 +235,7 @@ core.news = {
 		} catch(error) {
 			error.c2m = start.tick();
 			await api.__handleResponse("error", error);
-			throw { code: -1, description: `news.fetch(${path}): invalid middleware response (middleware: ${this.MIDDLEWARE})`, data: error }
+			throw { code: -1, description: `news.fetch(${path}): invalid middleware response (middleware: ${api.MIDDLEWARE})`, data: error }
 		}
 
 		let dom = document.createElement("template");
@@ -254,6 +264,22 @@ core.news = {
 	},
 
 	/**
+	 * Handle scroll event
+	 * @param {Event} e
+	 */
+	async check(e) {
+		if (this.catLoading || this.activePage >= this.activeMaxPage)
+			return;
+
+		let rect = this.content.listing.articles.getBoundingClientRect();
+		if (window.outerHeight - rect.bottom > 50) {
+			this.content.listing.appendChild(this.loadIndicator);
+			await this.fetchCategory(this.activeCID, this.activePage + 1);
+			this.content.listing.removeChild(this.loadIndicator);
+		}
+	},
+
+	/**
 	 * View specified category id
 	 * @param	{Number}	id
 	 */
@@ -275,6 +301,7 @@ core.news = {
 
 	async fetchCategory(id, page = 1) {
 		this.log("DEBG", `fetching category ${id} page ${page}`);
+		this.catLoading = true;
 
 		let response = await this.fetch({
 			path: "/Category.aspx",
@@ -297,6 +324,7 @@ core.news = {
 
 		let pager = response.dom.getElementById("pager");
 		this.activeMaxPage = pager.children.length;
+		this.activePage = page;
 
 		if (page === 1) {
 			this.__c(id).node.lastDate.innerText = lists[0].date;
@@ -384,6 +412,8 @@ core.news = {
 			this.content.listing.articles.appendChild(node);
 			this.articles.push(item);
 		}
+
+		this.catLoading = false;
 	},
 
 	/**

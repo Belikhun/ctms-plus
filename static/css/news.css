@@ -8,7 +8,7 @@
 */
 
 #news {
-	
+	display: block;
 }
 
 #news > .listing {

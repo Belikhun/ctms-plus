@@ -636,7 +636,7 @@ const core = {
 					min: 0.6,
 					max: 1.2,
 					step: 0.1,
-					defaultValue: 1,
+					defaultValue: checkAgentMobile() ? 0.7 : 1,
 					save: "display.scale",
 					onInput: (v) => this.changeZoom(v)
 				}, ux);

@@ -73,7 +73,6 @@
 }
 
 .emptyClassIDsNotice > .title {
-	font-family: var(--secondary-font);
 	font-size: 32px;
 	font-weight: 900;
 	text-align: center;

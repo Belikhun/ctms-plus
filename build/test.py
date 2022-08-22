@@ -25,6 +25,8 @@ log("OKAY", "Imported: threading.Thread")
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 log("OKAY", "Imported: http.server")
 
+log("INFO", "cwd = " + os.getcwd())
+
 class LocalStorage:
 	# Provide access to localStorage API
     def __init__(self, driver):
@@ -127,7 +129,10 @@ except Exception as e:
 # load the desired webpage
 driver.get("http://localhost:8000")
 localStorage = LocalStorage(driver)
-log("DEBG", f"Page load started")
+loadStart = time.time()
+TIME_OUT = 20
+
+log("DEBG", f"Page load started at {loadStart}")
 
 while True:
 	status = localStorage.get("__TEST_STATUS")
@@ -152,5 +157,15 @@ while True:
 
 		server.stop()
 		exit(int(code))
+
+	if (time.time() - loadStart > TIME_OUT):
+		amount = time.time() - loadStart
+		log("ERRR", "============================")
+		log("ERRR", f"PAGE LOAD TIMED OUT AFTER {amount:2.2f}s!")
+		log("ERRR", "")
+		log("ERRR", "TEST FAILED          ")
+
+		server.stop()
+		exit(-1)
 
 	time.sleep(0.5)

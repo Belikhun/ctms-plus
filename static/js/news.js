@@ -159,9 +159,17 @@ core.news = {
 
 		this.container.setToggler(this.button);
 		this.container.onScroll((e) => this.check(e));
-		this.container.onToggle((active) => {
-			if (active && !this.loaded)
-				this.category(3);
+		this.container.onToggle(async (active) => {
+			if (active) {
+				if (!this.loaded)
+					this.category(3);
+			} else {
+				this.loaded = false;
+				this.activeCID = undefined;
+				await delayAsync(1000);
+				emptyNode(this.content.listing.articles);
+				emptyNode(this.content.viewer.content);
+			}
 		});
 	},
 
@@ -268,7 +276,7 @@ core.news = {
 	 * @param {Event} e
 	 */
 	async check(e) {
-		if (this.catLoading || this.activePage >= this.activeMaxPage)
+		if (!this.loaded || this.catLoading || this.activePage >= this.activeMaxPage)
 			return;
 
 		let rect = this.content.listing.articles.getBoundingClientRect();
@@ -293,6 +301,7 @@ core.news = {
 		
 		this.__c(id).node.classList.add("active");
 		this.activeCID = id;
+		this.layout = "listing";
 
 		this.container.loading = true;
 		await this.fetchCategory(id, 1);

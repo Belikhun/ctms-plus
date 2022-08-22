@@ -51,7 +51,7 @@ class CoreScreen {
 		});
 
 		this.view = makeTree("div", ["screen", id], {
-			loading: new LoadingOverlay(),
+			loading: new LoadingOverlay(undefined, { index: 12 }),
 
 			overlay: { tag: "div", class: "overlay", child: {
 				icon: { tag: "icon" },

@@ -278,7 +278,6 @@ arr::before {
 }
 
 #content > .screen > .overlay > .title {
-	font-family: var(--heading-font);
 	font-size: 25px;
 	font-weight: 900;
 	text-align: center;
@@ -332,7 +331,6 @@ arr::before {
 }
 
 #content > .screen > .header > .detail > .title {
-	font-family: var(--heading-font);
 	font-weight: 300;
 	font-size: 34px;
 	line-height: 38px;
@@ -816,7 +814,6 @@ arr::before {
 }
 
 .projectInfo > .title {
-	font-family: var(--heading-font);
 	font-size: 32px;
 	font-weight: 900;
 	text-align: center;

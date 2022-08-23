@@ -31,6 +31,9 @@ class TestFramework {
 		/** @type {TestFrameworkScene} */
 		this.activeScene = undefined;
 
+		/** @type {Scrollable} */
+		this.stepsScroll = undefined;
+
 		this.scenesNode = document.createElement("span");
 		this.scenesNode.classList.add("scenes");
 
@@ -62,13 +65,26 @@ class TestFramework {
 			}},
 
 			panel: { tag: "div", class: "panel", child: {
-				steps: { tag: "div", class: "steps" },
+				steps: { tag: "div", class: "steps", child: {
+					sceneName: { tag: "div", class: "title" },
+					inner: { tag: "div", class: "inner" }
+				}},
+
 				field: { tag: "div", id: "testField", class: "field" }
 			}}
 		});
+
+		if (typeof Scrollable === "function") {
+			this.stepsScroll = new Scrollable(this.view.panel.steps, {
+				content: this.view.panel.steps.inner
+			});
+		}
 		
 		this.view.header.autoplay.input.addEventListener("input", () => {
 			this.autoplay = this.view.header.autoplay.input.checked;
+
+			if (this.activeScene && this.autoplay)
+				this.activeScene.autoplay();
 		});
 
 		this.view.header.timeout.input.addEventListener("input", () => {
@@ -80,7 +96,7 @@ class TestFramework {
 	}
 
 	get stepsNode() {
-		return this.view.panel.steps;
+		return this.view.panel.steps.inner;
 	}
 
 	get field() {
@@ -128,10 +144,7 @@ class TestFrameworkScene {
 		this.setupHandler = setup;
 		this.activateHandler = activate;
 		this.disposeHandler = dispose;
-
-		this.titleNode = document.createElement("div");
-		this.titleNode.classList.add("title");
-		this.titleNode.innerText = name;
+		this.isPlaying = false;
 
 		this.button = makeTree("button", ["tests-btn", "scene"], {
 			idValue: { tag: "div", class: "id", text: this.id },
@@ -159,15 +172,16 @@ class TestFrameworkScene {
 			this.instance.activeScene.dispose();
 
 		this.instance.activeScene = this;
+		this.instance.view.panel.steps.sceneName.innerText = this.name;
 		await this.activateHandler(this);
 		emptyNode(this.instance.stepsNode);
-		this.instance.stepsNode.appendChild(this.titleNode);
 
 		for (let group of this.groups)
 			await group.setup();
 
 		this.button.disabled = false;
 		this.button.classList.add("active");
+		this.autoplay();
 	}
 
 	async dispose() {
@@ -177,10 +191,21 @@ class TestFrameworkScene {
 		this.reset();
 	}
 
+	async autoplay() {
+		if (this.instance.autoplay && !this.isPlaying && this.groups[0]) {
+			clog("DEBG", `TestFrameworkScene(${this.id}).activate(): autoplaying...`);
+			this.resetGroups();
+			await this.groups[0].run();
+		}
+	}
+
 	reset() {
 		this.button.classList.remove("active");
 		emptyNode(this.field);
+		this.resetGroups();
+	}
 
+	resetGroups() {
 		for (let group of this.groups)
 			group.reset();
 	}
@@ -273,12 +298,24 @@ class TestFrameworkGroup {
 	}
 
 	async run() {
+		this.scene.isPlaying = true;
+
 		for (let step of this.steps) {
 			await delayAsync(this.scene.instance.timeout);
 
 			if (!await step.run())
 				break;
 		}
+
+		// Autoplay enabled
+		if (this.scene.instance.autoplay) {
+			let index = this.scene.groups.indexOf(this);
+
+			if (this.scene.groups[index + 1])
+				await this.scene.groups[index + 1].run();
+		}
+
+		this.scene.isPlaying = false;
 	}
 
 	reset() {
@@ -367,9 +404,16 @@ class TestFrameworkStep {
 			result = await this.runHandler(this);
 		} catch(e) {
 			this.failed = true;
-			this.status = "broken";
-			clog("EXCP", `test ${this.path} generated an exception!`, e);
-			errorHandler(e);
+
+			if (e instanceof AssertFailed) {
+				this.status = "failed";
+				this.detail = e.toString();
+				clog("ERRR", "TestFrameworkStep().run():", e.toString());
+			} else {
+				this.status = "broken";
+				clog("EXCP", `TestFrameworkStep().run(): test ${this.path} generated an exception!`, e);
+				errorHandler(e);
+			}
 		}
 
 		// Not failed yet, keep checking!
@@ -377,13 +421,13 @@ class TestFrameworkStep {
 			if (result === false) {
 				this.failed = true;
 				this.status = "failed";
-				clog("ERRR", `test ${this.path} failed!`);
+				clog("ERRR", `TestFrameworkStep().run(): test ${this.path} failed!`);
 			}
 		}
 
 		if (!this.failed) {
 			this.status = "passed";
-			clog("OKAY", `test ${this.path} passed!`);
+			clog("OKAY", `TestFrameworkStep().run(): test ${this.path} passed!`);
 		}
 
 		this.button.disabled = false;
@@ -436,5 +480,31 @@ class TestFrameworkStep {
 	 */
 	get status() {
 		return this.button.dataset.status;
+	}
+
+	/**
+	 * Assert Equal
+	 * @param	{String}		what
+	 * @param	{any}			which
+	 * @param	{any}			equal
+	 * @throws	{AssertFailed}
+	 */
+	AssertEqual(what, which, equal) {
+		if (which !== equal)
+			throw new AssertFailed(what, which, equal);
+	}
+}
+
+class AssertFailed extends Error {
+	constructor(what, which, equal) {
+		super();
+		this.what = what;
+		this.which = which;
+		this.equal = equal;
+		this.message = `assert failed: ${this.toString()}`;
+	}
+
+	toString() {
+		return `"${this.what}" ${this.which} !== ${this.equal}`;
 	}
 }

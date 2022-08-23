@@ -70,8 +70,10 @@
 	width: 100%;
 	height: 100%;
 
+	--test-background: rgb(32, 32, 32);
+
 	font-family: var(--heading-font);
-	background-color: rgb(32, 32, 32);
+	background-color: var(--test-background);
 	color: white;
 	overflow: hidden;
 }
@@ -105,6 +107,9 @@
 #app > .viewer > .header {
 	display: flex;
 	flex-direction: row;
+	flex-grow: 0;
+	flex-shrink: 0;
+
 	padding: 10px 20px;
 	border-bottom: 1px solid rgba(128, 128, 128, 0.4);
 }
@@ -138,25 +143,43 @@
 #app > .viewer > .panel {
 	display: flex;
 	flex-direction: row;
+	flex-shrink: 1;
 	flex-grow: 1;
+	overflow: hidden;
 }
 
 #app > .viewer > .panel > .steps {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	flex-grow: 0;
 	flex-shrink: 0;
 
 	width: 260px;
-	padding: 10px;
 	border-right: 1px solid rgba(128, 128, 128, 0.4);
 }
 
 #app > .viewer > .panel > .steps > .title {
+	padding: 10px;
 	font-size: 18px;
+	background-color: var(--test-background);
+	z-index: 1;
 }
 
-#app > .viewer > .panel > .steps > .tests-btn {
+#app > .viewer > .panel > .steps > .inner {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	height: auto;
+	padding: 0 10px;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#app > .viewer > .panel > .steps > .inner > .tests-btn {
 	--normal: rgb(46, 46, 46);
 	--hover: rgb(56, 56, 56);
 	--active: rgb(72, 72, 72);
@@ -164,16 +187,16 @@
 	--disabledBG: rgb(44, 44, 44);
 }
 
-#app > .viewer > .panel > .steps > .group {
+#app > .viewer > .panel > .steps > .inner > .group {
 	margin: 10px 0 0 0;
 	border-radius: 0;
 }
 
-#app > .viewer > .panel > .steps > .group > .name {
-	font-size: 16px;
+#app > .viewer > .panel > .steps > .inner > .group > .name {
+	margin-right: 20px;
 }
 
-#app > .viewer > .panel > .steps > .step {
+#app > .viewer > .panel > .steps > .inner > .step {
 	padding: 8px 16px;
 	padding-left: 32px;
 	margin: 6px 10px 0;
@@ -184,23 +207,23 @@
 	--line-color: rgb(171, 57, 247);
 }
 
-#app > .viewer > .panel > .steps > .step[data-status="running"] {
+#app > .viewer > .panel > .steps > .inner > .step[data-status="running"] {
 	--line-color: rgb(115, 198, 253);
 }
 
-#app > .viewer > .panel > .steps > .step[data-status="passed"] {
+#app > .viewer > .panel > .steps > .inner > .step[data-status="passed"] {
 	--line-color: rgb(38, 243, 116);
 }
 
-#app > .viewer > .panel > .steps > .step[data-status="failed"] {
+#app > .viewer > .panel > .steps > .inner > .step[data-status="failed"] {
 	--line-color: rgb(253, 112, 135);
 }
 
-#app > .viewer > .panel > .steps > .step[data-status="broken"] {
+#app > .viewer > .panel > .steps > .inner > .step[data-status="broken"] {
 	--line-color: rgb(247, 244, 108);
 }
 
-#app > .viewer > .panel > .steps > .step > .line {
+#app > .viewer > .panel > .steps > .inner > .step > .line {
 	position: absolute;
 	display: inline-block;
 	top: 8px;
@@ -214,14 +237,27 @@
 	transition: all 0.3s ease;
 }
 
+#app > .viewer > .panel > .steps > .inner > .step > .name {
+	margin-right: 10px;
+}
+
+#app > .viewer > .panel > .steps > .inner > .step > .detail {
+	color: rgb(158, 158, 158);
+}
+
+#app > .viewer > .panel > .steps > .inner > :first-child {
+	margin-top: 0;
+}
+
 #app > .viewer > .panel > .field {
 	position: relative;
 	display: block;
 	flex-grow: 1;
 
-	margin: 20px;
+	margin: 10px;
 	border-radius: 16px;
 	background-color: white;
+	color: black;
 	overflow: hidden;
 }
 
@@ -230,6 +266,10 @@
 	grid-template-columns: repeat(6, 1fr);
 	column-gap: 20px;
 	row-gap: 20px;
+}
+
+#app > .viewer > .panel > .field .center {
+	place-items: center;
 }
 
 #app > .viewer > .panel > .field .m-20 {

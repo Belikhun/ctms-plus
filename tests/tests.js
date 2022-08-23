@@ -78,7 +78,7 @@ const tests = {
 					this.log("DEBG", `registering step ${stepID}`);
 					group.addStep({
 						name: stepID,
-						run: async () => await groupObj[stepID]()
+						run: async (step) => await groupObj[stepID](step)
 					});
 				}
 			}

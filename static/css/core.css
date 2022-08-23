@@ -33,7 +33,7 @@
 body {
 	position: relative;
 	background-color: #ffffff;
-	font-family: "Open Sans", var(--primary-font), "Calibri", Tahoma, Geneva, Verdana, sans-serif;
+	font-family: var(--primary-font), var(--heading-font), "Calibri", Tahoma, Geneva, Verdana, sans-serif;
 	margin: 0 0 20px;
 	overflow: hidden;
 	width: 100vw;

@@ -852,7 +852,8 @@ core.screen = {
 			diemHK,
 			rawAverage,
 			average,
-			grade
+			grade,
+			ignored
 		} = {}) {
 			let row = makeTree("tr", ["item", (stt % 2 === 0) ? "even" : "odd"], {
 				stt: { tag: "td", class: ["bold", "right"], text: stt },
@@ -914,13 +915,17 @@ core.screen = {
 			});
 
 			// Add ignored badge
-			if (grade && !grade.passed) {
+			if (ignored) {
 				let ignoredBadge = document.createElement("span");
 				ignoredBadge.classList.add("generalTag");
 				ignoredBadge.dataset.color = "orange";
 				ignoredBadge.style.marginLeft = "8px";
-				ignoredBadge.innerText = "Nợ";
-				row.subject.appendChild(ignoredBadge);
+				ignoredBadge.innerText = "Đã Học Lại";
+
+				let tip = document.createElement("tip");
+				tip.title = "điểm của môn này không được tính do bạn đã học lại môn này";
+				tip.style.marginLeft = "8px";
+				row.subject.append(ignoredBadge, tip);
 			}
 
 			this.view.table.tbody.appendChild(row);

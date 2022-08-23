@@ -412,7 +412,7 @@ const api = {
 		let credits = 0;
 
 		for (let result of results) {
-			if (result.grade && result.grade.passed) {
+			if (result.grade && result.grade.passed && !result.ignored) {
 				totalCPA += result.grade.point * result.credits;
 				credits += result.credits;
 				totalPoint += result.average;
@@ -482,6 +482,9 @@ const api = {
 				: parseFloat(v);
 		}
 
+		// Encountered subjects to check for re-attempts of subjects
+		let encountered = {}
+
 		for (let row of resultTableRows) {
 			let data = {
 				subject: row.children[0].innerText.trim(),
@@ -494,6 +497,7 @@ const api = {
 				rawAverage: undefined,
 				average: undefined,
 				grade: undefined,
+				ignored: false
 
 				// We will add note later as currently we don't
 				// know what kind of data goes in here
@@ -506,7 +510,27 @@ const api = {
 				data.grade = this.resultGrading(data.average);
 			}
 
-			response.info.results.push(data);
+			let index = response.info.results.push(data) - 1;
+			let iden = data.subject.toLowerCase();
+
+			// Check for subject re-attempts. Based on average score (for now)
+			// but this will work in most cases because a re-attempt should have
+			// a higher score or you have f-ed up.
+			if (data.average) {
+				if (!encountered[iden]) {
+					encountered[iden] = {
+						index,
+						average: data.average
+					}
+				} else {
+					if (encountered[iden].average > data.average) {
+						data.ignored = true;
+					} else {
+						response.info.results[encountered[iden].index].ignored = true;
+						encountered[iden] = { index, average: data.average }
+					}
+				}
+			}
 		}
 
 		response.info = Object.assign(
@@ -1410,6 +1434,7 @@ const api = {
  * @property	{Number}				rawAverage
  * @property	{Number}				average
  * @property	{ResultGrade}			grade
+ * @property	{Boolean}				ignored
  */
 
 /**

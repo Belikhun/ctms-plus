@@ -306,6 +306,7 @@ core.news = {
 		this.container.loading = true;
 		await this.fetchCategory(id, 1);
 		this.container.loading = false;
+		this.loaded = true;
 	},
 
 	async fetchCategory(id, page = 1) {

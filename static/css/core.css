@@ -57,6 +57,25 @@ arr::before {
 	color: #000000;
 }
 
+/** ===================== COMPONENT:account ===================== */
+
+.navigationBar > .group > .component.account {
+	padding: 0 16px;
+}
+
+.navigationBar > .group > .component.account > .avatar {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+}
+
+.navigationBar > .group > .component.account > .name {
+	margin-left: 10px;
+	font-family: var(--heading-font);
+	font-weight: 800;
+	color: white;
+}
+
 /** ===================== COMPONENT:infoCard ===================== */
 
 .infoCard {

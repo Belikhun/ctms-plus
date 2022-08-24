@@ -195,7 +195,7 @@ class TestFrameworkScene {
 		if (this.instance.autoplay && !this.isPlaying && this.groups[0]) {
 			clog("DEBG", `TestFrameworkScene(${this.id}).activate(): autoplaying...`);
 			this.resetGroups();
-			await this.groups[0].run();
+			await this.run();
 		}
 	}
 
@@ -203,6 +203,21 @@ class TestFrameworkScene {
 		this.button.classList.remove("active");
 		emptyNode(this.field);
 		this.resetGroups();
+	}
+
+	async run(from = 0) {
+		if (this.isPlaying)
+			return;
+
+		this.isPlaying = true;
+		for (let i = from; i < this.groups.length; i++) {
+			if (this.groups[i].disabled)
+				continue;
+
+			await this.groups[i].run();
+		}
+
+		this.isPlaying = false;
 	}
 
 	resetGroups() {
@@ -255,6 +270,8 @@ class TestFrameworkGroup {
 		this.setupHandler = setup;
 		this.activateHandler = activate;
 		this.disposeHandler = dispose;
+		this.disabled = false;
+		this.isRunning = false;
 
 		this.button = makeTree("button", ["tests-btn", "group"], {
 			idValue: { tag: "div", class: "id", text: this.id },
@@ -269,28 +286,34 @@ class TestFrameworkGroup {
 
 	async setup() {
 		this.button.disabled = true;
-
 		this.scene.instance.stepsNode.appendChild(this.button);
-		await this.setupHandler(this);
-		for (let step of this.steps)
-			await step.setup();
+
+		try {
+			await this.setupHandler(this);
+			for (let step of this.steps)
+				await step.setup();
+		} catch(e) {
+			this.disabled = true;
+			this.button.classList.add("errored");
+			clog("ERRR", `TestFrameworkGroup(${this.id}).setup(): error occured while setting up group`, e);
+			return;
+		}
 
 		this.button.disabled = false;
 	}
 
 	async activate() {
-		this.button.classList.add("active");
-		this.button.disabled = true;
+		if (this.disabled)
+			return;
 
-		this.reset();
 		await this.activateHandler(this);
 		await this.run();
-
-		this.button.disabled = false;
-		this.button.classList.remove("active");
 	}
 
 	async dispose() {
+		if (this.disabled)
+			return;
+
 		this.button.disabled = true;
 		this.reset();
 		await this.disposeHandler(this);
@@ -298,7 +321,13 @@ class TestFrameworkGroup {
 	}
 
 	async run() {
-		this.scene.isPlaying = true;
+		if (this.disabled || this.isRunning)
+			return false;
+
+		this.isRunning = true;
+		this.button.classList.add("active");
+		this.button.disabled = true;
+		this.reset();
 
 		for (let step of this.steps) {
 			await delayAsync(this.scene.instance.timeout);
@@ -307,15 +336,15 @@ class TestFrameworkGroup {
 				break;
 		}
 
+		this.button.disabled = false;
+		this.button.classList.remove("active");
+		this.isRunning = false;
+
 		// Autoplay enabled
-		if (this.scene.instance.autoplay) {
+		if (this.scene.instance.autoplay && !this.scene.isPlaying) {
 			let index = this.scene.groups.indexOf(this);
-
-			if (this.scene.groups[index + 1])
-				await this.scene.groups[index + 1].run();
+			this.scene.run(index + 1);
 		}
-
-		this.scene.isPlaying = false;
 	}
 
 	reset() {
@@ -384,7 +413,7 @@ class TestFrameworkStep {
 
 	async setup() {
 		this.button.disabled = true;
-		this.group.scene.instance.stepsNode.appendChild(this.button);
+		this.stepsNode.appendChild(this.button);
 		await this.setupHandler(this);
 		this.button.disabled = false;
 	}
@@ -398,7 +427,14 @@ class TestFrameworkStep {
 		await nextFrameAsync();
 
 		this.status = "running";
+		this.button.disabled = true;
 		let result;
+
+		let topPos = this.button.offsetTop - this.stepsNode.clientHeight + 100;
+		if (this.stepsNode.scrollTop < topPos) {
+			// Scroll to this step if off screen
+			this.instance.stepsScroll.scrollTo(topPos + 300);
+		}
 
 		try {
 			result = await this.runHandler(this);
@@ -440,6 +476,14 @@ class TestFrameworkStep {
 			this.group.scene.id,
 			this.group.id
 		].join(".") + ` -> "${this.name}"`;
+	}
+
+	get instance() {
+		return this.group.scene.instance;
+	}
+
+	get stepsNode() {
+		return this.instance.stepsNode;
 	}
 
 	/**
@@ -487,24 +531,52 @@ class TestFrameworkStep {
 	 * @param	{String}		what
 	 * @param	{any}			which
 	 * @param	{any}			equal
+	 * @returns	{Boolean}
 	 * @throws	{AssertFailed}
 	 */
 	AssertEqual(what, which, equal) {
-		if (which !== equal)
-			throw new AssertFailed(what, which, equal);
+		if (which === equal)
+			return true;
+		
+		let message = (equal === "")
+			? `${which} is not empty string`
+			: `${which} !== ${equal}`
+
+		throw new AssertFailed(what, message);
+	}
+
+	/**
+	 * Assert Is
+	 * @param	{String}		what
+	 * @param	{Boolean}		which
+	 * @returns	{Boolean}
+	 * @throws	{AssertFailed}
+	 */
+	AssertIs(what, which) {
+		if (which === true)
+			return true;
+		
+		throw new AssertFailed(what, "is not satisfied");
+	}
+
+	/**
+	 * Assert Is Not Null
+	 * @param	{String}		what
+	 * @param	{any}			which
+	 * @returns	{Boolean}
+	 * @throws	{AssertFailed}
+	 */
+	AssertNotNull(what, which) {
+		if (which !== null)
+			return true;
+		
+		throw new AssertFailed(what, "is null");
 	}
 }
 
 class AssertFailed extends Error {
-	constructor(what, which, equal) {
-		super();
+	constructor(what, message) {
+		super(`assert failed: \"${what}\" ${message}`);
 		this.what = what;
-		this.which = which;
-		this.equal = equal;
-		this.message = `assert failed: ${this.toString()}`;
-	}
-
-	toString() {
-		return `"${this.what}" ${this.which} !== ${this.equal}`;
 	}
 }

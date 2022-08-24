@@ -192,6 +192,11 @@
 	border-radius: 0;
 }
 
+#app > .viewer > .panel > .steps > .inner > .group.errored {
+	background-color: rgb(85, 27, 27);
+	cursor: not-allowed;
+}
+
 #app > .viewer > .panel > .steps > .inner > .group > .name {
 	margin-right: 20px;
 }
@@ -208,7 +213,7 @@
 }
 
 #app > .viewer > .panel > .steps > .inner > .step[data-status="running"] {
-	--line-color: rgb(115, 198, 253);
+	--line-color: rgb(124, 192, 255);
 }
 
 #app > .viewer > .panel > .steps > .inner > .step[data-status="passed"] {
@@ -249,6 +254,10 @@
 	margin-top: 0;
 }
 
+#app > .viewer > .panel > .steps > .inner > :last-child {
+	margin-bottom: 200px;
+}
+
 #app > .viewer > .panel > .field {
 	position: relative;
 	display: block;
@@ -268,10 +277,29 @@
 	row-gap: 20px;
 }
 
+#app > .viewer > .panel > .field .grid-3 {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	column-gap: 20px;
+	row-gap: 20px;
+}
+
 #app > .viewer > .panel > .field .center {
 	place-items: center;
 }
 
+#app > .viewer > .panel > .field .v-base {
+	align-items: flex-start;
+}
+
 #app > .viewer > .panel > .field .m-20 {
 	margin: 20px;
+}
+
+#app > .viewer > .panel > .field .p-20 {
+	padding: 20px;
+}
+
+#app > .viewer > .panel > .field .bg-gray {
+	background-color: rgb(238, 238, 238);
 }

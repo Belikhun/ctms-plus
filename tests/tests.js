@@ -13,7 +13,9 @@ const tests = {
 	framework: undefined,
 
 	init() {
-		this.framework = new TestFramework(this.container);
+		this.framework = new TestFramework(this.container, {
+			timeout: 200
+		});
 
 		// Register
 		let sceneIDs = Object.keys(this.scenes);
@@ -21,7 +23,7 @@ const tests = {
 			if (typeof this.scenes[sceneID].name !== "string")
 				continue;
 
-			this.log("DEBG", `registering scene ${sceneID}`);
+			this.log("DEBG", `registering scene "${sceneID}"`);
 			let sceneObj = this.scenes[sceneID];
 			let scene = this.framework.addScene({
 				id: sceneID,
@@ -48,7 +50,7 @@ const tests = {
 				if (typeof sceneObj[groupID].name !== "string")
 					continue;
 
-				this.log("DEBG", `registering group ${groupID}`);
+				this.log("DEBG", `registering group "${groupID}"`);
 				let groupObj = sceneObj[groupID];
 				let group = scene.addGroup({
 					id: groupID,
@@ -75,7 +77,7 @@ const tests = {
 					if (typeof groupObj[stepID] !== "function")
 						continue;
 
-					this.log("DEBG", `registering step ${stepID}`);
+					this.log("DEBG", `registering step "${stepID}"`);
 					group.addStep({
 						name: stepID,
 						run: async (step) => await groupObj[stepID](step)

@@ -9,6 +9,7 @@
 /** @type {ScenesTree} */
 tests.scenes.components = {
 	name: "Các Thành Phần",
+	classes: "overflow",
 
 	buttons: {
 		name: "Nút Bấm",
@@ -426,6 +427,70 @@ tests.scenes.components = {
 		"value should not be null"(step) {
 			for (let [i, choice] of this.store.choices.entries())
 				step.AssertNotNull(`choice ${i + 1}`, choice.value);
+		}
+	},
+
+	progress: {
+		name: "Thanh Tiến Trình",
+
+		store: {
+			node: undefined,
+			bars: []
+		},
+
+		setup(group) {
+			this.store.node = document.createElement("div");
+			this.store.node.classList.add("grid-6", "v-base", "m-20", "progress");
+
+			this.store.bars = [
+				createProgressBar(),
+				createProgressBar({ warningZone: 20, progress: 10 }),
+				createProgressBar({ color: "pink", warningZone: 20, progress: 20 }),
+				createProgressBar({ color: "yellow", warningZone: 40, progress: 30, style: "round" }),
+				createProgressBar({ color: "green", warningZone: 40, progress: 30, style: "round", blink: "fade" }),
+				createProgressBar({
+					color: "red",
+					warningZone: 10,
+					progress: 40,
+					style: "round",
+					blink: "grow",
+					left: "left",
+					right: "right"
+				}),
+			]
+
+			for (let s of this.store.bars)
+				this.store.node.append(s.group);
+
+			group.field.appendChild(this.store.node);
+		},
+
+		async "set 20"() {
+			for (let bar of this.store.bars) {
+				bar.value = 20;
+				await delayAsync(100);
+			}
+		},
+
+		async "set 50"() {
+			for (let bar of this.store.bars) {
+				bar.value = 50;
+				await delayAsync(100);
+			}
+		},
+
+		async "set 80"() {
+			for (let bar of this.store.bars) {
+				bar.value = 80;
+				await delayAsync(100);
+			}
+		},
+
+		async "set 100"() {
+			for (let bar of this.store.bars) {
+				bar.value = 100;
+				await delayAsync(100);
+			}
 		}
 	}
 }

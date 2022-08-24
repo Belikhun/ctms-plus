@@ -119,6 +119,7 @@ class TestFramework {
  * @typedef {{
  * 	id: String
  * 	name: String
+ * 	classes: String | String[]
  * 	setup(scene: TestFrameworkScene)
  * 	activate(scene: TestFrameworkScene)
  * 	dispose(scene: TestFrameworkScene)
@@ -134,12 +135,14 @@ class TestFrameworkScene {
 	constructor(instance, {
 		id = "SampleScene",
 		name = "Sample Scene",
+		classes = [],
 		setup = () => {},
 		activate = () => {},
 		dispose = () => {}
 	} = {}) {
 		this.id = id;
 		this.name = name;
+		this.classes = classes;
 		this.instance = instance;
 		this.setupHandler = setup;
 		this.activateHandler = activate;
@@ -166,10 +169,28 @@ class TestFrameworkScene {
 	}
 
 	async activate() {
-		this.button.disabled = true;
+		if (this.instance.activeScene === this)
+			return;
 
+		this.button.disabled = true;
+		
+		// Dispose currently active scene.
 		if (this.instance.activeScene)
-			this.instance.activeScene.dispose();
+			await this.instance.activeScene.dispose();
+
+		// Apply classes to field
+		this.field.className = "field";
+		switch (typeof this.classes) {
+			case "string":
+				this.field.classList.add(this.classes);
+				break;
+			
+			case "object":
+				if (this.classes.length && this.classes.length >= 0)
+					this.field.classList.add(...this.classes);
+
+				break;
+		}
 
 		this.instance.activeScene = this;
 		this.instance.view.panel.steps.sceneName.innerText = this.name;
@@ -186,7 +207,13 @@ class TestFrameworkScene {
 
 	async dispose() {
 		this.button.disabled = true;
+		clog("INFO", `TestFrameworkScene(${this.id}).dispose(): disposing scene`);
+
+		for (let group of this.groups)
+			await group.dispose();
+
 		await this.disposeHandler(this);
+		
 		this.button.disabled = false;
 		this.reset();
 	}
@@ -311,10 +338,9 @@ class TestFrameworkGroup {
 	}
 
 	async dispose() {
-		if (this.disabled)
-			return;
-
 		this.button.disabled = true;
+		clog("INFO", `TestFrameworkGroup(${this.id}).dispose(): disposing group`);
+
 		this.reset();
 		await this.disposeHandler(this);
 		this.button.disabled = false;

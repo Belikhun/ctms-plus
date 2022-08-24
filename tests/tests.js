@@ -28,6 +28,7 @@ const tests = {
 			let scene = this.framework.addScene({
 				id: sceneID,
 				name: sceneObj.name,
+				classes: sceneObj.classes || [],
 
 				setup: (typeof sceneObj.setup === "function")
 					? async (scene) => await sceneObj.setup(scene)
@@ -51,6 +52,8 @@ const tests = {
 					continue;
 
 				this.log("DEBG", `registering group "${groupID}"`);
+				sceneObj[groupID].parent = sceneObj;
+
 				let groupObj = sceneObj[groupID];
 				let group = scene.addGroup({
 					id: groupID,
@@ -99,6 +102,7 @@ const tests = {
 	 * 			node: HTMLElement
 	 * 			buttons: SQButton[]
 	 * 		}
+	 * 		parent: Object
 	 * 	} & TestFrameworkGroupOptions
 	 * } & TestFrameworkSceneOptions} ScenesTree
 	 * 

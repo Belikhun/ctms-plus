@@ -214,6 +214,7 @@
 
 #app > .viewer > .panel > .steps > .inner > .step[data-status="running"] {
 	--line-color: rgb(124, 192, 255);
+	--disabledBG: rgb(48, 65, 82);
 }
 
 #app > .viewer > .panel > .steps > .inner > .step[data-status="passed"] {
@@ -258,6 +259,8 @@
 	margin-bottom: 200px;
 }
 
+/** ========= FIELDS STYLES ========= */
+
 #app > .viewer > .panel > .field {
 	position: relative;
 	display: block;
@@ -268,6 +271,24 @@
 	background-color: white;
 	color: black;
 	overflow: hidden;
+}
+
+#app > .viewer > .panel > .field.overflow {
+	overflow: auto;
+}
+
+#app > .viewer > .panel > .field.grid,
+#app > .viewer > .panel > .field .grid {
+	display: grid;
+}
+
+#app > .viewer > .panel > .field.center,
+#app > .viewer > .panel > .field .center {
+	place-items: center;
+}
+
+#app > .viewer > .panel > .field.dark {
+	background-color: rgb(46, 46, 46);
 }
 
 #app > .viewer > .panel > .field .grid-6 {
@@ -282,10 +303,6 @@
 	grid-template-columns: repeat(3, 1fr);
 	column-gap: 20px;
 	row-gap: 20px;
-}
-
-#app > .viewer > .panel > .field .center {
-	place-items: center;
 }
 
 #app > .viewer > .panel > .field .v-base {

@@ -470,7 +470,7 @@ core.screen = {
 			if (semester === 1) {
 				let dateDefault = (isK20 && year === 2020)
 					? new Date(`November 1, ${year}`)
-					: new Date(`October 1, ${year}`);
+					: new Date(`September 1, ${year}`);
 				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
 				
 				for (let i = 0; i < count; ++i) {

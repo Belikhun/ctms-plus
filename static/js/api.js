@@ -1111,18 +1111,38 @@ const api = {
 			}
 
 			item.classID = row.children[cellStart + 1].innerText.trim();
-			
-			// Parse basic data
-			let secondCell = /^(.+) \((\d+) tc\)[\n\s]+(.+)(?:[\n\s]+Học phí: (\d+)\*1000 \(đ\)|$)/gm
-				.exec(row.children[cellStart + 2].innerText.trim());
-			
-			if (secondCell) {
-				item.subject = secondCell[1];
-				item.credits = parseInt(secondCell[2]);
-				item.teacher = secondCell[3];
-				
-				if (secondCell[4])
-					item.tuition = parseInt(secondCell[4]) * 1000;
+
+			// Try to find tuition fee lines
+			let secondCell = row.children[cellStart + 2].innerText.trim();
+			let secondCellLines = secondCell
+				.split("\n")
+				.map(i => i.trim())
+				.filter(i => i.length > 2);
+
+			// Subject name should present at all time
+			let subjectLine = /(.+) \((\d+) tc\)/gm.exec(secondCell);
+			item.subject = subjectLine[1];
+			item.credits = parseInt(subjectLine[2]);
+
+			let tuitionLine = /Học phí: (\d+)\*1000 \(đ\)/gm.exec(secondCell);
+			if (tuitionLine) {
+				item.tuition = parseInt(tuitionLine[1]) * 1000;
+
+				if (secondCellLines.length === 2) {
+					// Only subject name is present
+					item.teacher = "Không Có Giảng Viên";
+				} else {
+					// Subject's teacher name is on second line
+					item.teacher = secondCellLines[1];
+				}
+			} else {
+				if (secondCellLines.length >= 2) {
+					// Subject's teacher name is on second line
+					item.teacher = secondCellLines[1];
+				} else {
+					// Only subject name is present
+					item.teacher = "Không Có Giảng Viên";
+				}
 			}
 
 			item.minimum = parseInt(row.children[cellStart + 3].innerText.trim().replace(" sv", ""));

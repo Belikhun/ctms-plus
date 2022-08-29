@@ -20,6 +20,8 @@ tests.scenes.schedule = {
 	},
 
 	activate(scene) {
+		throw new Error("bla");
+
 		if (!this.store.node) {
 			this.store.node = document.createElement("div");
 			this.store.node.id = "content";
@@ -32,10 +34,6 @@ tests.scenes.schedule = {
 		}
 
 		scene.field.appendChild(this.store.node);
-	},
-
-	dispose() {
-
 	},
 
 	"schedule1": {

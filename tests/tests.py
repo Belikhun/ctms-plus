@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from itertools import count
+import json
 from lib import ehook
 from lib.log import log
 
@@ -114,58 +116,41 @@ chromeOptions = webdriver.ChromeOptions()
 chromeOptions.add_argument("--headless")
 chromeOptions.add_argument("--no-sandbox")
 chromeOptions.add_argument("--disable-dev-shm-usage")
-chromeOptions.add_argument("--log-level=0")
+chromeOptions.add_argument("--log-level=3")
 desiredCapabilities = DesiredCapabilities.CHROME
 
 try:
 	driver = webdriver.Chrome(
 		options = chromeOptions,
-		desired_capabilities = desiredCapabilities
+		desired_capabilities = desiredCapabilities,
+		service_log_path=os.devnull
 	)
 except Exception as e:
 	server.stop()
 	raise e
 
 # load the desired webpage
-driver.get("http://localhost:8000")
+driver.get("http://localhost:8000/tests?autotest=true")
 localStorage = LocalStorage(driver)
 loadStart = time.time()
+logIndex = 0
 TIME_OUT = 20
 
 log("DEBG", f"Page load started at {loadStart}")
 
+def processLine(line):
+	log("DEBG", " ".join(line))
+
 while True:
-	status = localStorage.get("__TEST_STATUS")
+	logs = localStorage.get("test.framework.logs")
+	
+	if logs is not None:
+		logs = json.loads(logs)
 
-	if (status == "complete"):
-		log("DEBG", f"Page load completed")
-		code = localStorage.get("__TEST_CODE")
-		description = localStorage.get("__TEST_DESCRIPTION")
+		if (logIndex < len(logs) - 1):
+			for line in logs[logIndex:]:
+				processLine(line)
 
-		if (code != "0"):
-			log("ERRR", "===========================================")
-			log("ERRR", "AN CRITICAL ERROR OCCURED AT INITIALIZATION")
-			log("ERRR", "{} → CODE: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTYELLOW_EX, code))
-			log("ERRR", "{} → DESC: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTRED_EX, description))
-			log("ERRR", "")
-			log("ERRR", "TEST FAILED")
-		else:
-			log("OKAY", "==============================")
-			log("OKAY", "PAGE LOADED WITHOUT ANY ERROR!")
-			log("OKAY", "")
-			log("OKAY", "TEST PASSED          ")
-
-		server.stop()
-		exit(int(code))
-
-	if (time.time() - loadStart > TIME_OUT):
-		amount = time.time() - loadStart
-		log("ERRR", "============================")
-		log("ERRR", f"PAGE LOAD TIMED OUT AFTER {amount:2.2f}s!")
-		log("ERRR", "")
-		log("ERRR", "TEST FAILED          ")
-
-		server.stop()
-		exit(-1)
-
-	time.sleep(0.5)
+		logIndex = len(logs) - 1
+	
+	time.sleep(0.1)

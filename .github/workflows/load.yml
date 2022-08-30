@@ -12,7 +12,7 @@ on:
       - main
 
 jobs:
-  test:
+  load-test:
     runs-on: ubuntu-latest
 
     strategy:

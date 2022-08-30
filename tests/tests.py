@@ -8,9 +8,6 @@ from lib.log import log
 import os
 log("OKAY", "Imported: os")
 
-import sys
-log("OKAY", "Imported: sys")
-
 import json
 log("OKAY", "Imported: json")
 
@@ -114,10 +111,15 @@ class MyServer(Thread):
 
 	def run(self):
 		log("INFO", f"HTTP Server Will Start At Port {PORT}")
+		self.running = True
 		self.server = ThreadingHTTPServer(("", PORT), self.MyHTTPHandler)
 		self.server.serve_forever()
 	def stop(self):
+		if (not self.running):
+			return
+
 		self.server.shutdown()
+		self.running = False
 		log("INFO", f"HTTP Server Stopped")
 
 server = MyServer()
@@ -154,6 +156,7 @@ sceneNames = {}
 groupNames = {}
 currentScene = None
 currentGroup = None
+terminateCode = None
 failures = []
 TIME_OUT = 20
 
@@ -180,6 +183,8 @@ def updateTiming(type, cmd, cTime):
 		actionTimes[type] += cTime - lastTimes[type]
 
 def processLine(line):
+	global terminateCode
+	
 	ltime = line[0]
 	cmd = line[1]
 	args = line[2:]
@@ -208,6 +213,7 @@ def processLine(line):
 			data = processStepRun(args[0], args[2], args[3:], ltime)
 	elif (cmd == "completed"):
 		data, code = completedReport(args, ltime)
+		terminateCode = code
 	else:
 		output = f"Unknown command: {cmd}"
 		status = "WARN"
@@ -238,10 +244,6 @@ def processLine(line):
 	# Print each line
 	for o in output:
 		log(status, f"{Fore.MAGENTA}{ltime:7.2f}s", f"{' ' * padd}{o}", resetCursor = resetCursor)
-
-	# Exit
-	if (isinstance(code, int)):
-		sys.exit(code)
 
 def handleSubCmd(cmd, args, name, type, vIng, vEd, color):
 	if (cmd == "start"):
@@ -458,8 +460,11 @@ def completedReport(args, totalTimes):
 		with open(f"{scriptDir()}/report-generated.md", "w", encoding = "utf-8") as fg:
 			fg.write(report)
 
-		with open(os.getenv("GITHUB_STEP_SUMMARY"), "w", encoding = "utf-8") as fr:
-			fr.write(report)
+		if os.getenv("GITHUB_STEP_SUMMARY"):
+			# Write report to github job summary file
+			# More info: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
+			with open(os.getenv("GITHUB_STEP_SUMMARY"), "w", encoding = "utf-8") as fr:
+				fr.write(report)
 
 	return (level, lines), code
 
@@ -469,25 +474,36 @@ lastLog = time.time()
 while True:
 	logs = localStorage.get("test.framework.logs")
 	
-	if logs is not None:
-		logs = json.loads(logs)
+	try:
+		if logs is not None:
+			logs = json.loads(logs)
 
-		if (logIndex < len(logs) - 1):
-			if (actionTimes["load"] is None):
-				# Update loadtime since we received first log item
-				actionTimes["load"] = time.time() - loadStart
-				log("INFO", f"Received first log after {timeOf(actionTimes['load'])}")
+			if (logIndex < len(logs) - 1):
+				if (actionTimes["load"] is None):
+					# Update loadtime since we received first log item
+					actionTimes["load"] = time.time() - loadStart
+					log("INFO", f"Received first log after {timeOf(actionTimes['load'])}")
 
-			lastLog = time.time()
+				lastLog = time.time()
 
-			for line in logs[logIndex + 1:]:
-				processLine(line)
+				for line in logs[logIndex + 1:]:
+					processLine(line)
 
-		logIndex = len(logs) - 1
+			logIndex = len(logs) - 1
+	except Exception as e:
+		terminateCode = -1
+		server.stop()
+		raise e
 	
 	# Check log timeout
 	if (time.time() - lastLog > TIME_OUT):
 		log("ERRR", f"No log were sent for {time.time() - lastLog:2.2f}s! {Fore.LIGHTRED_EX}TEST FAILED!")
-		sys.exit(-1)
+		terminateCode = -1
+
+	if (terminateCode is not None):
+		break
 
 	time.sleep(0.1)
+
+server.stop()
+exit(terminateCode)

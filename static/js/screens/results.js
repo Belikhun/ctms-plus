@@ -470,7 +470,7 @@ core.screen = {
 			if (semester === 1) {
 				let dateDefault = (isK20 && year === 2020)
 					? new Date(`November 1, ${year}`)
-					: new Date(`September 1, ${year}`);
+					: new Date(`September 12, ${year}`);
 				dateDefault = new Date(dateDefault.setDate(dateDefault.getDate() - dateDefault.getDay() + 1));
 				
 				for (let i = 0; i < count; ++i) {
@@ -612,8 +612,12 @@ core.screen = {
 				}
 			}
 
+			// Reverse scan order
+			list = list.reverse()
+				.map(i => { i.semester = i.semester.reverse(); return i });
+
 			steps *= this.scanPerSemester;
-			this.log("DEBG", `scan(): scanning list:`, list, `(${steps} steps)`);
+			this.log("DEBG", `scan(): scanning list (${steps} steps):`, list);
 
 			for (let item of list) {
 				for (let semester of item.semester) {

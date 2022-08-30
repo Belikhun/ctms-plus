@@ -636,7 +636,7 @@ const core = {
 					min: 0.6,
 					max: 1.2,
 					step: 0.1,
-					defaultValue: checkAgentMobile() ? 0.7 : 1,
+					defaultValue: checkAgentMobile() ? 0.8 : 1,
 					save: "display.scale",
 					onInput: (v) => this.changeZoom(v)
 				}, ux);
@@ -1170,7 +1170,7 @@ const core = {
 
 			this.nameNode = document.createElement("t");
 			this.nameNode.classList.add("name");
-			this.nameNode.innerText = "Khách";
+			this.nameNode.innerText = "đang khởi tạo...";
 
 			container.append(this.avatarNode.container, this.nameNode);
 
@@ -1389,10 +1389,10 @@ const core = {
 				this.userInfo = undefined;
 				
 				this.nameNode.innerText = "Khách";
+				this.background.setColor("darkRed");
 				this.avatarNode.src = this.detailView.userCard.top.avatar.src = "./static/img/guest.png";
 				this.detailView.userCard.top.info.email.innerText = "";
 				this.navtip.set({ description: `nhấn để đăng nhập!` });
-				this.background.setColor("darkRed");
 
 				if (!this.subWindow.content || !this.subWindow.content.isSameNode(this.loginView)) {
 					this.log("OKAY", "User Signed Out");
@@ -1418,6 +1418,7 @@ const core = {
 
 				this.subWindow.loading = true;
 				this.subWindow.content = this.detailView;
+				this.nameNode.innerText = "đang tải dữ liệu...";
 				this.background.setColor("navyBlue");
 				
 				let promises = []
@@ -1482,6 +1483,8 @@ const core = {
 			localStorage.setItem("autoLogin.enabled", autoLogin);
 			localStorage.removeItem("session.username");
 			localStorage.removeItem("session.password");
+			this.nameNode.innerText = "đang đăng nhập...";
+			this.background.setColor("purple");
 
 			try {
 				await api.login({ username, password });

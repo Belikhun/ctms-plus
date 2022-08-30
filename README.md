@@ -1,8 +1,11 @@
 # CTMS+
 #### The Next Generation Of CTMS
 
+![Header](/static/img/ctms-header.svg)
+
 [![Build](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%9A%80%20build%20and%20deploy?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/build.yml)
-[![Test](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%A5%97%20browser%20test?label=TEST&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/test.yml)
+[![Load Test](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%8D%A1%20page%20load%20test?label=%F0%9F%8D%A1%20page%20load%20test&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/load.yml)
+[![Full Tests](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%9A%80%20full%20tests%20(using%20test%20framework)?label=%F0%9F%9A%80%20full%20tests%20%28using%20test%20framework%29&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/tests.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/Belikhun/ctms-plus/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/Belikhun/ctms-plus)
 
 ---

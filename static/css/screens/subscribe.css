@@ -199,6 +199,11 @@
 	margin-left: 10px;
 }
 
+.subscribeScreen > .content > .item > .actions > .right > button[key="toggle"] {
+	flex-shrink: 1;
+	margin-left: 30px;
+}
+
 @media only screen and (max-width: 700px) {
 	.subscribeScreen > .content > .item > .details {
 		flex-direction: column;

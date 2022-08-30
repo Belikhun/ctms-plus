@@ -358,6 +358,7 @@ core.screen = {
 				item.details.left.status.noCancel.style.display = "none";
 
 			if (action.command === "condition") {
+				item.actions.right.toggle.disabled = true;
 				item.actions.right.toggle.changeText(action.data);
 				item.actions.right.toggle.dataset.triColor = "orange";
 				item.actions.right.toggle.querySelector(":scope > icon")

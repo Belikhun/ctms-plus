@@ -33,7 +33,7 @@
 body {
 	position: relative;
 	background-color: #ffffff;
-	font-family: "Open Sans", var(--primary-font), "Calibri", Tahoma, Geneva, Verdana, sans-serif;
+	font-family: var(--primary-font), var(--heading-font), "Calibri", Tahoma, Geneva, Verdana, sans-serif;
 	margin: 0 0 20px;
 	overflow: hidden;
 	width: 100vw;
@@ -55,6 +55,25 @@ arr::before {
 	text-align: center;
 	line-height: 22px;
 	color: #000000;
+}
+
+/** ===================== COMPONENT:account ===================== */
+
+.navigationBar > .group > .component.account {
+	padding: 0 16px;
+}
+
+.navigationBar > .group > .component.account > .avatar {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+}
+
+.navigationBar > .group > .component.account > .name {
+	margin-left: 10px;
+	font-family: var(--heading-font);
+	font-weight: 800;
+	color: white;
 }
 
 /** ===================== COMPONENT:infoCard ===================== */

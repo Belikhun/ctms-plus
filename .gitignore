@@ -2,4 +2,5 @@ logs
 *.log
 *.pyc
 __pycache__
+tests/report-generated.md
 playground.html

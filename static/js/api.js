@@ -23,6 +23,13 @@
  * @version	1.0
  */
 const api = {
+	/**
+	 * Sepcial function to override default function `myajax`
+	 * to request to specified path.
+	 * @type {(APIRequest) => Promise<APIResponse>}
+	 */
+	requester: undefined,
+
 	HOST: `http://ctms.fithou.net.vn`,
 	MIDDLEWARE: `http://localhost`,
 
@@ -59,6 +66,13 @@ const api = {
 	 */
 	responseHandlers: {},
 
+	/**
+	 * Regiter on reponse handler that will be triggered when an
+	 * API call is completed.
+	 * @param	{String}				type
+	 * @param	{(response: Object)}	f
+	 * @param	{{ lock: Boolean }}		options
+	 */
 	onResponse(type, f, { lock = false } = {}) {
 		if (typeof f !== "function")
 			throw { code: -1, description: `api.onResponse(${type}): not a valid function` }
@@ -100,6 +114,7 @@ const api = {
 	 * @property	{String}			response	Raw response
 	 * @property	{String}			session		Session
 	 * 
+	 * @param		{APIRequest}				options
 	 * @returns		{Promise<APIResponse>}		API Response Object
 	 */
 	async request({
@@ -130,28 +145,32 @@ const api = {
 		let response;
 		
 		try {
-			response = await myajax({
-				url: `${this.MIDDLEWARE}/api/middleware`,
-				method,
-				header: {
-					"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-					"Session-Cookie-Key": "ASP.NET_SessionId",
-					"Session-Cookie-Value": localStorage.getItem("session") || "",
-					"Set-Host": "ctms.fithou.net.vn",
-					"Set-Origin": this.HOST,
-					"Set-Referer": `${this.HOST}${path}`,
-					"Upgrade-Insecure-Requests": 1,
-					...header
-				},
-				query: {
-					url: `${this.HOST}${path}`,
-					...query
-				},
-				form,
-				json,
-				withCredentials: true,
-				formEncodeURL: true
-			});
+			if (typeof this.requester === "function") {
+				response = await this.requester(arguments[0]);
+			} else {
+				response = await myajax({
+					url: `${this.MIDDLEWARE}/api/middleware`,
+					method,
+					header: {
+						"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+						"Session-Cookie-Key": "ASP.NET_SessionId",
+						"Session-Cookie-Value": localStorage.getItem("session") || "",
+						"Set-Host": "ctms.fithou.net.vn",
+						"Set-Origin": this.HOST,
+						"Set-Referer": `${this.HOST}${path}`,
+						"Upgrade-Insecure-Requests": 1,
+						...header
+					},
+					query: {
+						url: `${this.HOST}${path}`,
+						...query
+					},
+					form,
+					json,
+					withCredentials: true,
+					formEncodeURL: true
+				});
+			}
 		} catch(error) {
 			if (error.data) {
 				error.c2m = start.tick() - error.data.runtime;
@@ -1344,12 +1363,27 @@ const api = {
 //* ============= OBJECT DEFINITION =============
 
 /**
+ * @typedef {{
+ * 	path: String
+ * 	method: "GET" | "POST" | "PUT" | "DELETE"
+ * 	query: Object<string, string>
+ * 	form: Object<string, string>
+ * 	json: Object<string, string>
+ * 	header: Object<string, string>
+ * 	target: String
+ * 	argument: String
+ * 	renewSession: Boolean
+ * 	ignoreAnnouncement: Boolean
+ * }} APIRequest
+ */
+
+/**
  * Schedule object
  * @typedef		Schedule
  * @type		{Object}
  * @property	{Date}					date		Schedule start date, will be the first day of that week.
  * @property	{Boolean}				billAlert	Tuition bill alert
- * @property	{ScheduleWeekRow[]}		info		Contain each day of week1
+ * @property	{ScheduleWeekRow[]}		info		Contain each day of week
  */
 
 /**

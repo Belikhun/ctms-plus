@@ -114,7 +114,7 @@ chromeOptions = webdriver.ChromeOptions()
 chromeOptions.add_argument("--headless")
 chromeOptions.add_argument("--no-sandbox")
 chromeOptions.add_argument("--disable-dev-shm-usage")
-chromeOptions.add_argument("--log-level=0")
+chromeOptions.add_argument("--log-level=3")
 desiredCapabilities = DesiredCapabilities.CHROME
 
 try:
@@ -143,27 +143,28 @@ while True:
 		description = localStorage.get("__TEST_DESCRIPTION")
 
 		if (code != "0"):
-			log("ERRR", "===========================================")
-			log("ERRR", "AN CRITICAL ERROR OCCURED AT INITIALIZATION")
-			log("ERRR", "{} → CODE: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTYELLOW_EX, code))
-			log("ERRR", "{} → DESC: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTRED_EX, description))
+			log("ERRR", f"{Fore.LIGHTRED_EX}LOAD FAILED!")
+			log("ERRR", f"{Fore.LIGHTRED_EX}-------------------------------------------------------")
+			log("ERRR", f"  ⚠ {Fore.LIGHTYELLOW_EX}AN CRITICAL ERROR OCCURED AT INITIALIZATION")
+			log("ERRR", "{}    → CODE: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTYELLOW_EX, code))
+			log("ERRR", "{}    → DESC: {}{}".format(Fore.LIGHTBLACK_EX, Fore.LIGHTRED_EX, description))
 			log("ERRR", "")
-			log("ERRR", "TEST FAILED")
 		else:
-			log("OKAY", "==============================")
-			log("OKAY", "PAGE LOADED WITHOUT ANY ERROR!")
+			log("OKAY", f"{Fore.LIGHTGREEN_EX}LOAD COMPLETED!")
+			log("OKAY", f"{Fore.LIGHTGREEN_EX}-------------------------------------------------------")
+			log("OKAY", f"  ✔ {Fore.WHITE}PAGE LOADED WITHOUT ANY ERROR!")
+			log("OKAY", "{}    → TIME: {}{:.2f}s".format(Fore.LIGHTBLACK_EX, Fore.LIGHTBLUE_EX, time.time() - loadStart))
 			log("OKAY", "")
-			log("OKAY", "TEST PASSED          ")
 
 		server.stop()
 		exit(int(code))
 
 	if (time.time() - loadStart > TIME_OUT):
 		amount = time.time() - loadStart
-		log("ERRR", "============================")
-		log("ERRR", f"PAGE LOAD TIMED OUT AFTER {amount:2.2f}s!")
+		log("ERRR", f"{Fore.LIGHTRED_EX}LOAD FAILED!")
+		log("ERRR", f"{Fore.LIGHTRED_EX}-------------------------------------------------------")
+		log("ERRR", f"  🕒 {Fore.LIGHTYELLOW_EX}PAGE LOAD TIMED OUT AFTER {amount:2.2f}s!")
 		log("ERRR", "")
-		log("ERRR", "TEST FAILED          ")
 
 		server.stop()
 		exit(-1)

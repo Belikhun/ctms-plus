@@ -4,9 +4,15 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "browser test",
+			"label": "🧪 full test (using framework)",
 			"type": "shell",
-			"command": "py build/test.py"
+			"command": "py tests/tests.py"
+		},
+
+		{
+			"label": "🛶 page load test",
+			"type": "shell",
+			"command": "py tests/load.py"
 		}
 	]
 }

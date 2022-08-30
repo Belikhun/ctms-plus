@@ -48,7 +48,7 @@ def log(level, *args, resetCursor = False):
 	# khởi tạo output với format hh:mm:ss| ticks| module| level
 	out = "{}{:>8}| {}{:>6}| {}{:>10}| {}{:>5}".format(
 		Fore.WHITE,
-		"{0:>2}:{1:>2}:{2:>2}".format(ltime[3], ltime[4], ltime[5]),
+		"{0:0>2}:{1:0>2}:{2:0>2}".format(ltime[3], ltime[4], ltime[5]),
 		Fore.BLUE,
 		"{:10.4f}".format(ticks - sticks),
 		Fore.CYAN,

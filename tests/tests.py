@@ -1,15 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from itertools import count
-import json
-from math import floor
-from colorama import Fore, Style
+from colorama import Fore
 from lib import ehook
 from lib.log import log
 
 import os
 log("OKAY", "Imported: os")
+
+import sys
+log("OKAY", "Imported: sys")
+
+import json
+log("OKAY", "Imported: json")
+
+from math import floor
+log("OKAY", "Imported: math.floor")
 
 from colorama import Fore
 log("OKAY", "Imported: colorama")
@@ -29,7 +35,11 @@ log("OKAY", "Imported: threading.Thread")
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 log("OKAY", "Imported: http.server")
 
+def scriptDir():
+	return os.path.dirname(os.path.realpath(__file__))
+
 log("INFO", "cwd = " + os.getcwd())
+log("INFO", "swd = " + scriptDir())
 
 class LocalStorage:
 	# Provide access to localStorage API
@@ -131,26 +141,36 @@ except Exception as e:
 	server.stop()
 	raise e
 
+loadStart = time.time()
+log("DEBG", f"Page load started at {loadStart:.2f}")
+
 # load the desired webpage
 driver.get("http://localhost:8000/tests?autotest=true")
 localStorage = LocalStorage(driver)
-loadStart = time.time()
 logIndex = -1
+lastLog = 0
+stepStart = 0
 sceneNames = {}
 groupNames = {}
+currentScene = None
+currentGroup = None
+failures = []
 TIME_OUT = 20
 
-log("DEBG", f"Page load started at {loadStart}")
-
-def timeOf(t):
+def timeOf(t, color = Fore.LIGHTBLACK_EX):
 	if t < 1:
-		return f"{Fore.LIGHTBLACK_EX}[{t * 1000:>4.0f} ms]{Fore.RESET}"
+		string = f"[{t * 1000:>4.0f} ms]"
 	elif t > 60:
-		return f"{Fore.LIGHTBLACK_EX}[{floor(t / 60):0>2}m {t % 60:0>2}s]{Fore.RESET}"
+		string = f"[{floor(t / 60):0>2}m {t % 60:0>2}s]"
 	else:
-		return f"{Fore.LIGHTBLACK_EX}[{t:>5.02f} s]{Fore.RESET}"
+		string = f"[{t:>5.02f} s]"
 
-actionTimes = { "setup": 0, "activate": 0, "run": 0, "dispose": 0 }
+	if (color is not None):
+		string = f"{color}{string}{Fore.RESET}"
+
+	return string
+
+actionTimes = { "load": None, "setup": 0, "activate": 0, "run": 0, "dispose": 0 }
 lastTimes = { "setup": 0, "activate": 0, "run": 0, "dispose": 0 }
 
 def updateTiming(type, cmd, cTime):
@@ -167,6 +187,7 @@ def processLine(line):
 	status = "INFO"
 	data = None
 	padd = 0
+	code = None
 	resetCursor = False
 
 	if (cmd == "start"):
@@ -186,7 +207,7 @@ def processLine(line):
 			padd = 6
 			data = processStepRun(args[0], args[2], args[3:], ltime)
 	elif (cmd == "completed"):
-		data = completedReport(args, ltime)
+		data, code = completedReport(args, ltime)
 	else:
 		output = f"Unknown command: {cmd}"
 		status = "WARN"
@@ -216,8 +237,11 @@ def processLine(line):
 
 	# Print each line
 	for o in output:
-		log(status, f"{Fore.GREEN}{ltime:6.2f}s", f"{Fore.LIGHTMAGENTA_EX}{cmd:>10}", f"{' ' * padd}{o}", resetCursor = resetCursor)
+		log(status, f"{Fore.MAGENTA}{ltime:7.2f}s", f"{' ' * padd}{o}", resetCursor = resetCursor)
 
+	# Exit
+	if (isinstance(code, int)):
+		sys.exit(code)
 
 def handleSubCmd(cmd, args, name, type, vIng, vEd, color):
 	if (cmd == "start"):
@@ -227,102 +251,129 @@ def handleSubCmd(cmd, args, name, type, vIng, vEd, color):
 	elif (cmd == "errored"):
 		return "ERRR", [
 			f" ⮩ {Fore.LIGHTRED_EX}{type.capitalize()} generated an error {Fore.RESET}while {color}{vIng}!",
-			f"  {Fore.LIGHTBLACK_EX}→ Reason: (code:{args[0]}) {args[1]}"
+			f"  {Fore.LIGHTBLACK_EX}→ Reason: {f'(code:{args[0]})' if (isinstance(args[0], int)) else f'{args[0]}():'} {args[1]}"
 		]
 
 def processScene(id, cmd, args, ltime = 0):
-	global sceneNames
+	global sceneNames, currentScene
 	name = id
+	fname = name
 
 	if (cmd == "name"):
 		sceneNames[id] = args[0]
 		return "SKIP", ""
 
 	try:
-		name = Fore.LIGHTBLUE_EX + sceneNames[id]
+		name = sceneNames[id]
+		fname = Fore.LIGHTBLUE_EX + name
 	except KeyError:
 		pass
 
 	updateTiming(cmd, args[0], ltime)
 
 	if (cmd == "setup"):
-		return handleSubCmd(args[0], args[1:], name, "scene", "setting up", "setted-up", Fore.BLUE)
+		return handleSubCmd(args[0], args[1:], fname, "scene", "setting up", "setted-up", Fore.BLUE)
 	elif (cmd == "activate"):
-		return handleSubCmd(args[0], args[1:], name, "scene", "activating", "activated", Fore.MAGENTA)
+		return handleSubCmd(args[0], args[1:], fname, "scene", "activating", "activated", Fore.MAGENTA)
 	elif (cmd == "run"):
-		return handleSubCmd(args[0], args[1:], name, "scene", "running", "completed running", Fore.CYAN)
+		currentScene = name
+		return handleSubCmd(args[0], args[1:], fname, "scene", "running", "completed running", Fore.CYAN)
 	elif (cmd == "dispose"):
-		return handleSubCmd(args[0], args[1:], name, "scene", "disposing", "disposed", Fore.YELLOW)
+		return handleSubCmd(args[0], args[1:], fname, "scene", "disposing", "disposed", Fore.YELLOW)
 
 def processGroup(id, cmd, args, ltime = 0):
-	global groupNames
+	global groupNames, currentGroup
 	name = id
+	fname = name
 
 	if (cmd == "name"):
 		groupNames[id] = args[0]
 		return "SKIP", ""
 
 	try:
-		name = Fore.LIGHTYELLOW_EX + groupNames[id]
+		name = groupNames[id]
+		fname = Fore.LIGHTYELLOW_EX + name
 	except KeyError:
 		pass
 
 	if (cmd == "setup"):
-		return handleSubCmd(args[0], args[1:], name, "group", "setting up", "setted-up", Fore.BLUE)
+		return handleSubCmd(args[0], args[1:], fname, "group", "setting up", "setted-up", Fore.BLUE)
 	elif (cmd == "activate"):
-		return handleSubCmd(args[0], args[1:], name, "group", "activating", "activated", Fore.MAGENTA)
+		return handleSubCmd(args[0], args[1:], fname, "group", "activating", "activated", Fore.MAGENTA)
 	elif (cmd == "run"):
-		return handleSubCmd(args[0], args[1:], name, "group", "running", "completed running", Fore.CYAN)
+		currentGroup = name
+		return handleSubCmd(args[0], args[1:], fname, "group", "running", "completed running", Fore.CYAN)
 	elif (cmd == "dispose"):
-		return handleSubCmd(args[0], args[1:], name, "group", "disposing", "disposed", Fore.YELLOW)
-
-stepStart = 0
+		return handleSubCmd(args[0], args[1:], fname, "group", "disposing", "disposed", Fore.YELLOW)
 
 def processStepRun(name, cmd, args, ltime = 0):
 	global stepStart
-	name = f"{Fore.LIGHTBLACK_EX}\"{Fore.LIGHTMAGENTA_EX}{name}{Fore.LIGHTBLACK_EX}\""
+	fname = f"{Fore.LIGHTBLACK_EX}\"{Fore.LIGHTMAGENTA_EX}{name}{Fore.LIGHTBLACK_EX}\""
 
 	if (cmd == "start"):
 		stepStart = ltime
-		return "SRUN", f"{Fore.CYAN}[●] {Fore.WHITE}Running step {name}"
+		return "SRUN", f"{Fore.CYAN}[●] {Fore.WHITE}Running step {fname}"
 
 	runTime = ltime - stepStart
-	failedLine = f"{Fore.LIGHTRED_EX}[✗] {timeOf(runTime)} {Fore.WHITE}Step {name} {Fore.LIGHTRED_EX}FAILED{Fore.WHITE}!"
+	failedLine = f"{Fore.LIGHTRED_EX}[✗] {timeOf(runTime)} {Fore.WHITE}Step {fname} {Fore.LIGHTRED_EX}FAILED{Fore.WHITE}!"
 
 	if (cmd == "errored"):
+		failures.append({
+			"name": name,
+			"path": [currentScene, currentGroup],
+			"fail": "Assert failed!",
+			"reason": args[0]
+		})
+
 		return "ERRR", [
 			failedLine,
 			f" ⮩ {Fore.LIGHTRED_EX}Assert failed!",
 			f"  {Fore.LIGHTBLACK_EX}→ Reason: {args[0]}"
 		]
 	elif (cmd == "broken"):
+		reason = f"{f'(code:{args[0]})' if (isinstance(args[0], int)) else f'{args[0]}():'} {args[1]}"
+		failures.append({
+			"name": name,
+			"path": [currentScene, currentGroup],
+			"fail": "An exception occured!",
+			"reason": reason
+		})
+
 		return "EXCP", [
 			failedLine,
 			f" ⮩ {Fore.LIGHTRED_EX}An exception occured!",
-			f"  {Fore.LIGHTBLACK_EX}→ Reason: (code:{args[0]}) {args[1]}"
+			f"  {Fore.LIGHTBLACK_EX}→ Reason: {reason}"
 		]
 	elif (cmd == "failed"):
+		failures.append({
+			"name": name,
+			"fail": "Test failed!",
+			"reason": "Sorry, but thats all I know <(＿　＿)>"
+		})
+
 		return "ERRR", [
 			failedLine,
 			f" ⮩ {Fore.LIGHTRED_EX}Sorry, but thats all I know <(＿　＿)>"
 		]
 	elif (cmd == "skipped"):
-		return "INFO", f"{Fore.LIGHTBLACK_EX}[∅] {timeOf(runTime)} {Fore.WHITE}Step {name} {Fore.LIGHTBLACK_EX}SKIPPED{Fore.WHITE}."
+		return "INFO", f"{Fore.LIGHTBLACK_EX}[∅] {timeOf(runTime)} {Fore.WHITE}Step {fname} {Fore.LIGHTBLACK_EX}SKIPPED{Fore.WHITE}."
 	elif (cmd == "complete"):
-		return "OKAY", f"{Fore.LIGHTGREEN_EX}[✓] {timeOf(runTime)} {Fore.WHITE}Step {name} {Fore.LIGHTGREEN_EX}PASSED{Fore.WHITE}!"
+		return "OKAY", f"{Fore.LIGHTGREEN_EX}[✓] {timeOf(runTime)} {Fore.WHITE}Step {fname} {Fore.LIGHTGREEN_EX}PASSED{Fore.WHITE}!"
 
 def completedReport(args, totalTimes):
 	total, passed, skipped, failed, broken, errored = args
 
-	tFailed = failed + broken + errored
+	tFailed = failed + broken
 	color = Fore.WHITE
 	text = "NO FAILED TEST"
 	level = "INFO"
+	code = 1
 
-	if (total == passed):
+	if (total == passed and errored == 0):
 		color = Fore.LIGHTGREEN_EX
 		text = "ALL TESTS PASSED!"
 		level = "OKAY"
+		code = 0
 	elif (total == tFailed):
 		color = Fore.LIGHTRED_EX
 		text = "ALL TESTS FAILED!"
@@ -331,9 +382,13 @@ def completedReport(args, totalTimes):
 		color = Fore.LIGHTYELLOW_EX
 		text = "SOME TESTS FAILED!"
 		level = "WARN"
+	elif (errored > 0):
+		color = Fore.LIGHTMAGENTA_EX
+		text = "SOME SCENES/GROUPS FAILED TO INITIALIZE"
+		level = "WARN"
 
 	datas = [
-		[Fore.WHITE, "TOTAL", total],
+		[Fore.LIGHTBLUE_EX, "TOTAL", total],
 		[Fore.LIGHTGREEN_EX, "PASSED", passed],
 		[Fore.LIGHTRED_EX, "FAILED", failed],
 		[Fore.LIGHTBLACK_EX, "SKIPPED", skipped],
@@ -352,13 +407,64 @@ def completedReport(args, totalTimes):
 	]
 
 	for data in datas:
-		lines[3] += f"{data[0]}{data[1]:>12} |"
-		lines[4] += f"{data[0]}{data[2]:>12} |"
+		lines[3] += f"{data[0]}{data[1]:>8} |"
+		lines[4] += f"{data[0]}{data[2]:>8} |"
 
 	for key, value in actionTimes.items():
 		lines.append(f" ● {key.upper():>14} : {timeOf(value):>24}")
 
-	return level, lines
+	# Fill the report file
+	with open(f"{scriptDir()}/report.md", "r", encoding = "utf-8") as f:
+		report = f.read()
+
+		# Draft the failures
+		failuresStr = []
+
+		for f in failures:
+			failuresStr.append("```")
+			failuresStr.append(f"🌃 {f['path'][0]} ➜ 🧪 {f['path'][1]}")
+			failuresStr.append(f"  ❌ {f['name']}")
+			failuresStr.append(f"    ⮩ {f['fail']}")
+			failuresStr.append(f"      → Reason: {f['reason']}")
+			failuresStr.append("```")
+
+		replaces = {
+			"name": os.getenv("GITHUB_ACTION") or "Direct Run",
+			"workflow": os.getenv("GITHUB_WORKFLOW") or "No Workflow",
+			"runNum": os.getenv("GITHUB_RUN_NUMBER") or 0,
+			"event": os.getenv("GITHUB_EVENT_NAME") or "no event",
+			"commit": os.getenv("GITHUB_SHA") or "none",
+			"author": os.getenv("GITHUB_ACTOR") or os.getlogin(),
+			"ref": os.getenv("GITHUB_REF") or "direct/test",
+			"failures": "\n".join(failuresStr) if len(failuresStr) > 0 else "None 🥳",
+			"total": total,
+			"passed": passed,
+			"failed": failed,
+			"skipped": skipped,
+			"broken": broken,
+			"errored": errored,
+			"tFailed": tFailed,
+			"totalTime": timeOf(totalTimes, color = None),
+			"loadTime": timeOf(actionTimes["load"], color = None),
+			"setupTime": timeOf(actionTimes["setup"], color = None),
+			"activateTime": timeOf(actionTimes["activate"], color = None),
+			"runTime": timeOf(actionTimes["run"], color = None),
+			"disposeTime": timeOf(actionTimes["dispose"], color = None)
+		}
+
+		for key, value in replaces.items():
+			report = report.replace(f"{{{key}}}", str(value))
+
+		with open(f"{scriptDir()}/report-generated.md", "w", encoding = "utf-8") as fg:
+			fg.write(report)
+
+		with open(os.getenv("GITHUB_STEP_SUMMARY"), "w", encoding = "utf-8") as fr:
+			fr.write(report)
+
+	return (level, lines), code
+
+# Init last log time for timeout killswitch
+lastLog = time.time()
 
 while True:
 	logs = localStorage.get("test.framework.logs")
@@ -367,9 +473,21 @@ while True:
 		logs = json.loads(logs)
 
 		if (logIndex < len(logs) - 1):
+			if (actionTimes["load"] is None):
+				# Update loadtime since we received first log item
+				actionTimes["load"] = time.time() - loadStart
+				log("INFO", f"Received first log after {timeOf(actionTimes['load'])}")
+
+			lastLog = time.time()
+
 			for line in logs[logIndex + 1:]:
 				processLine(line)
 
 		logIndex = len(logs) - 1
 	
+	# Check log timeout
+	if (time.time() - lastLog > TIME_OUT):
+		log("ERRR", f"No log were sent for {time.time() - lastLog:2.2f}s! {Fore.LIGHTRED_EX}TEST FAILED!")
+		sys.exit(-1)
+
 	time.sleep(0.1)

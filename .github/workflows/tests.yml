@@ -1,0 +1,50 @@
+name: 🚀 full tests (using test framework)
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+      - '!production'
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: 📁 Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      - name: 🛠 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 🛒 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install colorama
+          pip install selenium
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: 🧭 Setting Up Chrome Driver
+        uses: nanasess/setup-chromedriver@v1
+
+      - name: 📜 Run Test
+        run: python tests/tests.py
+
+      - name: 📦 Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-report
+          path: tests/report-generated.md

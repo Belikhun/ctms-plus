@@ -125,6 +125,10 @@ core.screen = {
 			}
 		},
 
+		/**
+		 * Render subject card
+		 * @param {{ type: "waiting" | "subscribed" } & SubscribeEntry} 
+		 */
 		processListItem({
 			type = "waiting",
 			expired,
@@ -141,16 +145,12 @@ core.screen = {
 			classroom = [],
 			action = {
 				command: undefined,
+				data: undefined,
 				classID: undefined,
 			},
 			date = {
-				/** @type {Date} */
 				start: undefined,
-				
-				/** @type {Date} */
 				end: undefined,
-				
-				/** @type {Date} */
 				cancel: undefined
 			}
 		} = {}) {
@@ -248,78 +248,80 @@ core.screen = {
 					});
 				});
 
-				this.itemList[classID].actions.right.toggle.addEventListener("click", async () => {
-					let action = this.itemList[classID].action;
-
-					if (!action.command || !action.classID) {
-						clog("WARN", "core.screen.subscribe(): undefined command or classID");
-						return;
-					}
-
-					let response;
-					switch (action.command) {
-						case "subscribe":
-							response = await popup.show({
-								windowTitle: `Đăng Kí ${classID}`,
-								title: "Đăng Kí",
-								message: subject,
-								icon: "signin",
-								bgColor: "darkBlue",
-								description: `Bạn có chắc muốn đăng kí lớp tín chỉ này không?`,
-								buttonList: {
-									confirm: { text: "XÁC NHẬN", color: "green" },
-									cancel: { text: "Hủy", color: "red" }
-								}
-							});
-							break;
-
-						case "unsubscribe":
-							response = await popup.show({
-								windowTitle: `Hủy Đăng Kí ${classID}`,
-								title: "Hủy Đăng Kí",
-								message: subject,
-								icon: "signout",
-								bgColor: "red",
-								description: `Bạn có chắc muốn hủy đăng kí lớp tín chỉ này không?`,
-								buttonList: {
-									confirm: { text: "XÁC NHẬN", color: "red" },
-									cancel: { text: "Hủy", color: "blue" }
-								}
-							});
-							break;
-					
-						default:
-							break;
-					}
-
-					if (response !== "confirm") {
-						clog("DEBG", `core.screen.subscribe(): user cancelled ${action.command}:${action.classID}`);
-						return;
-					}
-
-					this.itemList[classID].actions.right.toggle.loading(true);
-
-					try {
-						await api.subscribe({ action: action.command, classID: action.classID });
-
-						if (action.command === "subscribe") {
-							// Temporary append to Subscribed without removing loading
-							// indicator.
-							this.itemList[classID].actions.right.toggle.dataset.triColor = "orange";
-							this.view.subscribed.appendChild(this.itemList[classID]);
+				if (action.command !== "condition") {
+					this.itemList[classID].actions.right.toggle.addEventListener("click", async () => {
+						let action = this.itemList[classID].action;
+	
+						if (!action.command || !action.classID) {
+							clog("WARN", "core.screen.subscribe(): undefined command or classID");
+							return;
 						}
-					} catch(e) {
-						errorHandler(e);
-					}
-
-					try {
-						await api.subscribe({ action: "subscribed" });
-					} catch(e) {
-						errorHandler(e);
-					}
-					
-					this.itemList[classID].actions.right.toggle.loading(false);
-				});
+	
+						let response;
+						switch (action.command) {
+							case "subscribe":
+								response = await popup.show({
+									windowTitle: `Đăng Kí ${classID}`,
+									title: "Đăng Kí",
+									message: subject,
+									icon: "signin",
+									bgColor: "darkBlue",
+									description: `Bạn có chắc muốn đăng kí lớp tín chỉ này không?`,
+									buttonList: {
+										confirm: { text: "XÁC NHẬN", color: "green" },
+										cancel: { text: "Hủy", color: "red" }
+									}
+								});
+								break;
+	
+							case "unsubscribe":
+								response = await popup.show({
+									windowTitle: `Hủy Đăng Kí ${classID}`,
+									title: "Hủy Đăng Kí",
+									message: subject,
+									icon: "signout",
+									bgColor: "red",
+									description: `Bạn có chắc muốn hủy đăng kí lớp tín chỉ này không?`,
+									buttonList: {
+										confirm: { text: "XÁC NHẬN", color: "red" },
+										cancel: { text: "Hủy", color: "blue" }
+									}
+								});
+								break;
+						
+							default:
+								break;
+						}
+	
+						if (response !== "confirm") {
+							clog("DEBG", `core.screen.subscribe(): user cancelled ${action.command}:${action.classID}`);
+							return;
+						}
+	
+						this.itemList[classID].actions.right.toggle.loading(true);
+	
+						try {
+							await api.subscribe({ action: action.command, classID: action.classID });
+	
+							if (action.command === "subscribe") {
+								// Temporary append to Subscribed without removing loading
+								// indicator.
+								this.itemList[classID].actions.right.toggle.dataset.triColor = "orange";
+								this.view.subscribed.appendChild(this.itemList[classID]);
+							}
+						} catch(e) {
+							errorHandler(e);
+						}
+	
+						try {
+							await api.subscribe({ action: "subscribed" });
+						} catch(e) {
+							errorHandler(e);
+						}
+						
+						this.itemList[classID].actions.right.toggle.loading(false);
+					});
+				}
 			}
 
 			this.itemList[classID].action = action;
@@ -355,23 +357,30 @@ core.screen = {
 			else
 				item.details.left.status.noCancel.style.display = "none";
 
-			switch (type) {
-				case "waiting":
-					item.actions.right.toggle.changeText("ĐĂNG KÍ");
-					item.actions.right.toggle.dataset.triColor = "green";
-					item.actions.right.toggle.querySelector(":scope > icon")
-						.dataset.icon = "signin";
-					break;
-			
-				case "subscribed":
-					item.actions.right.toggle.changeText("HỦY ĐĂNG KÍ");
-					item.actions.right.toggle.dataset.triColor = "red";
-					item.actions.right.toggle.querySelector(":scope > icon")
-						.dataset.icon = "signout";
-					break;
+			if (action.command === "condition") {
+				item.actions.right.toggle.changeText(action.data);
+				item.actions.right.toggle.dataset.triColor = "orange";
+				item.actions.right.toggle.querySelector(":scope > icon")
+					.dataset.icon = "exclamation";
+			} else {
+				switch (type) {
+					case "waiting":
+						item.actions.right.toggle.changeText("ĐĂNG KÍ");
+						item.actions.right.toggle.dataset.triColor = "green";
+						item.actions.right.toggle.querySelector(":scope > icon")
+							.dataset.icon = "signin";
+						break;
+				
+					case "subscribed":
+						item.actions.right.toggle.changeText("HỦY ĐĂNG KÍ");
+						item.actions.right.toggle.dataset.triColor = "red";
+						item.actions.right.toggle.querySelector(":scope > icon")
+							.dataset.icon = "signout";
+						break;
+				}
+	
+				item.actions.right.toggle.disabled = !(action && action.command && action.classID);
 			}
-
-			item.actions.right.toggle.disabled = !(action && action.command && action.classID);
 			
 			if (type === "waiting" && !this.view.waiting.contains(item))
 				this.view.waiting.appendChild(item);

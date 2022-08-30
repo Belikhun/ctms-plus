@@ -1069,7 +1069,8 @@ const api = {
 				classroom: [],
 				action: {
 					command: undefined,
-					classID: undefined,
+					data: undefined,
+					classID: undefined
 				},
 				date: {
 					start: undefined,
@@ -1106,6 +1107,13 @@ const api = {
 					if (unsub) {
 						item.action.command = "unsubscribe";
 						item.action.classID = parseInt(unsub[1]);
+					}
+				} else {
+					// Test condition button
+					let conditionBtn = firstCell.querySelector(":scope > img[title]");
+					if (conditionBtn) {
+						item.action.command = "condition";
+						item.action.data = conditionBtn.getAttribute("title");
 					}
 				}
 			}
@@ -1409,27 +1417,28 @@ const api = {
  * Subscribe Entry
  * @typedef		SubscribeEntry
  * @type		{Object}
- * @property	{Date}					date	Schedule start date, will be the first day of that week.
- * @property	{ScheduleWeekRow[]}		info	Contain each day of week
- * @property	{Boolean}				expired
- * @property	{Boolean}				isFull
- * @property	{String}				classID
- * @property	{String}				subject
- * @property	{String}				teacher
- * @property	{Number}				credits
- * @property	{Number}				tuition
- * @property	{Number}				minimum
- * @property	{Number}				maximum
- * @property	{Number}				subscribed
- * @property	{String[]}				schedule
- * @property	{String[]}				classroom
- * @property	{Object}				action
- * @property	{String}				action.command
- * @property	{String}				action.classID
- * @property	{Object}				date
- * @property	{String}				date.start
- * @property	{String}				date.end
- * @property	{String}				date.cancel
+ * @property	{Date}												date	Schedule start date, will be the first day of that week.
+ * @property	{ScheduleWeekRow[]}									info	Contain each day of week
+ * @property	{Boolean}											expired
+ * @property	{Boolean}											isFull
+ * @property	{String}											classID
+ * @property	{String}											subject
+ * @property	{String}											teacher
+ * @property	{Number}											credits
+ * @property	{Number}											tuition
+ * @property	{Number}											minimum
+ * @property	{Number}											maximum
+ * @property	{Number}											subscribed
+ * @property	{String[]}											schedule
+ * @property	{String[]}											classroom
+ * @property	{Object}											action
+ * @property	{"subscribe" | "unsubscribe" | "condition"}			action.command
+ * @property	{?String}											action.data
+ * @property	{?String}											action.classID
+ * @property	{Object}											date
+ * @property	{String}											date.start
+ * @property	{String}											date.end
+ * @property	{String}											date.cancel
  */
 
 /**

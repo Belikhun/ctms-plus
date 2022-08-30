@@ -905,7 +905,7 @@ const core = {
 
 				// Components
 				new smenu.components.Button({
-					label: "Báo Lỗi",
+					label: "báo lỗi",
 					color: "pink",
 					icon: "externalLink",
 					complex: true,
@@ -913,7 +913,7 @@ const core = {
 				}, links);
 				
 				new smenu.components.Button({
-					label: "Mã Nguồn",
+					label: "mã nguồn",
 					color: "pink",
 					icon: "externalLink",
 					complex: true,
@@ -922,8 +922,16 @@ const core = {
 
 				let project = new smenu.Child({ label: "Dự Án" }, this.group);
 
+				new smenu.components.Button({
+					label: "testing framework",
+					color: "orange",
+					icon: "flaskVial",
+					complex: true,
+					onClick: () => window.open("/tests")
+				}, project);
+
 				let detailsButton = new smenu.components.Button({
-					label: "Thông Tin",
+					label: "thông tin",
 					color: "blue",
 					icon: "arrowLeft",
 					complex: true

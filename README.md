@@ -67,9 +67,17 @@ Hoặc sử dụng [Live Server Extension](https://marketplace.visualstudio.com/
 
 Sau khi khởi động, đi tới http://locahost:8001 để mở trang web.
 
+### 🧪 Testing
+
+CTMS+ đang sử dụng một testing framework để đảm bảo mọi thứ hoạt động trước khi lên production. [How does it look like?](https://ctmsplus.netlify.com/tests)
+
+Bạn có thể truy cập vào `/tests` trên máy của bạn để đi đến trang test, hoặc chạy test ở chế độ headless bằng cách chạy `py tests/tests.py` tại thư mục gốc của project.
+
+Toàn bộ code trước khi đưa vào 🌿 `main` đều phải qua bộ test này.
+
 ### 😇 Đóng góp
 
-Mọi đóng góp về code, ý tưởng hoặc góp ý đều được chào mừng!
+Mọi đóng góp về code, test, ý tưởng hoặc góp ý đều được chào mừng!
 
 Nếu bạn có một ý tưởng, một tính năng mà bạn muốn thấy trong tương lai, hoặc gặp một lỗi nào đó khi dùng phần mềm, bạn có thể gửi nó bằng cách tạo một **[Bug Report](https://github.com/Belikhun/ctms-plus/issues/new?labels=bug%2C+help+wanted&template=bug_report.md)/[Feature Request](https://github.com/Belikhun/ctms-plus/issues/new?labels=enhancement&template=feature_request.md)** trong tab *Issues* của repo này.
 

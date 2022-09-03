@@ -553,7 +553,7 @@ core.screen = {
 				: [];
 
 			// Set Up Progress Popup
-			let progress = createProgressBar();
+			let progress = createProgressBar({ blink: "fade", progress: 100 });
 			let cancelled = false;
 			popup.show({
 				windowTitle: "Kết Quả Học Tập",
@@ -570,6 +570,16 @@ core.screen = {
 					cancelled = true;
 			});
 
+			// Get states for schedule page if not already done.
+			// TODO: this might lead to duplicate request to schedule page,
+			// TODO: so further optimization to the api will needed to tell
+			// TODO: if the initial request is sending or not.
+			if (!api.__SCHEDULE_VIEWSTATE) {
+				popup.message = `Đang lấy state của trang lịch học...`;
+				await api.schedule();
+			}
+
+			progress.set({ progress: 0, blink: "none" });
 			let now = new Date();
 			let startYear = parseInt("20" + core.account.userInfo.course.substring(0, 2));
 			let currentYear = now.getFullYear();
@@ -612,10 +622,6 @@ core.screen = {
 				}
 			}
 
-			// Reverse scan order
-			list = list.reverse()
-				.map(i => { i.semester = i.semester.reverse(); return i });
-
 			steps *= this.scanPerSemester;
 			this.log("DEBG", `scan(): scanning list (${steps} steps):`, list);
 
@@ -635,7 +641,7 @@ core.screen = {
 						let dateString = humanReadableTime(date, { onlyDate: true });
 
 						this.log("DEBG", `scan(): fetching ${dateString}`);
-						popup.popupNode.popup.body.top.message.innerText = `Đang Quét ${year} HK${semester} (${dateString})`;
+						popup.message = `Đang Quét ${year} HK${semester} (${dateString})`;
 						progress.set({
 							right: `${step}/${steps}`,
 							progress: (step / steps) * 100

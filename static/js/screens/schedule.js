@@ -74,7 +74,7 @@ const ScheduleScreen = {
 		});
 
 		this.view.note.group.style.display = "none";
-		this.setLoading(true);
+		this.loading = true;
 		this.screen.content = this.view;
 		this.screen.onShow(() => this.load());
 		new Scrollable(this.view, { content: this.view.list });
@@ -136,6 +136,7 @@ const ScheduleScreen = {
 			
 			this.view.note.group.style.display = "none";
 			this.loaded = true;
+			this.loading = false;
 			this.render(response);
 		});
 
@@ -188,9 +189,9 @@ const ScheduleScreen = {
 					if (autoLogin === "true") {
 						// Switch to button loading indicator because we have just
 						// hided the screen loading overlay
-						this.setLoading(true);
+						this.loading = true;
 					} else {
-						this.setLoading(false);
+						this.loading = false;
 						this.view.control.confirm.disabled = true;
 					}
 				}
@@ -209,7 +210,7 @@ const ScheduleScreen = {
 		this.setInputNow();
 	},
 
-	setLoading(loading = false) {
+	set loading(loading = false) {
 		if (this.screen.overlayShowing) {
 			this.screen.loading = loading;
 			this.view.control.confirm.loading(false);
@@ -236,7 +237,7 @@ const ScheduleScreen = {
 			}
 		});
 
-		this.setLoading(false);
+		this.loading = false;
 	},
 
 	/**
@@ -254,16 +255,14 @@ const ScheduleScreen = {
 		try {
 			if (!this.loaded) {
 				this.haveCacheData = false;
-				this.setLoading(true);
+				this.loading = true;
 				this.screen.overlay({ show: false });
 				await api.schedule();
 				this.view.control.confirm.disabled = false;
-				this.setLoading(false);
 			} else {
 				if (date) {
-					this.setLoading(true);
+					this.loading = true;
 					await api.schedule(date);
-					this.setLoading(false);
 				}
 			}
 		} catch(e) {
@@ -271,7 +270,7 @@ const ScheduleScreen = {
 			this.view.control.confirm.disabled = true;
 			this.screen.handleError(e, async () => await this.load());
 
-			this.setLoading(false);
+			this.loading = false;
 		}
 	},
 

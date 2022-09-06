@@ -578,7 +578,7 @@ const ScheduleScreen = {
 						classID: {
 							tag: "t",
 							class: "classID",
-							text: (typeof row.classID === "object")
+							html: (typeof row.classID === "object")
 								? row.classID.join("<br>")
 								: row.classID
 						},

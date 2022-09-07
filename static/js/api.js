@@ -760,8 +760,8 @@ const api = {
 	/**
 	 * Lấy lịch học với ngày đầu tuần (hoặc ngày trong tuần) cho trước
 	 * 
-	 * @param		{Date}		date 	Thời gian trong tuần cần xem
-	 * @param		{tuition}	tuition	
+	 * @param		{Date}							date 		Thời gian trong tuần cần xem
+	 * @param		{{ triggerEvents: Boolean }}	options	
 	 * @returns		{Promise<APIResponse & Schedule>}
 	 */
 	async schedule(date, { triggerEvents = true } = {}) {

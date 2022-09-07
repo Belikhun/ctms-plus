@@ -1404,6 +1404,10 @@ const core = {
 				if (errMsg && errMsg.innerText !== "") {
 					this.loginView.note.group.style.display = null;
 					this.loginView.note.set({ message: errMsg.innerText });
+
+					// Dis is poor-man inline css 😥
+					this.nameNode.innerHTML = `<icon style="font-size: 14px; margin-right: 4px;" data-icon="exclamation"></icon> lỗi đăng nhập!`;
+					this.background.setColor("red");
 				} else
 					this.loginView.note.group.style.display = "none";
 

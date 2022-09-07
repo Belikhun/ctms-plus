@@ -17,6 +17,15 @@ log("OKAY", "Imported: requests")
 import json
 log("OKAY", "Imported: json")
 
+import random
+log("OKAY", "Imported: random")
+
+import string
+log("OKAY", "Imported: string")
+
+import hashlib
+log("OKAY", "Imported: hashlib")
+
 from glob import glob
 log("OKAY", "Imported: glob.glob")
 
@@ -25,6 +34,21 @@ log("OKAY", "Imported: shutil")
 
 import re
 log("OKAY", "Imported: re")
+
+from rcssmin import cssmin
+log("OKAY", "Imported: rcssmin.cssmin")
+
+from rjsmin import jsmin
+log("OKAY", "Imported: rjsmin.jsmin")
+
+def scriptDir():
+	return os.path.dirname(os.path.realpath(__file__))
+
+def randString(length = 8):
+	return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
+
+log("INFO", "cwd = " + os.getcwd())
+log("INFO", "swd = " + scriptDir())
 
 def logStatus(text, status, overWrite = False):
 	statusText = [f"{Fore.RED}✗ ERRR", f"{Fore.YELLOW}● WAIT", f"{Fore.GREEN}✓ OKAY"]
@@ -91,21 +115,82 @@ with open("metadata.json", "w", encoding="utf-8") as file:
 logStatus("Lưu Thông Tin Dự Án", 1, True)
 
 
-logStatus("Cập Nhật Phiên Bản Các Liên Kết", 0)
+logStatus("Minify Các Tệp Tài Nguyên (css, js)", 0, True)
+
+if not os.path.exists("static/min"):
+    os.mkdir("static/min")
 
 with open("index.html", "r", encoding="utf-8") as file:
 	content = file.read()
-	srcRegex = r"(?:assets|static)\/.+\.(?:css|js)"
-	search = re.findall(srcRegex, content)
 
-	for item in search:
-		log("DEBG", "Update " + item)
-		content = content.replace(item, f"{item}?v={metadata['version']}")
+	cssRegex = r"\<\!-- START\: MINCSS -->(.+)\<\!-- END\: MINCSS -->"
+	csses = re.findall(cssRegex, content, re.MULTILINE | re.DOTALL)
+
+	for item in csses:
+		cssContents = ""
+
+		log("DEBG", "Getting css files")
+		cssFilesRe = r"<link rel=\"stylesheet\" .+ href=\"(.+)\""
+		cssFiles = re.findall(cssFilesRe, item)
+
+		log("DEBG", "Generating css bundle")
+		for file in cssFiles:
+			log("DEBG", f"Reading {file}")
+
+			with open(file, "r", encoding="utf-8") as cssF:
+				cssContents += cssF.read() + "\n"
+
+		log("DEBG", "Minifying css bundle")
+		cssContents = cssmin(cssContents)
+
+		cssMd5 = hashlib.md5(cssContents.encode('utf-8')).hexdigest()
+		cssMinFile = f"{cssMd5[0:6]}.min.css"
+
+		log("DEBG", f"Writing css bundle to {cssMinFile}")
+		with open(f"static/min/{cssMinFile}", "w", encoding="utf-8") as cssMin:
+			cssMin.write(cssContents)
+
+		log("DEBG", f"Replacing css links")
+		content = content.replace(item, f"""
+			<link rel="stylesheet" type="text/css" media="screen" href="static/min/{cssMinFile}" />
+		""")
+
+	jsRegex = r"\<\!-- START\: MINJS -->(.+)\<\!-- END\: MINJS -->"
+	jses = re.findall(jsRegex, content, re.MULTILINE | re.DOTALL)
+
+	for item in jses:
+		jsContents = ""
+
+		log("DEBG", "Getting js files")
+		jsFilesRe = r"<script src=\"(.+)\" type.+"
+		jsFiles = re.findall(jsFilesRe, item)
+
+		log("DEBG", "Generating js bundle")
+		for file in jsFiles:
+			log("DEBG", f"Reading {file}")
+
+			with open(file, "r", encoding="utf-8") as jsF:
+				jsContents += jsF.read() + "\n"
+
+		log("DEBG", "Minifying js bundle")
+		jsContents = jsmin(jsContents)
+
+		jsMd5 = hashlib.md5(jsContents.encode('utf-8')).hexdigest()
+		jsMinFile = f"{jsMd5[0:6]}.min.js"
+
+		log("DEBG", f"Writing js bundle to {jsMinFile}")
+		with open(f"static/min/{jsMinFile}", "w", encoding="utf-8") as jsMin:
+			jsMin.write(jsContents)
+
+		log("DEBG", f"Replacing js links")
+		content = content.replace(item, f"""
+			<script src="static/min/{jsMinFile}" type="text/javascript"></script>
+		""")
 
 	with open("index.html", "w", encoding="utf-8") as fileWrite:
 		fileWrite.write(content)
 
-logStatus("Cập Nhật Phiên Bản Các Liên Kết", 1, True)
+logStatus("Minify Các Tệp Tài Nguyên (css, js)", 1, True)
 
 
 logStatus("Cài Mã Xác Minh", 0)
@@ -115,5 +200,10 @@ for path in glob("build/verification/*.html"):
 	shutil.copyfile(path, name)
 
 logStatus("Cài Mã Xác Minh", 1, True)
+
+
+logStatus("Thay đổi .gitignore", 0)
+shutil.copy("build/prod.gitignore", ".gitignore")
+logStatus("Thay đổi .gitignore", 1, True)
 
 exit(0)

@@ -4,4 +4,3 @@ logs
 __pycache__
 tests/report-generated.md
 playground.html
-static/min

@@ -22,7 +22,7 @@
 
 	opacity: 1;
 	overflow: hidden;
-	background-color: rgba(0, 0, 0, 0.4);
+	background-color: rgba(255, 255, 255, 0.8);
 
 	transition:
 		height 0.5s ease,
@@ -37,4 +37,8 @@
 	vertical-align: middle;
 	margin-right: 4px;
 	font-family: var(--heading-font);
+}
+
+body.dark .debugLogger > .line {
+	background-color: rgba(0, 0, 0, 0.4);
 }

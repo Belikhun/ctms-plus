@@ -346,6 +346,11 @@ const core = {
 		init: () => popup.init()
 	},
 
+	toast: {
+		priority: 0,
+		init: () => toast.init(core.container)
+	},
+
 	metadata: {
 		priority: 0,
 
@@ -367,11 +372,20 @@ const core = {
 				window.REPO_ADDRESS = response.link.repo;
 				window.DEBUG = (META.branch === "development");
 
+				// Check version change
+				let lastVersion = localStorage.getItem("version");
+				if (lastVersion && lastVersion !== window.VERSION) {
+					toast.show("đã cập nhật", `${window.VERSION} - ${window.STATE}`, {
+						hint: `từ ${lastVersion}`
+					});
+				}
+				
+				localStorage.setItem("version", window.VERSION);
+
 				if (DEBUG)
 					this.log("INFO", "Development Mode Enabled. Detailed logs will be printed in verbose level.");
 			} catch(e) {
-				this.log("WARN", "Could not fetch metadata file! Maybe it's missing?");
-				this.log("DEBG", e);
+				throw { code: -1, description: "Cannot fetch metadata files! Commiting sudoku...", data: e }
 			}
 		}
 	},
@@ -607,6 +621,7 @@ const core = {
 					color: "pink",
 					save: "display.nightmode",
 					defaultValue: false,
+					toast: true,
 					onChange: (v) => core.darkmode.set(v)
 				}, ux);
 
@@ -615,6 +630,7 @@ const core = {
 					color: "blue",
 					save: "display.transition",
 					defaultValue: true,
+					toast: true,
 					onChange: (v) => document.body.classList[v ? "remove" : "add"]("disableTransition")
 				}, ux);
 
@@ -638,7 +654,8 @@ const core = {
 					step: 0.1,
 					defaultValue: checkAgentMobile() ? 0.8 : 1,
 					save: "display.scale",
-					onInput: (v) => this.changeZoom(v)
+					toast: true,
+					onChange: (v) => this.changeZoom(v)
 				}, ux);
 
 				let other = new smenu.Child({ label: "Khác" }, this.group);
@@ -672,89 +689,6 @@ const core = {
 				});
 
 				this.animator.onComplete(() => this.animator = null);
-			}
-		},
-
-		schedule: {
-			group: smenu.Group.prototype,
-
-			init() {
-				if (typeof core.screen.schedule !== "object") {
-					this.log("WARN", `core.screen.schedule module is missing! init cancelled.`);
-					return false;
-				}
-
-				this.group = new smenu.Group({ label: "lịch học", icon: "calendarWeek" });
-
-				let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
-
-				new smenu.components.Checkbox({
-					label: "Tự động thay đổi kiểu hiển thị",
-					color: "pink",
-					save: "schedule.autoChangeRenderer",
-					defaultValue: true,
-					onChange: (v) => {					
-						core.screen.home.setAutoChangeRenderer(v);
-						core.screen.schedule.setAutoChangeRenderer(v);
-					}
-				}, ux);
-
-				new smenu.components.Choice({
-					label: "Kiểu hiển thị mặc định",
-					color: "blue",
-					choice: {
-						table: { title: "Bảng", icon: "table" },
-						list: { title: "Danh Sách", icon: "list" }
-					},
-					save: "schedule.renderMode",
-					defaultValue: "table",
-					onChange: (v) => {
-						core.screen.home.setDefaultRenderMode(v);
-						core.screen.schedule.setDefaultRenderMode(v);
-					}
-				}, ux);
-
-				let data = new smenu.Child({ label: "Dữ Liệu" }, this.group);
-
-				new smenu.components.Button({
-					label: "xóa dữ liệu điểm danh",
-					color: "red",
-					complex: true,
-					onClick: () => core.screen.schedule.clearCheckInData()
-				}, data);
-			}
-		},
-
-		results: {
-			group: smenu.Group.prototype,
-
-			init() {
-				if (typeof core.screen.results !== "object") {
-					this.log("WARN", `core.screen.results module is missing! init cancelled.`);
-					return false;
-				}
-
-				this.group = new smenu.Group({ label: "kết quả học", icon: "poll" });
-				let grouping = new smenu.Child({ label: "Sắp Xếp Nhóm" }, this.group);
-
-				new smenu.components.Slider({
-					label: `Số tuần quét mỗi kì`,
-					min: 2,
-					max: 6,
-					defaultValue: 2,
-					unit: "tuần",
-					save: "results.scanPerSemester",
-					onChange: (v) => core.screen.results.scanPerSemester = v
-				}, grouping);
-
-				let data = new smenu.Child({ label: "Dữ Liệu" }, this.group);
-
-				new smenu.components.Button({
-					label: "xóa dữ liệu nhóm",
-					color: "red",
-					complex: true,
-					onClick: () => core.screen.results.clearGroupingData()
-				}, data);
 			}
 		},
 
@@ -921,14 +855,6 @@ const core = {
 				}, links);
 
 				let project = new smenu.Child({ label: "Dự Án" }, this.group);
-
-				new smenu.components.Button({
-					label: "testing framework",
-					color: "orange",
-					icon: "flaskVial",
-					complex: true,
-					onClick: () => window.open("/tests")
-				}, project);
 
 				let detailsButton = new smenu.components.Button({
 					label: "thông tin",

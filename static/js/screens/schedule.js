@@ -746,6 +746,61 @@ const ScheduleScreen = {
 		}
 
 		this.render(undefined, true);
+	},
+
+	settings: {
+		group: smenu.Group.prototype,
+
+		init() {
+			this.group = new smenu.Group({
+				label: "lịch học",
+				icon: "calendarWeek",
+				after: core.userSettings.display.group
+			});
+
+			let ux = new smenu.Child({ label: "Giao Diện" }, this.group);
+
+			new smenu.components.Checkbox({
+				label: "Tự động thay đổi kiểu hiển thị",
+				color: "pink",
+				save: "schedule.autoChangeRenderer",
+				defaultValue: true,
+				onChange: (v) => {
+					if (typeof HomeScreen === "object")
+						HomeScreen.setAutoChangeRenderer(v);
+
+					ScheduleScreen.setAutoChangeRenderer(v);
+				}
+			}, ux);
+
+			new smenu.components.Choice({
+				label: "Kiểu hiển thị mặc định",
+				color: "blue",
+				choice: {
+					table: { title: "Bảng", icon: "table" },
+					list: { title: "Danh Sách", icon: "list" }
+				},
+				save: "schedule.renderMode",
+				defaultValue: "table",
+				onChange: (v) => {
+					if (typeof HomeScreen === "object")
+						HomeScreen.setDefaultRenderMode(v);
+					
+					ScheduleScreen.setDefaultRenderMode(v);
+				},
+
+				toast: true
+			}, ux);
+
+			let data = new smenu.Child({ label: "Dữ Liệu" }, this.group);
+
+			new smenu.components.Button({
+				label: "xóa dữ liệu điểm danh",
+				color: "red",
+				complex: true,
+				onClick: () => ScheduleScreen.clearCheckInData()
+			}, data);
+		}
 	}
 }
 

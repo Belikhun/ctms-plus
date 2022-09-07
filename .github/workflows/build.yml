@@ -30,9 +30,7 @@ jobs:
         run: |
           sudo apt install dos2unix
           python -m pip install --upgrade pip
-          pip install colorama
-          pip install rcssmin
-          pip install rjsmin
+          pip install requests colorama rcssmin rjsmin
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: 📜 Run Build

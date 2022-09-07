@@ -1,7 +1,7 @@
 //? |-----------------------------------------------------------------------------------------------|
 //? |  /static/js/core.js                                                                           |
 //? |                                                                                               |
-//? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
+//? |  Copyright (c) 2022 Belikhun. All right reserved                                              |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
@@ -286,7 +286,7 @@ class CoreScreen {
  * @author	Belikhun
  * @version	1.0
  */
-const core = {
+var core = {
 	container: $("#container"),
 	content: $("#content"),
 

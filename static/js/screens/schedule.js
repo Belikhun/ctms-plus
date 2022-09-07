@@ -1,7 +1,7 @@
 //? |-----------------------------------------------------------------------------------------------|
 //? |  /static/js/screens/schedule.js                                                               |
 //? |                                                                                               |
-//? |  Copyright (c) 2021 Belikhun. All right reserved                                              |
+//? |  Copyright (c) 2022 Belikhun. All right reserved                                              |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 

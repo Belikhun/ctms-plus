@@ -1,0 +1,40 @@
+/*
+? |-----------------------------------------------------------------------------------------------|
+? |  /static/css/debug.css                                                                        |
+? |                                                                                               |
+? |  Copyright (c) 2022 Belikhun. All right reserved                                              |
+? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+? |-----------------------------------------------------------------------------------------------|
+*/
+
+.debugLogger {
+	position: absolute;
+	display: block;
+	bottom: 10px;
+	left: 10px;
+	max-width: 90vw;
+	z-index: 10000;
+}
+
+.debugLogger > .line {
+	width: fit-content;
+	height: 0;
+
+	opacity: 1;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, 0.4);
+
+	transition:
+		height 0.5s ease,
+		opacity 0.5s linear;
+}
+
+.debugLogger > .line.fade {
+	opacity: 0;
+}
+
+.debugLogger > .line > .item {
+	vertical-align: middle;
+	margin-right: 4px;
+	font-family: var(--heading-font);
+}

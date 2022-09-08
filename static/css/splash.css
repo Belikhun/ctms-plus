@@ -8,7 +8,7 @@
 */
 
 .splash {
-    position: fixed;
+    position: relative;
     display: flex;
     flex-direction: column;
 	justify-content: flex-end;
@@ -16,14 +16,19 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 140px;
+    padding-bottom: 26px;
+    transition:
+        opacity 0.6s ease,
+        padding-bottom 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 
     opacity: 1;
     z-index: 98;
+    overflow: hidden;
 }
 
 .splash.hide {
-    animation: splash-disapear 0.5s ease-out 0.5s 1 alternate forwards;
+    padding-bottom: 0;
+    opacity: 0;
 }
 
 .splash::before {
@@ -64,14 +69,14 @@
 .splash > .phase {
     position: absolute;
 
-    bottom: 28px;
-    right: 50%;
-    transform: translateX(50%);
+    bottom: 0;
+    left: 10px;
     margin-bottom: 5px;
 
-	font-size: 11px;
+	font-size: 10px;
 	font-weight: bold;
     text-align: right;
+    font-family: var(--heading-font);
     text-transform: uppercase;
     letter-spacing: .3px;
     color: rgb(46, 46, 46);
@@ -79,22 +84,22 @@
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.splash.errored > .phase {
-    right: 60px;
-    transform: unset;
-}
-
 .splash > .progressBar {
     width: 100%;
     height: 30px;
 	margin-top: unset;
 
-    overflow: hidden;
+    overflow: visible;
     transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .splash.errored > .progressBar {
     height: 60px;
+}
+
+.splash.hide > .progressBar {
+    transition-duration: 0.6s;
+    height: 0;
 }
 
 .splash > .progressBar > .error {
@@ -126,15 +131,15 @@
     flex-wrap: wrap;
 
     bottom: 50%;
-    right: 50%;
-    width: 100%;
-    transform: translate(50%, 50%);
+    left: 10px;
+    transform: translateY(50%);
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .splash.errored > .progressBar > .detail {
-    bottom: 10px;
-    right: 60px;
+    bottom: -22px;
+    left: unset;
+    right: 10px;
     width: auto;
     max-width: 40vw;
     transform: unset;
@@ -144,7 +149,7 @@
     margin-right: 6px;
 
     font-family: var(--code-font);
-    font-size: 17px;
+    font-size: 15px;
     font-weight: bold;
     color: rgb(0, 0, 0);
 }
@@ -156,16 +161,12 @@
 .splash > .progressBar > .detail > .status {
     min-height: 18px;
 
-    font-size: 15px;
+    font-size: 13px;
     letter-spacing: .6px;
     color: rgb(44, 44, 44);
 }
 
 @media only screen and (max-width: 1000px) {
-    .splash.errored > .phase {
-        display: none;
-    }
-
 	.splash.errored > .progressBar > .detail {
         display: none;
     }
@@ -177,26 +178,6 @@
 
 @media only screen and (max-width: 450px) {
     .splash > .progressBar > .detail > .module {
-        display: none;
-    }
-}
-
-@keyframes splash-disapear {
-    0% {
-        opacity: 1;
-        z-index: 100;
-        display: flex;
-    }
-
-    99% {
-        opacity: 0;
-        z-index: 100;
-        display: flex;
-    }
-
-    100% {
-        opacity: 0;
-        z-index: -10;
         display: none;
     }
 }

@@ -8,8 +8,6 @@
 class Splash {
 	constructor({
 		container,
-		name = "Sample App",
-		icon = "/api/images/icon",
 		onInit,
 		onPostInit,
 		onError
@@ -29,11 +27,6 @@ class Splash {
 		this.container = container;
 
 		this.splash = makeTree("div", "splash", {
-			icon: new lazyload({
-				source: icon,
-				classes: "icon"
-			}),
-
 			phase: { tag: "t", class: "phase", text: "Phase 0/0: Init Splash" },
 			
 			progress: { tag: "div", class: ["progressBar", "light"], child: {
@@ -174,9 +167,12 @@ class Splash {
 		this.bar.style.width = `100%`;
 		this.status.innerText = "Tải Hoàn Thành";
 		cookie.set("splashInitSuccess", true, 1);
-		this.splash.classList.add("hide");
-
 		localStorage.setItem("__TEST_STATUS", "complete");
+		
+		setTimeout(() => {
+			this.splash.classList.add("hide");
+			setTimeout(() => this.container.removeChild(this.splash), 600);
+		}, 400);
 	}
 
 	async panic(error, stop = true) {

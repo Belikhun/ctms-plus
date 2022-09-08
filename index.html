@@ -72,6 +72,13 @@
 	<body lang="vi-VN">
 		<h1 style="display: none;">CTMS+ | CTMS Plus</h1>
 
+		<div id="container">
+			<div id="navbar"></div>
+			<div id="userSettings"></div>
+			<div id="waveContainer"></div>
+			<div id="content"></div>
+		</div>
+
 		<!--
 			Load Important Library, Draw Splash Screen
 			Initialize CTMS+ Core
@@ -81,7 +88,7 @@
 		<script type="text/javascript" src="static/js/splash.js"></script>
 		<script type="text/javascript">
 			const mainSplash = new Splash({
-				container: document.body,
+				container,
 				name: "CTMS+",
 				icon: "static/img/icon.png"
 			});
@@ -143,16 +150,6 @@
 						alert(error);
 			});
 		</script>
-
-		<div id="container">
-			<div id="navbar"></div>
-			<div id="userSettings"></div>
-			<div id="waveContainer"></div>
-
-			<div id="content">
-				
-			</div>
-		</div>
 
 		<!-- Library -->
 		<!-- START: MINJS -->

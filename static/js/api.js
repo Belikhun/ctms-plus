@@ -129,6 +129,8 @@ const api = {
 		renewSession = false,
 		ignoreAnnouncement = false
 	} = {}) {
+		clog("INFO", `api.request(${path}): begin ${method} request`);
+
 		if (method === "POST") {
 			form.__EVENTTARGET = target;
 			form.__EVENTARGUMENT = argument;

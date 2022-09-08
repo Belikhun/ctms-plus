@@ -9,7 +9,8 @@ const RUNTIME = "runtime";
 // A list of local resources we always want to be cached.
 const PRECACHE_URLS = [
 	"index.html",
-	"./"
+	"./",
+	"metadata.json"
 ];
 
 // The install handler takes care of precaching the resources we always need.
@@ -42,7 +43,7 @@ self.addEventListener("fetch",
 	 */
 	(event) => {
 		// Skip cross-origin requests, like those for Google Analytics.
-		if (event.request.url.startsWith(self.location.origin)) {
+		if (event.request.url.startsWith(self.location.origin) && !event.request.url.includes("ping.html")) {
 			event.respondWith(
 				fetch(event.request).then(async response => {
 					let cache = await caches.open(RUNTIME);

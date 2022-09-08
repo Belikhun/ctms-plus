@@ -303,8 +303,7 @@ var core = {
 	async init(set = () => {}) {
 		let start = time();
 
-		// Disable connection state change
-		__connection__.enabled = false;
+		ConnectionState.container = this.container;
 
 		await initGroup(this, "core", ({ p, m, d }) => {
 			clog("DEBG", {
@@ -371,6 +370,8 @@ var core = {
 				window.SERVER = { REPORT_ERROR: window.REPORT_ERROR };
 				window.REPO_ADDRESS = response.link.repo;
 				window.DEBUG = (META.branch === "development");
+
+				ConnectionState.NAME = window.APPNAME;
 
 				// Check version change
 				let lastVersion = localStorage.getItem("version");
@@ -917,7 +918,7 @@ var core = {
 				options: mwOptions,
 				defaultValue: mwDefault,
 				save: `server.middleware.${VERSION}`,
-				onChange: (v) => api.MIDDLEWARE = META.middleware[v].host
+				onChange: (v) => this.set(META.middleware[v].host)
 			}, general);
 
 			new smenu.components.Button({
@@ -926,6 +927,12 @@ var core = {
 				complex: true,
 				onClick: async () => await this.check()
 			}, general);
+		},
+
+		set(host) {
+			this.log("DEBG", "Set middleware to", host);
+			api.MIDDLEWARE = host;
+			// ConnectionState.HOST = host;
 		},
 
 		async check({
@@ -1047,6 +1054,25 @@ var core = {
 				popup.popup.body.top.description.innerHTML = `Đã chuyển sang middleware <b>${this.list[target].name}</b>!`;
 				this.select.set({ value: target });
 			} else {
+				// Verify if we are online
+				if (!await ConnectionState.check()) {
+					popup.show({
+						windowTitle: `Ngoại Tuyến`,
+						title: "Không Có Kết Nối",
+						icon: "unlink",
+						message: "Bạn đang ở chế độ ngoại tuyến",
+						description: `CTMS+ sẽ tự động kết nối lại một khi mạng của bạn hoạt động.`,
+						level: "offline",
+						buttonList: {
+							close: { color: "blue", text: "OK!" }
+						}
+					});
+
+					this.log("WARN", "We are offline, waiting until we are online... (keep current middleware)");
+					await ConnectionState.backOnline();
+					return;
+				}
+
 				this.log("WARN", `No suitable middleware found!`);
 				popup.popup.header.dataset.triColor = "red";
 				popup.popup.body.top.description.innerHTML = `Không tìm thấy middleware phù hợp!

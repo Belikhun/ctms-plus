@@ -130,6 +130,7 @@ class DebugLoggerInstance {
 				WARN: "yellow",
 				ERRR: "red",
 				CRIT: "purple",
+				LCNT: "pink"
 			}[level]),
 			text: level,
 			padding: 6,

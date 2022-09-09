@@ -33,6 +33,7 @@ core.news = {
 	activePage: 0,
 	activeMaxPage: 0,
 	catLoading: false,
+	prevScroll: 0,
 
 	/** @type {WaveContainer} */
 	container: undefined,
@@ -118,9 +119,11 @@ core.news = {
 
 		this.content.id = "news";
 		this.layout = "listing";
-		this.content.viewer.header.top.back.addEventListener("click", () => {
+		
+		this.content.viewer.header.top.back.addEventListener("click", async () => {
 			this.layout = "listing";
 			emptyNode(this.content.viewer.content);
+			this.container.content.scrollTop = this.prevScroll;
 		});
 
 		this.loadIndicator = document.createElement("div");
@@ -273,7 +276,7 @@ core.news = {
 
 	/**
 	 * Handle scroll event
-	 * @param {Event} e
+	 * @param	{Event}		e
 	 */
 	async check(e) {
 		if (!this.loaded || this.catLoading || this.activePage >= this.activeMaxPage)
@@ -455,6 +458,7 @@ core.news = {
 	 * @param {NewArticle} article
 	 */
 	async article(article) {
+		this.prevScroll = this.container.scrollable.scrollTop;
 		this.container.loading = true;
 
 		let cat = this.__c(article.cid);

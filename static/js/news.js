@@ -279,8 +279,11 @@ core.news = {
 		if (!this.loaded || this.catLoading || this.activePage >= this.activeMaxPage)
 			return;
 
+		if (this.layout !== "listing")
+			return;
+
 		let rect = this.content.listing.articles.getBoundingClientRect();
-		if (window.outerHeight - rect.bottom > 50) {
+		if (window.outerHeight - rect.bottom > 20) {
 			this.content.listing.appendChild(this.loadIndicator);
 			await this.fetchCategory(this.activeCID, this.activePage + 1);
 			this.content.listing.removeChild(this.loadIndicator);
@@ -576,5 +579,12 @@ core.news = {
 	 */
 	set layout(layout) {
 		this.content.dataset.layout = layout;
+	},
+
+	/**
+	 * @return	{"listing" | "viewer"}
+	 */
+	get layout() {
+		return this.content.dataset.layout;
 	}
 }

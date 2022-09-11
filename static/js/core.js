@@ -854,6 +854,14 @@ var core = {
 					complex: true,
 					onClick: () => window.open(REPO_ADDRESS, "_blank")
 				}, links);
+				
+				new smenu.components.Button({
+					label: "metronome?",
+					color: "darkBlue",
+					icon: "stopwatch",
+					complex: true,
+					onClick: () => location.href = `https://belikhun.github.io/metronome`
+				}, links);
 
 				let project = new smenu.Child({ label: "Dự Án" }, this.group);
 

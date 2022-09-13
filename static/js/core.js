@@ -898,6 +898,92 @@ var core = {
 		}
 	},
 
+	server: {
+		priority: 2,
+		
+		/** @type {ToastInstance} */
+		toast: undefined,
+
+		options: {},
+		current: undefined,
+		select: smenu.components.Select.prototype,
+		loginSelect: undefined,
+		
+		init() {
+			if (!META.servers)
+				return false;
+
+			let defaultHost = null;
+			for (let [key, value] of Object.entries(META.servers)) {
+				this.options[key] = value.name;
+
+				if (value.default)
+					defaultHost = key;
+			}
+
+			// Set up select input for changing server.
+			let general = new smenu.Child({ label: "CTMS" }, core.userSettings.server.group);
+
+			this.select = new smenu.components.Select({
+				label: "Máy chủ sử dụng",
+				icon: "hive",
+				options: this.options,
+				defaultValue: defaultHost,
+				onChange: (v) => this.switch(v)
+			}, general);
+
+			onInitGroup("core.account", (group) => {
+				this.loginSelect = group.loginView.servers;
+				this.loginSelect.set({ options: this.options });
+				this.loginSelect.onChange((value) => this.switch(value));
+
+				if (this.current)
+					this.loginSelect.value = this.current;
+			});
+
+			this.toast = new ToastInstance("Máy Chủ", "none");
+			let current = localStorage.getItem(`server.host.${VERSION}`);
+
+			if (!current) {
+				if (defaultHost)
+					this.switch(defaultHost, false);
+
+				return;
+			}
+
+			this.switch(current, false);
+		},
+
+		/**
+		 * Change current server's host.
+		 * @param	{String}	key
+		 * @param	{Boolean}	toast	Show toast?
+		 */
+		switch(key, toast = true) {
+			if (!META.servers || !META.servers[key] || key === this.current)
+				return;
+
+			let server = META.servers[key];
+			this.current = key;
+			
+			this.log("INFO", `switching to server "${key}"`, server);
+			localStorage.setItem(`server.host.${VERSION}`, key);
+			api.HOST = server.host;
+			api.HOST_NAME = key;
+
+			if (this.loginSelect)
+				this.loginSelect.value = key;
+			
+			this.select.set({ value: key });
+
+			if (toast) {
+				this.toast.value = server.name;
+				this.toast.hint = server.host;
+				this.toast.show();
+			}
+		}
+	},
+
 	middleware: {
 		priority: 2,
 		list: {},
@@ -921,8 +1007,9 @@ var core = {
 			}
 
 			this.select = new smenu.components.Select({
-				label: "Middleware",
+				label: "Máy chủ sử dụng",
 				icon: "hive",
+				color: "pink",
 				options: mwOptions,
 				defaultValue: mwDefault,
 				save: `server.middleware.${VERSION}`,
@@ -1174,6 +1261,10 @@ var core = {
 				autoLogin: createCheckbox({
 					label: "tự động đăng nhập",
 					value: false
+				}),
+
+				servers: createSelectInput({
+					icon: "server"
 				}),
 
 				submitBtn: createButton("ĐĂNG NHẬP", {

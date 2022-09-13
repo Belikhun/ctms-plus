@@ -31,6 +31,8 @@ const api = {
 	requester: undefined,
 
 	HOST: `http://ctms.fithou.net.vn`,
+	HOST_NAME: "fithou",
+
 	MIDDLEWARE: `http://localhost`,
 
 	__PATH: undefined,
@@ -150,6 +152,9 @@ const api = {
 			if (typeof this.requester === "function") {
 				response = await this.requester(arguments[0]);
 			} else {
+				let url = `${this.HOST}${path}`;
+				let urlParsed = new URL(url);
+
 				response = await myajax({
 					url: `${this.MIDDLEWARE}/api/middleware`,
 					method,
@@ -157,14 +162,14 @@ const api = {
 						"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 						"Session-Cookie-Key": "ASP.NET_SessionId",
 						"Session-Cookie-Value": localStorage.getItem("session") || "",
-						"Set-Host": "ctms.fithou.net.vn",
-						"Set-Origin": this.HOST,
+						"Set-Host": urlParsed.hostname,
+						"Set-Origin": urlParsed.origin,
 						"Set-Referer": `${this.HOST}${path}`,
 						"Upgrade-Insecure-Requests": 1,
 						...header
 					},
 					query: {
-						url: `${this.HOST}${path}`,
+						url,
 						...query
 					},
 					form,
@@ -369,56 +374,101 @@ const api = {
 	},
 
 	/**
+	 * Lấy xếp loại chữ và màu cho điểm hệ 4
+	 * @param	{Number}	point
+	 * @param	{Number}	[average]
+	 */
+	resultBadge(point, average = undefined) {
+		let letter = "?";
+		let color = "dark";
+
+		switch (point) {
+			case 4.0: {
+				letter = (average && average >= 9.5) ? "A+" : "A";
+				color = "green";
+				break;
+			}
+
+			case 3.5: {
+				letter = "B+";
+				color = "blue";
+				break;
+			}
+
+			case 3.0: {
+				letter = "B";
+				color = "blue";
+				break;
+			}
+
+			case 2.5: {
+				letter = "C+";
+				color = "yellow";
+				break;
+			}
+
+			case 2.0: {
+				letter = "C";
+				color = "yellow";
+				break;
+			}
+
+			case 1.5: {
+				letter = "D+";
+				color = "orange";
+				break;
+			}
+
+			case 1.0: {
+				letter = "D";
+				color = "orange";
+				break;
+			}
+
+			case 0: {
+				letter = "F";
+				color = "red";
+				break;
+			}
+		}
+
+		return { letter, color }
+	},
+
+	/**
 	 * Chuyển điểm hệ số 10 sang hệ số 4 và xếp loại
 	 * @param 	{Number}		average
 	 * @return	{ResultGrade}
 	 */
 	resultGrading(average) {
 		let point = 0;
-		let letter = "?";
-		let color = "dark";
 		let passed = true;
 
-		if (average >= 9.5) {
+		// Tính thang điểm hệ 4.
+		if (average >= 8.5) {
 			point = 4.0;
-			letter = "A+";
-			color = "green";
-		} else if (average >= 8.5) {
-			point = 4.0;
-			letter = "A";
-			color = "green";
 		} else if (average >= 8.0) {
 			point = 3.5;
-			letter = "B+";
-			color = "blue";
 		} else if (average >= 7.0) {
 			point = 3.0;
-			letter = "B";
-			color = "blue";
 		} else if (average >= 6.5) {
 			point = 2.5;
-			letter = "C+";
-			color = "yellow";
 		} else if (average >= 5.5) {
 			point = 2.0;
-			letter = "C";
-			color = "yellow";
 		} else if (average >= 5.0) {
 			point = 1.5;
-			letter = "D+";
-			color = "orange";
 		} else if (average >= 4.0) {
 			point = 1.0;
-			letter = "D";
-			color = "orange";
 		} else {
 			point = 0;
-			letter = "F";
-			color = "red";
 			passed = false;
 		}
 
-		return { point, letter, color, passed }
+		return {
+			point,
+			passed,
+			...this.resultBadge(point, average)
+		}
 	},
 
 	/**
@@ -433,11 +483,14 @@ const api = {
 		let credits = 0;
 
 		for (let result of results) {
-			if (result.grade && result.grade.passed && !result.ignored) {
+			if (result.grade && result.grade.passed && !result.ignored && !result.relearned) {
 				totalCPA += result.grade.point * result.credits;
 				credits += result.credits;
-				totalPoint += result.average;
-				count++;
+
+				if (typeof result.average === "number") {
+					totalPoint += result.average;
+					count++;
+				}
 			}
 		}
 
@@ -506,49 +559,165 @@ const api = {
 		// Encountered subjects to check for re-attempts of subjects
 		let encountered = {}
 
-		for (let row of resultTableRows) {
-			let data = {
-				subject: row.children[0].innerText.trim(),
-				credits: parseInt(row.children[1].innerText.trim()),
-				classID: row.children[2].innerText.trim(),
-				teacher: row.children[3].innerText.trim(),
-				diemCC: __procPoint(row.children[4]),
-				diemDK: __procPoint(row.children[5]),
-				diemHK: __procPoint(row.children[6]),
-				rawAverage: undefined,
-				average: undefined,
-				grade: undefined,
-				ignored: false
+		if (this.HOST_NAME === "kinhte") {
+			/** @type {ResultGroupStore[]} */
+			let groupingData = []
 
-				// We will add note later as currently we don't
-				// know what kind of data goes in here
-				// note: row.children[7].innerText.trim()
-			}
+			// KINHTE page have different structure, so different parsing
+			// rules.
+			for (let row of resultTableRows) {
+				let data = {
+					subject: row.children[3].innerText.trim(),
+					credits: parseInt(row.children[4].innerText.trim()),
+					classID: row.children[5].innerText.trim(),
+					teacher: row.children[6].innerText.trim(),
+					diemCC: __procPoint(row.children[8]),
+					diemDK: __procPoint(row.children[9]),
+					diemHK: undefined,
+					rawAverage: undefined,
+					average: undefined,
+					grade: undefined,
+					ignored: false,
+					relearned: false
+				}
 
-			if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
-				data.rawAverage = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
-				data.average = round(round(data.rawAverage, 2), 1);
-				data.grade = this.resultGrading(data.average);
-			}
-
-			let index = response.info.results.push(data) - 1;
-			let iden = data.subject.toLowerCase();
-
-			// Check for subject re-attempts. Based on average score (for now)
-			// but this will work in most cases because a re-attempt should have
-			// a higher score or you have f-ed up.
-			if (data.average) {
-				if (!encountered[iden]) {
-					encountered[iden] = {
-						index,
-						average: data.average
+				// A very specical case, sometime we have 2 missing column!
+				// And because of that the third point is missing, so we only
+				// parse the third point if we have enough columns!
+				if (row.children.length === 13) {
+					// Only calculate for subject that have first and second point.
+					if (data.diemCC !== "?" && data.diemDK !== "?") {
+						let point = parseFloat(row.children[11].innerText.trim()) || 0;
+						data.ignored = true;
+	
+						data.grade = {
+							point,
+							passed: (point >= 1),
+							...this.resultBadge(point)
+						}
 					}
 				} else {
-					if (encountered[iden].average > data.average) {
-						data.ignored = true;
+					// Full data row, we can safely get the third point now.
+					data.diemHK = __procPoint(row.children[10]);
+
+					let aCell = row.children[11].innerText.trim();
+					data.average = (aCell.length > 0 && aCell !== "?")
+						? parseFloat(aCell)
+						: null;
+				}
+
+				if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
+					if (!data.average) {
+						data.rawAverage = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
+						data.average = round(round(data.rawAverage, 2), 1);
 					} else {
-						response.info.results[encountered[iden].index].ignored = true;
-						encountered[iden] = { index, average: data.average }
+						data.rawAverage = data.average;
+					}
+
+					if (!data.grade)
+						data.grade = this.resultGrading(data.average);
+				}
+
+				// Update grouping data on-the-fly
+				let year = row.children[1].innerText.trim();
+				let semester = row.children[2].innerText.trim();
+
+				if (year.length > 0 && semester.length > 0) {
+					// Process year and semester string.
+					semester = parseInt({ "I": 1, "II": 2, "III": 3 }[semester] || semester);
+					year = parseInt(year.split("-")[semester === 1 ? 0 : 1]);
+					
+					let index;
+					for (let i = 0; i < groupingData.length; i++) {
+						if (groupingData[i].year === year && groupingData[i].semester === semester) {
+							index = i;
+							break;
+						}
+					}
+	
+					// Create new group
+					if (typeof index !== "number") {
+						index = groupingData.push({
+							year,
+							semester,
+							classID: []
+						}) - 1;
+					}
+	
+					if (!groupingData[index].classID.includes(data.classID))
+						groupingData[index].classID.push(data.classID);
+				}
+	
+				let index = response.info.results.push(data) - 1;
+				let iden = data.subject.toLowerCase();
+	
+				// Check for subject re-attempts. Based on average score (for now)
+				// but this will work in most cases because a re-attempt should have
+				// a higher score or you have f-ed up.
+				if (data.average) {
+					if (!encountered[iden]) {
+						encountered[iden] = {
+							index,
+							average: data.average
+						}
+					} else {
+						if (encountered[iden].average > data.average) {
+							data.relearned = true;
+						} else {
+							response.info.results[encountered[iden].index].relearned = true;
+							encountered[iden] = { index, average: data.average }
+						}
+					}
+				}
+			}
+
+			localStorage.setItem("results.grouping", JSON.stringify(groupingData));
+		} else {
+			for (let row of resultTableRows) {
+				let data = {
+					subject: row.children[0].innerText.trim(),
+					credits: parseInt(row.children[1].innerText.trim()),
+					classID: row.children[2].innerText.trim(),
+					teacher: row.children[3].innerText.trim(),
+					diemCC: __procPoint(row.children[4]),
+					diemDK: __procPoint(row.children[5]),
+					diemHK: __procPoint(row.children[6]),
+					rawAverage: undefined,
+					average: undefined,
+					grade: undefined,
+					ignored: false,
+					relearned: false
+	
+					// We will add note later as currently we don't
+					// know what kind of data goes in here
+					// note: row.children[7].innerText.trim()
+				}
+	
+				if (typeof data.diemCC === "number" && typeof data.diemDK === "number" && typeof data.diemHK === "number") {
+					data.rawAverage = data.diemCC * 0.1 + data.diemDK * 0.2 + data.diemHK * 0.7;
+					data.average = round(round(data.rawAverage, 2), 1);
+					data.grade = this.resultGrading(data.average);
+				}
+	
+				let index = response.info.results.push(data) - 1;
+				let iden = data.subject.toLowerCase();
+	
+				// Check for subject re-attempts. Based on average score (for now)
+				// but this will work in most cases because a re-attempt should have
+				// a higher score or you have f-ed up.
+				if (data.average) {
+					if (!encountered[iden]) {
+						encountered[iden] = {
+							index,
+							average: data.average
+						}
+					} else {
+						if (encountered[iden].average > data.average) {
+							data.relearned = true;
+						} else {
+							response.info.results[encountered[iden].index].relearned = true;
+							encountered[iden] = { index, average: data.average }
+						}
 					}
 				}
 			}
@@ -1500,6 +1669,7 @@ const api = {
  * @property	{Number}				average
  * @property	{ResultGrade}			grade
  * @property	{Boolean}				ignored
+ * @property	{Boolean}				relearned
  */
 
 /**

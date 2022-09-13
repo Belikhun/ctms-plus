@@ -7,6 +7,18 @@
         "report": "https://github.com/Belikhun/ctms-plus/issues",
         "classIDHelp": "https://nc-minh.github.io/FITHOU/"
     },
+    "servers": {
+        "fithou": {
+            "name": "FITHOU CTMS",
+            "host": "http://ctms.fithou.net.vn",
+            "default": true
+        },
+
+        "kinhte": {
+            "name": "CTMS4KINHTE",
+            "host": "http://ctms4kinhte.fithou.net.vn"
+        }
+    },
     "middleware": {
         "maylockhongkhi": {
             "host": "https://0e0e-2405-4802-11a-f450-e65f-1ff-fe45-8c7f.ap.ngrok.io",

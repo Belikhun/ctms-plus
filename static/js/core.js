@@ -946,20 +946,20 @@ var core = {
 
 			if (!current) {
 				if (defaultHost)
-					this.switch(defaultHost, false);
+					this.switch(defaultHost, true);
 
 				return;
 			}
 
-			this.switch(current, false);
+			this.switch(current, true);
 		},
 
 		/**
 		 * Change current server's host.
 		 * @param	{String}	key
-		 * @param	{Boolean}	toast	Show toast?
+		 * @param	{Boolean}	initial		Is initial set?
 		 */
-		switch(key, toast = true) {
+		async switch(key, initial = false) {
 			if (!META.servers || !META.servers[key] || key === this.current)
 				return;
 
@@ -976,11 +976,17 @@ var core = {
 			
 			this.select.set({ value: key });
 
-			if (toast) {
+			if (!initial) {
 				this.toast.value = server.name;
 				this.toast.hint = server.host;
 				this.toast.show();
+
+				// Re-request to update VIEW_STATE
+				core.account.subWindow.loading = true;
+				await api.request();
+				core.account.subWindow.loading = false;
 			}
+
 		}
 	},
 

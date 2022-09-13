@@ -649,11 +649,12 @@ const ResultScreen = {
 
 					// Find location of current group in the stored grouping data,
 					// we will create one if not exist.
-					for (let i = 0; i < groupingData.length; i++)
+					for (let i = 0; i < groupingData.length; i++) {
 						if (groupingData[i].year === year && groupingData[i].semester === semester) {
 							index = i;
 							break;
 						}
+					}
 
 					// Create new group
 					if (typeof index !== "number") {
@@ -664,10 +665,12 @@ const ResultScreen = {
 						}) - 1;
 					}
 
-					for (let day of response.info)
-						for (let subject of day.rows)
+					for (let day of response.info) {
+						for (let subject of day.rows) {
 							if (!groupingData[index].classID.includes(subject.classID))
 								groupingData[index].classID.push(subject.classID);
+						}
+					}
 
 					if (cancelled)
 						return;
@@ -860,7 +863,8 @@ const ResultScreen = {
 		rawAverage,
 		average,
 		grade,
-		ignored
+		ignored,
+		relearned
 	} = {}) {
 		let row = makeTree("tr", ["item", (stt % 2 === 0) ? "even" : "odd"], {
 			stt: { tag: "td", class: ["bold", "right"], text: stt },
@@ -921,18 +925,27 @@ const ResultScreen = {
 			}},
 		});
 
-		// Add ignored badge
-		if (ignored) {
-			let ignoredBadge = document.createElement("span");
-			ignoredBadge.classList.add("generalTag");
-			ignoredBadge.dataset.color = "orange";
-			ignoredBadge.style.marginLeft = "8px";
-			ignoredBadge.innerText = "Đã Học Lại";
-
-			let tip = document.createElement("tip");
-			tip.title = "điểm của môn này không được tính do bạn đã học lại môn này";
-			tip.style.marginLeft = "8px";
-			row.subject.append(ignoredBadge, tip);
+		if (ignored || relearned) {
+			// Add relearned badge
+			if (relearned) {
+				let relearnedBadge = document.createElement("span");
+				relearnedBadge.classList.add("generalTag");
+				relearnedBadge.dataset.color = "orange";
+				relearnedBadge.style.marginLeft = "8px";
+				relearnedBadge.innerText = "Đã Học Lại";
+	
+				let tip = document.createElement("tip");
+				tip.title = "điểm của môn này không được tính do bạn đã học lại môn này";
+				tip.style.marginLeft = "8px";
+				row.subject.append(relearnedBadge, tip);
+			} else {
+				let ignoredBadge = document.createElement("span");
+				ignoredBadge.classList.add("generalTag");
+				ignoredBadge.dataset.color = "red";
+				ignoredBadge.style.marginLeft = "8px";
+				ignoredBadge.innerText = "Không Tính";
+				row.subject.append(ignoredBadge);
+			}
 		}
 
 		this.view.table.tbody.appendChild(row);

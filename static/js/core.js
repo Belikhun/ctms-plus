@@ -956,18 +956,20 @@ var core = {
 
 		/**
 		 * Change current server's host.
-		 * @param	{String}	key 
-		 * @param	{Boolean}	toast	Show toast? 
+		 * @param	{String}	key
+		 * @param	{Boolean}	toast	Show toast?
 		 */
 		switch(key, toast = true) {
 			if (!META.servers || !META.servers[key] || key === this.current)
 				return;
 
 			let server = META.servers[key];
-			this.log("INFO", `switching to server "${key}"`, server);
-			api.HOST = server.host;
-			localStorage.setItem(`server.host.${VERSION}`, key);
 			this.current = key;
+			
+			this.log("INFO", `switching to server "${key}"`, server);
+			localStorage.setItem(`server.host.${VERSION}`, key);
+			api.HOST = server.host;
+			api.HOST_NAME = key;
 
 			if (this.loginSelect)
 				this.loginSelect.value = key;

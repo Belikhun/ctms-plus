@@ -1009,6 +1009,7 @@ var core = {
 			this.select = new smenu.components.Select({
 				label: "Máy chủ sử dụng",
 				icon: "hive",
+				color: "pink",
 				options: mwOptions,
 				defaultValue: mwDefault,
 				save: `server.middleware.${VERSION}`,

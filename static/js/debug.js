@@ -91,6 +91,32 @@ const debug = {
 					toast: true,
 					onChange: (value) => debug.logger = value
 				}, tools);
+
+				new smenu.components.Button({
+					label: "clear caches",
+					color: "darkRed",
+					icon: "hardDrive",
+					complex: true,
+					onClick: () => {
+						let count = 0;
+						for (let key of Object.keys(localStorage)) {
+							if (key.startsWith("cache")) {
+								localStorage.removeItem(key);
+								count += 1;
+							}
+						}
+
+						this.log("DEBG", `removed ${count} caches`);
+					}
+				}, tools);
+
+				new smenu.components.Button({
+					label: "clear localStorage",
+					color: "darkRed",
+					icon: "database",
+					complex: true,
+					onClick: () => localStorage.clear()
+				}, tools);
 	
 				let fw = new smenu.Child({ label: "framework" }, this.group);
 				new smenu.components.Button({

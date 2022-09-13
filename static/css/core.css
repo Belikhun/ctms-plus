@@ -447,7 +447,8 @@ arr::before {
 	margin: 10px 0;
 }
 
-.loginView > .sq-btn {
+.loginView > .sq-btn,
+.loginView > .sq-selector {
 	margin-top: 10px;
 }
 

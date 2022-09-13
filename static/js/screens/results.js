@@ -543,6 +543,23 @@ const ResultScreen = {
 		if (!this.currentData)
 			throw { code: 22, description: `core.screen.results.scan(): no data available` }
 
+		if (api.HOST_NAME === "kinhte") {
+			popup.show({
+				windowTitle: "Kết Quả Học Tập",
+				title: "Trình Quét Học Kì",
+				icon: "search",
+				message: "Quét Bị Hủy",
+				description: "Trang của khoa Kinh Tế không cần xếp nhóm học kì nữa =))",
+				headerTheme: "light",
+				bgColor: "darkBlue",
+				buttonList: {
+					close: { text: "FIN 😥", color: "blue" }
+				}
+			});
+
+			return;
+		}
+
 		/** @type {ResultGroupStore[]} */
 		let groupingData = localStorage.getItem("results.grouping");
 		groupingData = (groupingData)

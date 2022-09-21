@@ -131,7 +131,10 @@ class CoreScreen {
 
 	__hide() {
 		this.showing = false;
-		core.screen.container.removeChild(this.view);
+
+		if (core.screen.container.contains(this.view))
+			core.screen.container.removeChild(this.view);
+		
 		this.hideHandlers.forEach(f => f());
 	}
 

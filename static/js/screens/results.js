@@ -351,8 +351,10 @@ const ResultScreen = {
 		if (cpa === this.currentCPA)
 			return;
 
-		if (this.animator)
+		if (this.animator) {
 			this.animator.cancel();
+			this.animator = null;
+		}
 
 		let start = this.currentCPA;
 		let delta = cpa - start;
@@ -782,7 +784,7 @@ const ResultScreen = {
 			return;
 
 		let newData = false;
-		if (typeof data === "object") {
+		if (typeof data === "object" && data !== null) {
 			newData = true;
 			this.currentData = data;
 		} else
@@ -969,9 +971,13 @@ const ResultScreen = {
 	},
 
 	settings: {
+		initialized: false,
 		group: smenu.Group.prototype,
 
 		init() {
+			if (this.initialized || !smenu.initialized)
+				return false;
+
 			this.group = new smenu.Group({
 				label: "kết quả học",
 				icon: "poll",
@@ -999,6 +1005,8 @@ const ResultScreen = {
 				complex: true,
 				onClick: () => ResultScreen.clearGroupingData()
 			}, data);
+
+			this.initialized = true;
 		}
 	},
 }

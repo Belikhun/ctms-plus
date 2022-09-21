@@ -27,10 +27,10 @@ tests.scenes.schedule = {
 			core.screen.container = this.store.node;
 		}
 
-		if (!ScheduleScreen.screen) {
+		if (!ScheduleScreen.screen)
 			initGroup({ "schedule": ScheduleScreen }, "tests.schedule");
-		}
 
+		this.store.node.appendChild(ScheduleScreen.screen.view);
 		scene.field.appendChild(this.store.node);
 	},
 

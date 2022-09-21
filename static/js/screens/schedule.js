@@ -749,9 +749,13 @@ const ScheduleScreen = {
 	},
 
 	settings: {
+		initialized: false,
 		group: smenu.Group.prototype,
 
 		init() {
+			if (this.initialized || !smenu.initialized)
+				return;
+
 			this.group = new smenu.Group({
 				label: "lịch học",
 				icon: "calendarWeek",
@@ -800,6 +804,8 @@ const ScheduleScreen = {
 				complex: true,
 				onClick: () => ScheduleScreen.clearCheckInData()
 			}, data);
+
+			this.initialized = true;
 		}
 	}
 }

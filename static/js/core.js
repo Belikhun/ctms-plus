@@ -328,6 +328,9 @@ var core = {
 			padding: 34,
 			separate: true
 		}, `CTMS+ Core Loaded In ${time() - start}s`);
+
+		if (typeof gtag === "function")
+			gtag("event", "loaded", { loadtime: time() - start });
 	},
 
 	serviceWorker: {
@@ -1522,6 +1525,9 @@ var core = {
 			this.detailView.userCard.bottom.classroom.innerText = response.info.classroom;
 			this.detailView.department.content.innerText = response.info.department;
 			this.detailView.tForm.content.innerText = response.info.tForm;
+
+			if (typeof gtag === "function")
+				gtag("event", "loggedin", { class: this.userInfo.classroom });
 		},
 
 		updateEmail(email) {

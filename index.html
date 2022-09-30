@@ -180,7 +180,13 @@
 			window.dataLayer = window.dataLayer || [];
 			function gtag() { dataLayer.push(arguments) }
 			gtag("js", new Date());
-			gtag("config", `G-G0YF7DFC55`, { groups: "default" });
+			gtag("config", `G-G0YF7DFC55`, {
+				groups: "default",
+				custom_map: {
+					"dimension1": "class",
+					"metric1": "loadtime"
+				}
+			});
 		</script>
 	</body>
 </html>

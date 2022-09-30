@@ -49,7 +49,7 @@ tests.scenes.results = {
 			step.AssertIs("served", handler.served);
 		},
 
-		"render lại"(step) {
+		"render lại"() {
 			ResultScreen.render(null, true);
 		}
 	},
@@ -69,7 +69,7 @@ tests.scenes.results = {
 			step.AssertIs("served", handler.served);
 		},
 
-		"render lại"(step) {
+		"render lại"() {
 			ResultScreen.render(null, true);
 		}
 	}

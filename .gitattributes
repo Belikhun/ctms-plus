@@ -1,2 +1,3 @@
 assets/css/* linguist-vendored=false
+tests/files/* linguist-vendored=false
 assets/fonts/* linguist-vendored

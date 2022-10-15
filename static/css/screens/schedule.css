@@ -339,6 +339,10 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	--color: var(--color-red);
 }
 
+.scheduleList > .listItem > .items > .item > .gradient[data-status="Ngoại khoá"] {
+	--color: var(--color-orange);
+}
+
 .scheduleList > .listItem > .items > .item > .gradient::before {
 	content: "";
 	position: absolute;

@@ -878,14 +878,16 @@ arr::before {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
+	flex-wrap: wrap;
 
-	margin: 0 10px;
+	margin: 8px 10px 0;
 }
 
 .projectInfo > .author > .item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	margin: 0 16px;
 }
 
 .projectInfo > .author > .item > .avatar {
@@ -904,6 +906,11 @@ arr::before {
 
 .projectInfo > .author > .item > .department {
 	font-weight: bold;
+}
+
+.projectInfo > .author > .item > .role {
+	white-space: pre-wrap;
+	text-align: center;
 }
 
 .projectInfo > .contributor {

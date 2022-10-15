@@ -427,7 +427,14 @@ var core = {
 		enabled: false,
 		toggleHandlers: [],
 
+		/** @type {HTMLMetaElement} */
+		metaNode: undefined,
+
 		init() {
+			this.metaNode = document.createElement("meta");
+			this.metaNode.name = "theme-color";
+			document.head.appendChild(this.metaNode);
+
 			this.update();
 		},
 
@@ -449,6 +456,7 @@ var core = {
 		update() {
 			this.toggleHandlers.forEach(f => f(this.enabled));
 			document.body.classList[this.enabled ? "add" : "remove"]("dark");
+			this.metaNode.content = this.enabled ? "#212121" : "#ffffff";
 		}
 	},
 

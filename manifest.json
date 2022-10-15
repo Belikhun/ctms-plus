@@ -52,9 +52,9 @@
 			"type": "image/png",
 			"sizes": "128x128"
 		}, {
-			"src": "/static/img/icon-maskable@128x128.png",
+			"src": "/static/img/icon-maskable.png",
 			"type": "image/png",
-			"sizes": "128x128",
+			"sizes": "1000x1000",
 			"purpose": "maskable"
 		}]
 	}],

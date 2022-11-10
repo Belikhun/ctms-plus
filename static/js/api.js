@@ -1040,6 +1040,10 @@ const api = {
 				});
 			}
 
+			// Sort by start time since ctms is sending unordered list
+			// sometimes.
+			item.rows = item.rows.sort((a, b) => a.date[0] - b.date[0]);
+
 			response.info.push(item);
 		}
 

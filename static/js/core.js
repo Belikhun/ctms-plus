@@ -1145,20 +1145,22 @@ var core = {
 				}));
 			}
 
-			popup.show({
-				windowTitle: `Middleware Status Check`,
-				title: "Middleware",
-				icon: "server",
-				message,
-				description,
-				customNode: checkStatus,
-				buttonList: {
-					cancel: { color: "red", text: "HỦY" }
-				}
-			}).then((value) => {
-				if (value === "cancel")
-					cancelled = true;
-			});
+			let showTimeout = setTimeout(() => {
+				popup.show({
+					windowTitle: `Middleware Status Check`,
+					title: "Middleware",
+					icon: "server",
+					message,
+					description,
+					customNode: checkStatus,
+					buttonList: {
+						cancel: { color: "red", text: "HỦY" }
+					}
+				}).then((value) => {
+					if (value === "cancel")
+						cancelled = true;
+				});
+			}, 100);
 
 			// Await all check to complete
 			await Promise.all(promises);
@@ -1180,9 +1182,11 @@ var core = {
 			}
 			
 			// Hack the popup
-			popup.popup.body.top.message.innerText = "Kiểm Tra Hoàn Thành!";
-			popup.popup.body.button.children[0].dataset.color = "blue";
-			popup.popup.body.button.children[0].children[0].innerText = "ĐÓNG";
+			if (popup.showing) {
+				popup.popup.body.top.message.innerText = "Kiểm Tra Hoàn Thành!";
+				popup.popup.body.button.children[0].dataset.color = "blue";
+				popup.popup.body.button.children[0].children[0].innerText = "ĐÓNG";
+			}
 
 			if (target) {
 				this.log("OKAY", `Switched to middleware`, {
@@ -1196,17 +1200,8 @@ var core = {
 			} else {
 				// Verify if we are online
 				if (!await ConnectionState.check()) {
-					popup.show({
-						windowTitle: `Ngoại Tuyến`,
-						title: "Không Có Kết Nối",
-						icon: "unlink",
-						message: "Bạn đang ở chế độ ngoại tuyến",
-						description: `CTMS+ sẽ tự động kết nối lại một khi mạng của bạn hoạt động.`,
-						level: "offline",
-						buttonList: {
-							close: { color: "blue", text: "OK!" }
-						}
-					});
+					clearTimeout(showTimeout);
+					popup.hide();
 
 					this.log("WARN", "We are offline, waiting until we are online... (keep current middleware)");
 					await ConnectionState.backOnline();

@@ -494,8 +494,33 @@ var core = {
 
 		container: $("#waveContainer"),
 
+		/** @type {WaveContainer} */
+		browser: undefined,
+
+		/** @type {HTMLIFrameElement} */
+		iframe: undefined,
+
 		init() {
 			wavec.init(this.container);
+
+			this.iframe = document.createElement("iframe");
+			this.iframe.id = "browser"; 
+			this.browser = new WaveContainer(this.iframe, { icon: "globe" });
+			this.iframe.addEventListener("loadstart", () => this.browser.loading = true);
+			this.iframe.addEventListener("load", () => this.browser.loading = false);
+
+			this.browser.onToggle((showing) => {
+				if (!showing) {
+					// Wait for container to finally close.
+					setTimeout(() => this.iframe.src = "about:blank", 1000);
+				}
+			});
+		},
+
+		browse(url) {
+			this.iframe.src = url;
+			this.browser.set({ title: url });
+			this.browser.show();
 		}
 	},
 

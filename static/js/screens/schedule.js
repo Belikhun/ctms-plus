@@ -9,7 +9,7 @@ const ScheduleScreen = {
 	/** @type {CoreScreen} */
 	screen: undefined,
 
-	/** @type {HTMLDivElement} */
+	/** @type {TreeDOM} */
 	view: null,
 
 	loaded: false,
@@ -21,14 +21,17 @@ const ScheduleScreen = {
 	currentRenderer: "table",
 	currentData: [],
 
-	async init() {
-		this.view = makeTree("div", "scheduleScreen", {
-			note: createNote({
-				level: "warning",
-				message: "",
-				style: "round"
-			}),
+	/** @type {NoteInstance} */
+	note: undefined,
 
+	async init() {
+		this.note = createNote({
+			level: "warning",
+			message: "",
+			style: "flat"
+		});
+
+		this.view = makeTree("div", "scheduleScreen", {
 			control: { tag: "div", class: "control", child: {
 				dateInput: createInput({
 					type: "date",
@@ -62,7 +65,10 @@ const ScheduleScreen = {
 				})
 			}},
 
-			list: { tag: "div", class: ["list", "showEmpty"] }
+			list: { tag: "div", class: ["list", "showEmpty"], child: {
+				note: this.note,
+				table: { tag: "table" }
+			}}
 		});
 
 		this.screen = new CoreScreen({
@@ -73,7 +79,7 @@ const ScheduleScreen = {
 			applyScrollable: false
 		});
 
-		this.view.note.group.style.display = "none";
+		this.note.group.style.display = "none";
 		this.loading = true;
 		this.screen.content = this.view;
 		this.screen.onShow(() => this.load());
@@ -134,7 +140,7 @@ const ScheduleScreen = {
 				})()
 			}
 			
-			this.view.note.group.style.display = "none";
+			this.note.group.style.display = "none";
 			this.loaded = true;
 			this.loading = false;
 			this.render(response);
@@ -173,17 +179,15 @@ const ScheduleScreen = {
 					this.render({ info: cache.info });
 
 					// Render notice for user
-					this.view.note.set({
+					this.note.set({
+						level: "okay",
 						message: `
-							Đây là dữ liệu lịch học của tuần từ ngày
-							<b>${cache.date.getDate()}/${cache.date.getMonth() + 1}/${cache.date.getFullYear()}</b>
-							của tài khoản <b>${cache.name}</b>.<br>
-							Thông tin được lưu vào lúc <b>${humanReadableTime(cache.stored)}</b>, do vậy thông tin đã có thể được cập nhật!<br>
-							Hãy <a href="javascript:core.account.subWindow.show()">đăng nhập</a> để cập nhật dữ liệu!
+							Đang hiển thị lịch học đã lưu của <b>${cache.name}</b> vào ${humanReadableTime(cache.stored)}.<br>
+							<a href="javascript:core.account.subWindow.show()">Đăng nhập</a> để cập nhật lịch học mới nhất!
 						`
 					});
 
-					this.view.note.group.style.display = null;
+					this.note.group.style.display = null;
 
 					let autoLogin = localStorage.getItem("autoLogin.enabled");
 					if (autoLogin === "true") {
@@ -206,7 +210,7 @@ const ScheduleScreen = {
 
 	reset() {
 		this.loaded = false;
-		emptyNode(this.view.list);
+		emptyNode(this.view.list.table);
 		this.setInputNow();
 	},
 
@@ -228,7 +232,7 @@ const ScheduleScreen = {
 		this.reset();
 		this.view.control.confirm.disabled = true;
 		this.screen.overlay({
-			icon: "exclamation",
+			icon: "signout",
 			title: "Bạn Chưa Đăng Nhập",
 			description: `Hãy đăng nhập vào CTMS để xem nội dung này! Hoặc bạn <b>có thể</b> xem lịch học của khoa mà không cần đăng nhập.`,
 			buttons: {
@@ -337,26 +341,27 @@ const ScheduleScreen = {
 		// updated data to render
 		if (this.currentRenderer !== renderer || newData || force) {
 			this.log("DEBG", `render(${renderer}): re-rendering`);
-			emptyNode(this.view.list);
 
 			// Hide overlay to make sure data is always visible
 			this.screen.overlay({ show: false });
 
 			if (billAlert) {
-				this.view.note.set({
+				this.note.set({
+					level: "error",
 					message: `
 						<h3>Cảnh báo</h3>
 						Bạn còn hóa đơn học phí chưa thanh toán!`
 				});
 
-				this.view.note.group.style.display = null;
+				this.note.group.style.display = null;
 			}
 
-			if (renderer === "table")
-				this.view.list.appendChild(this.renderTable(data));
-			else
-				this.view.list.appendChild(this.renderList(data));
+			let node = (renderer === "table")
+				? this.renderTable(data)
+				: this.renderList(data);
 
+			this.view.list.replaceChild(node, this.view.list.table);
+			this.view.list.table = node;
 			this.currentRenderer = renderer;
 		}
 	},

@@ -57,6 +57,16 @@ arr::before {
 	color: #000000;
 }
 
+#browser {
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: unset;
+}
+
 /** ===================== COMPONENT:account ===================== */
 
 .navigationBar > .group > .component.account {
@@ -281,7 +291,7 @@ arr::before {
 	position: absolute;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
 
 	top: 0;
@@ -289,32 +299,84 @@ arr::before {
 	width: 100%;
 	height: 100%;
 
+	padding: 0 max(calc(50% - 340px), 20px);
+	box-sizing: border-box;
+
 	background-color: var(--global-background);
 	z-index: 10;
 }
 
 #content > .screen > .overlay > icon {
-	margin-bottom: 20px;
-}
-
-#content > .screen > .overlay > icon::after {
+	padding: 20px;
+	margin-left: -20px;
+	margin-bottom: 10px;
 	font-size: 92px;
 	line-height: normal;
+	overflow: hidden;
 }
 
-#content > .screen > .overlay > icon[data-icon="exclamation"]::after {
-	color:rgb(255, 57, 110);
+#content > .screen > .overlay > icon[data-icon="exclamation"] {
+	color: rgb(255, 57, 110);
+}
+
+#content > .screen > .overlay > icon[data-icon="bomb"]::after {
+	margin-left: 0;
+	animation-name: overlay-icon-bomb;
+	animation-duration: 3s;
+	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+	animation-iteration-count: infinite;
+}
+
+#content > .screen > .overlay > icon[data-icon="signout"]::after {
+	animation-name: overlay-icon-signout;
+	animation-duration: 3s;
+	animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+	animation-iteration-count: infinite;
+}
+
+@keyframes overlay-icon-signout {
+	0%,
+	20%,
+	100% {
+		transform: translateX(0);
+	}
+
+	70% {
+		transform: translateX(120%);
+	}
+
+	70.000001% {
+		transform: translateX(-120%);
+		animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+	}
+}
+
+@keyframes overlay-icon-bomb {
+	0%,
+	100% {
+		transform: unset;
+	}
+
+	33% {
+		transform: translate(0, 10px) rotate(-25deg);
+	}
+
+	66% {
+		transform: translate(-20px, -10px) rotate(-65deg);
+	}
 }
 
 #content > .screen > .overlay > .title {
 	font-size: 25px;
 	font-weight: 900;
-	text-align: center;
+	text-align: left;
 }
 
 #content > .screen > .overlay > .description {
+	margin-top: 8px;
 	font-size: 15px;
-	text-align: center;
+	font-weight: 600;
+	text-align: left;
 }
 
 #content > .screen > .overlay > .buttons {
@@ -322,11 +384,21 @@ arr::before {
 	flex-direction: row;
 	flex-wrap: wrap;
 
-	margin-top: 20px;
+	margin-top: 36px;
 }
 
 #content > .screen > .overlay > .buttons > .sq-btn {
-	margin: 5px;
+	margin-right: 10px;
+}
+
+@media screen and (max-width: 760px) {
+	#content > .screen > .overlay > icon {
+		font-size: 58px;
+	}
+
+	#content > .screen > .overlay > .title {
+		font-size: 22px;
+	}
 }
 
 #content > .screen > .header {

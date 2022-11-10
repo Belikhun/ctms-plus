@@ -102,7 +102,7 @@ const HomeScreen = {
 					complex: true
 				}),
 
-				help: createButton("Hướng Dẫn", {
+				help: createButton("Video Hướng Dẫn", {
 					color: "purple",
 					style: "round",
 					icon: "question",
@@ -166,7 +166,10 @@ const HomeScreen = {
 		this.view.control.edit.addEventListener("click", () => this.showClassIDEditor());
 		this.view.control.confirm.addEventListener("click", () => this.load(this.getInputDate()));
 		this.emptyClassIDsNotice.buttons.edit.addEventListener("click", () => this.showClassIDEditor());
-		this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => window.open(META.link.classIDHelp, "_blank"));
+
+		this.emptyClassIDsNotice.buttons.help.addEventListener("click", () => {
+			core.wavec.browse(META.link.classIDHelp);
+		});
 
 		this.view.control.homeDate.onChange((value) => {
 			this.currentWeekday = value;

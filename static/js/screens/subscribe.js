@@ -89,7 +89,7 @@ core.screen = {
 		onLogout() {
 			this.reset();
 			this.screen.overlay({
-				icon: "exclamation",
+				icon: "signout",
 				title: "Bạn Chưa Đăng Nhập",
 				description: `Hãy đăng nhập vào CTMS để xem nội dung này!`,
 				buttons: {

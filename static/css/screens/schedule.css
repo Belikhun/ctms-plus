@@ -488,15 +488,6 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	height: 100%;
 }
 
-.scheduleScreen > .note {
-	width: auto;
-	margin: 0 10px 20px;
-}
-
-.scheduleScreen > .note > .inner > h3 {
-	margin: 10px 0 0;
-}
-
 .scheduleScreen > .control {
 	position: relative;
 	display: flex;
@@ -540,6 +531,16 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 
 .scheduleScreen > .list:last-child {
 	padding-bottom: 200px;
+}
+
+.scheduleScreen > .list > .note {
+	width: auto;
+	margin-bottom: 20px;
+	border-radius: 16px;
+}
+
+.scheduleScreen > .list > .note > .inner {
+	font-size: 12px;
 }
 
 @media only screen and (max-width: 500px) {

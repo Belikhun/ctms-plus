@@ -334,15 +334,26 @@ var core = {
 	},
 
 	serviceWorker: {
-		init() {
+		/** @type {ServiceWorkerRegistration} */
+		registration: undefined,
+
+		async init() {
 			if (!navigator 
 				|| !navigator.serviceWorker
 				|| typeof navigator.serviceWorker.register !== "function")
 				return false;
 
-			navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
-				.then((res) => this.log("OKAY", "Service Worker registered", res))
-				.catch((e) => this.log("ERRR", e));
+			try {
+				this.registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
+				this.log("OKAY", "Service Worker registered", this.registration);
+			} catch(e) {
+				this.log("WARN", e);
+			}
+		},
+
+		async update() {
+			await this.registration.update();
+			this.log("OKAY", "Service Worker updated", this.registration);
 		}
 	},
 
@@ -382,6 +393,7 @@ var core = {
 				// Check version change
 				let lastVersion = localStorage.getItem("version");
 				if (lastVersion && lastVersion !== window.VERSION) {
+					core.serviceWorker.update();
 					toast.show("đã cập nhật", `${window.VERSION} - ${window.STATE}`, {
 						hint: `từ ${lastVersion}`
 					});

@@ -575,8 +575,7 @@ const ScheduleScreen = {
 					}},
 
 					subject: { tag: "span", class: "subject", child: {
-						inner: { tag: "t", class: "inner", text: row.subject },
-						placeholder: { tag: "t", class: "placeholder", text: row.subject }
+						inner: { tag: "t", class: "inner", text: row.subject }
 					}},
 
 					teacher: { tag: "t", class: "teacher", text: row.teacher },

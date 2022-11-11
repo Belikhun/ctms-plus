@@ -250,7 +250,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	display: flex;
 	flex-direction: column;
 
-	max-height: 155px;
+	max-height: 162px;
 	margin-bottom: 10px;
 	padding: 8px 10px;
 	border-radius: 12px;
@@ -266,19 +266,19 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 
 	top: 0;
 	left: 0;
-	width: 4px;
+	border-right: 4px dotted var(--schedule-gray);
 	height: calc(100% + 10px);
 	transform: translateX(-18px);
-
-	background-color: var(--schedule-gray);
 }
 
 .scheduleList > .listItem > .items > .item.passed::before {
-	background-color: var(--schedule-green);
+	border-right-color: var(--schedule-green);
+	border-right-style: solid;
 }
 
 .scheduleList > .listItem > .items > .item.inProgress::before {
-	background-color: var(--schedule-blue);
+	border-right-color: var(--schedule-blue);
+	border-right-style: solid;
 }
 
 .scheduleList > .listItem > .items > .item:last-child::before {
@@ -373,6 +373,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	opacity: 0.4;
 
 	box-shadow: inset 0 50px 55px -60px var(--color);
+	transition: height var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .top {
@@ -433,7 +434,10 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 .scheduleList > .listItem > .items > .item > .subject {
 	display: flex;
 	flex-direction: row;
-	margin-top: 10px;
+	margin-top: 8px;
+
+	transform-origin: center left;
+	transition: transform calc(var(--collapse-duration) - 0.1s) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .subject > .inner,
@@ -443,22 +447,14 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
     font-weight: 800;
 }
 
-.scheduleList > .listItem > .items > .item > .subject > .inner {
-	position: absolute;
-	top: 40px;
-	transition: all calc(var(--collapse-duration) - 0.1s) var(--collapse-timing);
-}
-
-.scheduleList > .listItem > .items > .item > .subject > .placeholder {
-	visibility: hidden;
-}
-
 .scheduleList > .listItem > .items > .item > .subject > .openNote {
 	cursor: pointer;
 	margin-left: 10px;
 }
 
 .scheduleList > .listItem > .items > .item > .teacher {
+	margin-top: 8px;
+	
 	font-family: Calibri;
     font-size: 18px;
     font-weight: bold;
@@ -519,7 +515,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 }
 
 .scheduleList > .listItem > .items > .item.collapse > .top {
-	margin-top: 4px;
+	margin-top: 5px;
 }
 
 .scheduleList > .listItem > .items > .item.collapse > .top > icon {
@@ -530,9 +526,9 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	height: 0;
 }
 
-.scheduleList > .listItem > .items > .item.collapse > .subject > .inner {
-	top: 12px;
-	font-size: 17px;
+.scheduleList > .listItem > .items > .item.collapse > .subject {
+	transition-duration: var(--collapse-duration);
+	transform: translateY(-34px) scale(0.8);
 }
 
 .scheduleList > .listItem > .items > .item.collapse > .top > .status,

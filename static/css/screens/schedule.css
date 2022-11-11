@@ -170,6 +170,9 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 
 .scheduleList > .listItem {
 	position: relative;
+
+	--collapse-timing: cubic-bezier(0.33, 1, 0.68, 1);
+	--collapse-duration: 0.4s;
 }
 
 .scheduleList > .listItem:last-child {
@@ -247,10 +250,13 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	display: flex;
 	flex-direction: column;
 
-	background-color: white;
+	max-height: 155px;
 	margin-bottom: 10px;
 	padding: 8px 10px;
 	border-radius: 12px;
+	background-color: white;
+
+	transition: max-height var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item::before {
@@ -373,6 +379,11 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	transition: margin var(--collapse-duration) var(--collapse-timing);
+}
+
+.scheduleList > .listItem > .items > .item > .top > .status {
+	transition: opacity var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .top > .status[data-status="Học"] {
@@ -401,10 +412,22 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	font-size: 14px;
 	font-weight: bold;
 	line-height: 100%;
+
+	transition: opacity var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .top > .time {
 	font-weight: bold;
+}
+
+.scheduleList > .listItem > .items > .item > .top > icon {
+	flex-grow: 0;
+	flex-shrink: 0;
+	margin-left: 8px;
+
+	font-size: 8px;
+	cursor: pointer;
+	transition: transform var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .subject {
@@ -413,10 +436,21 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	margin-top: 10px;
 }
 
-.scheduleList > .listItem > .items > .item > .subject > .inner {
+.scheduleList > .listItem > .items > .item > .subject > .inner,
+.scheduleList > .listItem > .items > .item > .subject > .placeholder {
 	font-family: var(--heading-font);
     font-size: 22px;
     font-weight: 800;
+}
+
+.scheduleList > .listItem > .items > .item > .subject > .inner {
+	position: absolute;
+	top: 40px;
+	transition: all calc(var(--collapse-duration) - 0.1s) var(--collapse-timing);
+}
+
+.scheduleList > .listItem > .items > .item > .subject > .placeholder {
+	visibility: hidden;
 }
 
 .scheduleList > .listItem > .items > .item > .subject > .openNote {
@@ -429,6 +463,8 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
     font-size: 18px;
     font-weight: bold;
 	line-height: 16px;
+
+	transition: opacity var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .teacher::before {
@@ -444,6 +480,8 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	flex-direction: row;
 	align-items: center;
 	margin-top: 8px;
+
+	transition: opacity var(--collapse-duration) var(--collapse-timing);
 }
 
 .scheduleList > .listItem > .items > .item > .bottom > span {
@@ -474,6 +512,34 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 	cursor: pointer;
 	color: rgb(0, 0, 177);
 	text-decoration: underline;
+}
+
+.scheduleList > .listItem > .items > .item.collapse {
+	max-height: 30px;
+}
+
+.scheduleList > .listItem > .items > .item.collapse > .top {
+	margin-top: 4px;
+}
+
+.scheduleList > .listItem > .items > .item.collapse > .top > icon {
+	transform: rotate(180deg);
+}
+
+.scheduleList > .listItem > .items > .item.collapse > .gradient::after {
+	height: 0;
+}
+
+.scheduleList > .listItem > .items > .item.collapse > .subject > .inner {
+	top: 12px;
+	font-size: 17px;
+}
+
+.scheduleList > .listItem > .items > .item.collapse > .top > .status,
+.scheduleList > .listItem > .items > .item.collapse > .top > .classroom,
+.scheduleList > .listItem > .items > .item.collapse > .teacher,
+.scheduleList > .listItem > .items > .item.collapse > .bottom  {
+	opacity: 0;
 }
 
 /**? ------------ SCREEN.SCHEDULE MAIN STYLE ------------ */
@@ -540,7 +606,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 }
 
 .scheduleScreen > .list > .note > .inner {
-	font-size: 12px;
+	font-size: 14px;
 }
 
 @media only screen and (max-width: 500px) {

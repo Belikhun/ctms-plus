@@ -180,7 +180,7 @@ const ScheduleScreen = {
 
 					// Render notice for user
 					this.note.set({
-						level: "okay",
+						level: "info",
 						message: `
 							Đang hiển thị lịch học đã lưu của <b>${cache.name}</b> vào ${humanReadableTime(cache.stored)}.<br>
 							<a href="javascript:core.account.subWindow.show()">Đăng nhập</a> để cập nhật lịch học mới nhất!
@@ -571,10 +571,12 @@ const ScheduleScreen = {
 						tag: { tag: "span", class: ["generalTag", "status"], data: { status: row.status }, text: row.status },
 						classroom: { tag: "t", class: "classroom", text: row.classroom },
 						time: { tag: "t", class: "time", html: `${row.time[0]}<arr></arr>${row.time[1]}` },
+						collapse: { tag: "icon", icon: "arrowUp" }
 					}},
 
 					subject: { tag: "span", class: "subject", child: {
-						inner: { tag: "t", class: "inner", text: row.subject }
+						inner: { tag: "t", class: "inner", text: row.subject },
+						placeholder: { tag: "t", class: "placeholder", text: row.subject }
 					}},
 
 					teacher: { tag: "t", class: "teacher", text: row.teacher },
@@ -593,9 +595,16 @@ const ScheduleScreen = {
 					}}
 				});
 
-				if (today > row.date[1])
+				item.top.collapse.addEventListener("click", () => {
+					item.classList.toggle("collapse");
+				});
+
+				if (today > row.date[1]) {
 					item.classList.add("passed");
-				else if (today > row.date[0])
+
+					// Collapese by default
+					item.classList.add("collapse");
+				} else if (today > row.date[0])
 					item.classList.add("inProgress");
 
 				if (typeof row.noteID === "number") {

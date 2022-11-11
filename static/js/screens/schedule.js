@@ -180,7 +180,7 @@ const ScheduleScreen = {
 
 					// Render notice for user
 					this.note.set({
-						level: "okay",
+						level: "info",
 						message: `
 							Đang hiển thị lịch học đã lưu của <b>${cache.name}</b> vào ${humanReadableTime(cache.stored)}.<br>
 							<a href="javascript:core.account.subWindow.show()">Đăng nhập</a> để cập nhật lịch học mới nhất!

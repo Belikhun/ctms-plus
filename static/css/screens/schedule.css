@@ -606,7 +606,7 @@ table.scheduleTable > tbody > .row > td[key="classID"].clickable {
 }
 
 .scheduleScreen > .list > .note > .inner {
-	font-size: 12px;
+	font-size: 14px;
 }
 
 @media only screen and (max-width: 500px) {

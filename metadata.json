@@ -26,6 +26,11 @@
             "default": true
         },
 
+        "render": {
+            "host": "https://ctmsmw.onrender.com",
+            "name": "Render (Node)"
+        },
+
         "heroku-node": {
             "host": "https://ctmsmw-node.herokuapp.com",
             "name": "Heroku Middleware (Node)"

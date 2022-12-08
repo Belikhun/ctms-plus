@@ -21,7 +21,7 @@
     },
     "middleware": {
         "maylockhongkhi": {
-            "host": "https://e1ac-42-115-249-141.ap.ngrok.io",
+            "host": "https://eabd-58-186-70-159.ap.ngrok.io",
             "name": "maylockhongkhi (Node)",
             "default": true
         },
@@ -29,16 +29,6 @@
         "render": {
             "host": "https://ctmsmw.onrender.com",
             "name": "Render (Node)"
-        },
-
-        "heroku-node": {
-            "host": "https://ctmsmw-node.herokuapp.com",
-            "name": "Heroku Middleware (Node)"
-        },
-
-        "heroku": {
-            "host": "https://ctmsmw.herokuapp.com",
-            "name": "Heroku Middleware"
         },
         
         "local": {

@@ -21,7 +21,7 @@
     },
     "middleware": {
         "maylockhongkhi": {
-            "host": "https://6a16-2405-4802-155-e1b0-e65f-1ff-fe45-8c7f.ap.ngrok.io",
+            "host": "https://d423-117-5-140-156.ap.ngrok.io",
             "name": "maylockhongkhi (Node)",
             "default": true
         },

@@ -3,9 +3,9 @@
 
 ![Header](/static/img/ctms-header.svg)
 
-[![Build](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%9A%80%20build%20and%20deploy?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/build.yml)
-[![Load Test](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%8D%A1%20page%20load%20test?label=%F0%9F%8D%A1%20page%20load%20test&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/load.yml)
-[![Full Tests](https://img.shields.io/github/workflow/status/Belikhun/ctms-plus/%F0%9F%9A%80%20full%20tests%20(using%20test%20framework)?label=%F0%9F%9A%80%20full%20tests%20%28using%20test%20framework%29&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/tests.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/Belikhun/ctms-plus/build.yml?style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/build.yml)
+[![Load Test](https://img.shields.io/github/actions/workflow/status/Belikhun/ctms-plus/load.yml?label=%F0%9F%A7%AA%20page%20load%20test&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/load.yml)
+[![Full Tests](https://img.shields.io/github/actions/workflow/status/Belikhun/ctms-plus/tests.yml?label=%F0%9F%94%AE%20function%20tests&style=for-the-badge)](https://github.com/Belikhun/ctms-plus/actions/workflows/tests.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/Belikhun/ctms-plus/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/Belikhun/ctms-plus)
 
 ---

@@ -546,6 +546,9 @@ const api = {
 		let resultTableRows = [ ...response.dom.querySelectorAll(`#leftcontent > table.RowEffect.CenterElement > tbody > tr`) ]
 
 		let __procPoint = (node) => {
+			if (!node || !node.tagName)
+				return undefined;
+
 			let v = node.innerText.trim();
 
 			if (v === "")

@@ -68,6 +68,12 @@ const api = {
 	 */
 	responseHandlers: {},
 
+	resultIgnoreList: [
+		"sinh hoạt",
+		"giáo dục",
+		"kiến tập"
+	],
+
 	/**
 	 * Regiter on reponse handler that will be triggered when an
 	 * API call is completed.
@@ -722,6 +728,16 @@ const api = {
 							encountered[iden] = { index, average: data.average }
 						}
 					}
+				}
+			}
+		}
+
+		for (let item of response.info.results) {
+			// If this item is in the ignore list, ignore it.
+			for (let ignore of this.resultIgnoreList) {
+				if (item.subject.toLowerCase().indexOf(ignore) !== -1) {
+					item.ignored = true;
+					break;
 				}
 			}
 		}

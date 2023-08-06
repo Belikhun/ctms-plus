@@ -21,7 +21,7 @@
     },
     "middleware": {
         "maylockhongkhi": {
-            "host": "https://6b33-113-23-55-175.ngrok-free.app",
+            "host": "https://096a-113-22-47-81.ngrok-free.app",
             "name": "maylockhongkhi (Node)",
             "default": true
         },

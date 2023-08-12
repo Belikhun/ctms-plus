@@ -115,13 +115,9 @@ chromeOptions.add_argument("--headless")
 chromeOptions.add_argument("--no-sandbox")
 chromeOptions.add_argument("--disable-dev-shm-usage")
 chromeOptions.add_argument("--log-level=3")
-desiredCapabilities = DesiredCapabilities.CHROME
 
 try:
-	driver = webdriver.Chrome(
-		options = chromeOptions,
-		desired_capabilities = desiredCapabilities
-	)
+	driver = webdriver.Chrome(options = chromeOptions)
 except Exception as e:
 	server.stop()
 	raise e

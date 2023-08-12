@@ -70,7 +70,7 @@ class CoreScreen {
 				buttons: { tag: "span", class: "buttons", child: {
 
 					reload: createButton("TẢI LẠI", {
-						style: "round",
+						style: "big",
 						icon: "reload",
 						complex: true
 					})
@@ -218,7 +218,7 @@ class CoreScreen {
 		for (let key of Object.keys(buttons)) {
 			let b = createButton(buttons[key].text, {
 				color: buttons[key].color || "blue",
-				style: "round",
+				style: "big",
 				icon: buttons[key].icon,
 				complex: true
 			});
@@ -1232,9 +1232,11 @@ var core = {
 		priority: 4,
 
 		loggedIn: false,
-		background: null,
 		email: undefined,
 		password: undefined,
+		
+		/** @type {TriangleBackground} */
+		background: null,
 
 		/** @type {UserInfo} */
 		userInfo: undefined,
@@ -1260,7 +1262,12 @@ var core = {
 			let container = document.createElement("span");
 			container.classList.add("component", "account");
 
-			this.background = triBg(container, { color: "darkBlue", scale: 1, triangleCount: 8, speed: 6 });
+			this.background = triBg(container, {
+				color: "darkBlue",
+				scale: 1,
+				triangleCount: 8,
+				speed: 6
+			});
 
 			this.avatarNode = new lazyload({
 				source: "./static/img/guest.png",
@@ -1293,7 +1300,7 @@ var core = {
 				note: createNote({
 					level: "warning",
 					message: "This is a sample warning",
-					style: "round"
+					style: "big"
 				}),
 
 				username: createInput({
@@ -1323,17 +1330,19 @@ var core = {
 					color: "blue",
 					type: "submit",
 					classes: "submit",
-					style: "round",
+					style: "big",
 					icon: "signin",
+					triangleStyle: "border",
 					complex: true
 				}),
 
 				forgotBtn: createButton("Quên Mật Khẩu", {
 					color: "pink",
 					classes: "forgot",
-					style: "round",
+					style: "big",
 					icon: "key",
 					complex: true,
+					triangleStyle: "border",
 					disabled: true
 				})
 			});
@@ -1395,16 +1404,18 @@ var core = {
 				renewBtn: createButton("Làm Mới Phiên", {
 					color: "orange",
 					classes: "logout",
-					style: "round",
+					style: "big",
 					icon: "reload",
+					triangleStyle: "border",
 					complex: true
 				}),
 
 				signoutBtn: createButton("ĐĂNG XUẤT", {
 					color: "blue",
 					classes: "logout",
-					style: "round",
+					style: "big",
 					icon: "signout",
+					triangleStyle: "border",
 					complex: true
 				})
 			});
@@ -1415,8 +1426,11 @@ var core = {
 				speed: 64
 			});
 
+			this.subWindow.content = this.loginView;
+			this.subWindow.loading = true;
+
 			set({ p: 30, d: `Attaching Listeners` });
-			core.darkmode.onToggle((dark) => userCardBG.setColor(dark ? "dark" : "whitesmoke"));
+			core.darkmode.onToggle((dark) => userCardBG.color = dark ? "dark" : "whitesmoke");
 			navbar.insert({ container }, "right");
 
 			// Attach response handlers
@@ -1492,7 +1506,7 @@ var core = {
 				this.userInfo = undefined;
 				
 				this.nameNode.innerText = "Khách";
-				this.background.setColor("darkRed");
+				this.background.color = "darkRed";
 				this.avatarNode.src = this.detailView.userCard.top.avatar.src = "./static/img/guest.png";
 				this.detailView.userCard.top.info.email.innerText = "";
 				this.navtip.set({ description: `nhấn để đăng nhập!` });
@@ -1510,7 +1524,7 @@ var core = {
 
 					// Dis is poor-man inline css 😥
 					this.nameNode.innerHTML = `<icon style="font-size: 14px; margin-right: 4px;" data-icon="exclamation"></icon> lỗi đăng nhập!`;
-					this.background.setColor("red");
+					this.background.color = "red";
 				} else
 					this.loginView.note.group.style.display = "none";
 
@@ -1526,7 +1540,7 @@ var core = {
 				this.subWindow.loading = true;
 				this.subWindow.content = this.detailView;
 				this.nameNode.innerText = "đang tải dữ liệu...";
-				this.background.setColor("navyBlue");
+				this.background.color = "navyBlue";
 				
 				let promises = []
 				this.loginHandlers.forEach(f => promises.push(f()));
@@ -1575,7 +1589,7 @@ var core = {
 			if (email === this.email)
 				return;
 
-			this.avatarNode.src = this.detailView.userCard.top.avatar.src = `https://www.gravatar.com/avatar/${md5(email)}?s=160`;
+			this.avatarNode.src = this.detailView.userCard.top.avatar.src = `https://www.gravatar.com/avatar/${md5(email)}?s=160&d=identicon`;
 			this.detailView.userCard.top.info.email.innerText = email;
 			this.email = email;
 		},
@@ -1594,7 +1608,7 @@ var core = {
 			localStorage.removeItem("session.username");
 			localStorage.removeItem("session.password");
 			this.nameNode.innerText = "đang đăng nhập...";
-			this.background.setColor("purple");
+			this.background.color = "purple";
 
 			try {
 				await api.login({ username, password });

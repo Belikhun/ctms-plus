@@ -198,7 +198,7 @@ const ResultScreen = {
 		let scanButton = createButton("XẾP NHÓM", {
 			icon: "search",
 			color: "orange",
-			style: "round",
+			style: "big",
 			complex: true
 		});
 

@@ -44,7 +44,7 @@ const HomeScreen = {
 				confirm: createButton("XEM", {
 					icon: "calendarWeek",
 					color: "orange",
-					style: "round",
+					style: "big",
 					complex: true,
 					disabled: true
 				}),
@@ -68,7 +68,7 @@ const HomeScreen = {
 				edit: createButton(undefined, {
 					icon: "pencil",
 					color: "blue",
-					style: "round",
+					style: "big",
 					complex: true
 				})
 			}},
@@ -97,14 +97,14 @@ const HomeScreen = {
 			buttons: { tag: "div", class: "buttons", child: {
 				edit: createButton("CHỈNH SỬA", {
 					color: "blue",
-					style: "round",
+					style: "big",
 					icon: "pencil",
 					complex: true
 				}),
 
 				help: createButton("Video Hướng Dẫn", {
 					color: "purple",
-					style: "round",
+					style: "big",
 					icon: "question",
 					complex: true
 				})

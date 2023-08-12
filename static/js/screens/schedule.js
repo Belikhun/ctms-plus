@@ -42,7 +42,7 @@ const ScheduleScreen = {
 				confirm: createButton("XEM LỊCH", {
 					icon: "calendarWeek",
 					color: "brown",
-					style: "round",
+					style: "big",
 					complex: true,
 					disabled: true
 				}),
@@ -51,6 +51,7 @@ const ScheduleScreen = {
 					icon: "backward",
 					color: "blue",
 					classes: "controlWeekLeft",
+					style: "big",
 					complex: true,
 					disabled: true,
 				}),
@@ -60,6 +61,7 @@ const ScheduleScreen = {
 					color: "blue",
 					align: "right",
 					classes: "controlWeekRight",
+					style: "big",
 					complex: true,
 					disabled: true
 				})

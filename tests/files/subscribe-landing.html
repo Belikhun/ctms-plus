@@ -1,0 +1,458 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	CTMS - Một sản phẩm của OTSC
+</title><meta http-equiv="PRAGMA" content="NO-CACHE" /><meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
+    <link href="http://ctms.fithou.net.vn/css/downloads/w3.css" rel="stylesheet" type="text/css" />
+	<link rel="Stylesheet" type="text/css" href="/css/CTMS.screen.css" media="screen" /><link rel="Stylesheet" type="text/css" href="/css/CTMS.print.css" media="print" /><link rel="Stylesheet" type="text/css" href="/css/common.css" /><link rel="Stylesheet" type="text/css" href="/css/jqueryslidemenu.css" /><link rel="Stylesheet" type="text/css" href="/css/RC.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link href="http://ctms.fithou.net.vn/css/downloads/w3switch.css" rel="stylesheet" type="text/css" />
+	<link href="http://ctms.fithou.net.vn/css/ctms.switch.css" rel="stylesheet" type="text/css" />
+    
+    
+    
+    <script type="text/javascript" src="/scripts/jquery.tools.min.js"></script>
+    <script type="text/javascript" src="/scripts/jqueryslidemenu.js"></script>
+    <script type="text/javascript" src="/scripts/CallbackScript.js"></script>
+    <script type="text/javascript" src="/scripts/CheckboxScript.js"></script>
+    <script type="text/javascript" src="/scripts/OverlayScript.js"></script>
+    <script type="text/javascript" src="/scripts/DateTimePicker.js"></script>
+    
+    <style type="text/css">
+        td ul
+        {
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+        h3
+        {
+            text-align: left;
+        }
+    </style>
+    <script type="text/javascript">
+        var itv = null;
+        function countDown() {
+            var sp = document.getElementById("spSeconds");
+            var x = parseInt(sp.firstChild.data);
+            sp.firstChild.data = --x;
+            
+            if (x == 1) {
+                clearInterval(itv);
+                sp.parentNode.innerHTML = "<img src='/images/ajaxbar.gif' alt='Đang tải dữ liệu' title='Đang tải dữ liệu' />";
+                getSubcribleModule();
+            }
+        }
+        function getSubcribleModule() {
+            var args = "getmodule:" + 6406;
+            var context = "";
+            WebForm_DoCallback('__Page',args,showSubcribleModule,context,showError,true);
+        }
+        function showSubcribleModule(data) {
+            var dv = document.getElementById("leftcontent");
+            dv.innerHTML = data;
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="./DangkyLoptinchi.aspx?sid=" id="form1">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJNTU0NDQwMzk4ZGRMExXiqzsNsCGrc9WjobZoDcCzO2od6+mLzUrLiU+Rww==" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=EVjaqRPkmSdO_x14z3d4YFI7h5X8dE3_8dNmLA_CUGOL_REzd2uR4ZUZbzt_e583l3Xjxazym_i0fVAaADD9alK_c4MThcGAMhLeS0IPxXE1&amp;t=636765208020000000" type="text/javascript"></script>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="4B900DBD" />
+</div>
+    <div id="container">
+        <div id="header">
+            <div id="banner">
+                <div id="logo">
+                    CTMS
+                </div>
+                <div class="jqueryslidemenu" id="topmenu">
+                    
+<script type="text/javascript">
+    function doLogout() {
+        var arg = "logout";
+        var context = "";
+        WebForm_DoCallback('ctl00$QuanlyMenu1',arg,logoutFinished,context,null,false);
+    }
+
+    function logoutFinished(arg, context) {
+        location.href="http://ctms.fithou.net.vn/login.aspx";
+    }
+</script>
+<ul>
+    <li><a href="#">Liên kết</a>
+        <ul>
+            <li><a href="http://www.fithou.edu.vn">Trang chủ</a></li>
+            <li><a href="http://ctms.fithou.net.vn/index.aspx" tabindex="100">
+                CTMS</a></li>
+            <li><a href="http://forum.fithou.net.vn" target="_blank">FForum</a></li></ul>
+    </li>
+    
+    <!--Cập nhật hồ sơ sinh viên-->
+    
+    <!--Cập nhật điểm-->
+    
+    <li><a href="#">Cá nhân</a>
+        <ul>
+            
+            <li><a href="http://ctms.fithou.net.vn/KetquaHoctap.aspx?sid=">
+                Kết quả học tập</a></li>
+            
+            <li><a href="http://ctms.fithou.net.vn/ChuyennganhDangky.aspx">
+                Đăng ký Chuyên ngành</a></li>
+            
+            <li><a href="http://ctms.fithou.net.vn/DangkyLoptinchi.aspx?sid=">
+                Đăng ký Lớp tín chỉ</a></li>
+            
+            <li><a href="http://ctms.fithou.net.vn/HocphiDsHoadonSV.aspx?sid=">
+                Hoá đơn học phí</a></li>
+            
+            <li><a href="http://ctms.fithou.net.vn/ChangePassword.aspx">
+                Đổi mật khẩu</a></li>
+            <li><a href="javascript:doLogout();">Thoát</a></li>
+        </ul>
+        <!--16-->
+    </li>
+    <!--TEST-->
+    
+    <li><a href="http://ctms.fithou.net.vn/Lichhoc.aspx?sid=">
+        Lịch học </a></li>
+    <li><a href="http://ctms.fithou.net.vn/Lichthi.aspx?sid=">
+        Lịch thi </a></li>
+    <li><a href="http://ctms.fithou.net.vn/ChuongtrinhDaotaoSinhvien.aspx?sid=">
+        Chương trình đào tạo</a></li>
+    
+    <li><a href='/helps/StudentGuide.html'>Trợ giúp</a></li>
+</ul>
+<!--18-->
+
+                </div>
+                <script type="text/javascript">
+                    jqueryslidemenu.buildmenu("topmenu", arrowimages);
+                </script>
+            </div>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+        <div id="content">
+            <div id="topbackground" class="noprint">
+                
+                
+                
+
+                
+  
+    <h2>
+        Đăng ký lớp tín chỉ</h2>
+   
+
+            </div>
+            <div class="clear">
+            </div>
+            <div id="leftcontent">
+                
+    
+    <h3 style="text-align: center;">
+        Quá trình tải dữ liệu sẽ chạy sau <span id="spSeconds">30</span> giây!</h3>
+    
+    <script type="text/javascript">
+        itv = setInterval(countDown, 1000);
+    </script>
+    <div style="display: none">
+        
+<style type="text/css">
+    .lichhoc
+    {
+        margin: 0px;
+    }
+    .redtext
+    {
+        color: Red;
+    }
+    .handangky
+    {
+        font-size: smaller;
+        text-align: right;
+    }
+    .khuyennghi
+    {
+        background-image: url('/images/star32.png'); /*background-color:Green;*/
+        background-position: center center;
+        cursor: pointer;
+        display: block;
+        font-size: smaller;
+        height: 32px;
+        line-height: 32px;
+        margin: 0 auto 0 auto;
+        text-align: center;
+        width: 32px;
+    }
+</style>
+
+<script type="text/javascript">
+    var tmp=0;
+    function subcrible(loptcID, sinhvienID, ct) {
+        var args = "subcrible:" + loptcID+ ":" + sinhvienID;
+        var context = 'dvLopChoDangky';
+        tmp=sinhvienID;
+        WebForm_DoCallback('ctl00$LeftCol$LoptinchiDangky1',args,hienLoptinchi,context,null,false);
+        showWaiting(loptcID);
+        //remove the same subject rows
+        var trNodes = document.getElementsByTagName("tr");
+        var i=0;
+        while( i<trNodes.length){
+            if (trNodes[i].title!=null && trNodes[i].title==("m"+ct)){
+                trNodes[i].parentNode.removeChild(trNodes[i],true);
+            }
+            else 
+                i++;
+        }
+    }
+    function unSubcrible(loptcID, sinhvienID){
+        var ans = confirm("Bạn có chắc chắn muốn huỷ đăng ký này?");
+        if(!ans) return;
+        var args = "unsubcrible:" + loptcID + ":" + sinhvienID;
+        var context = 'dvLopChoDangky';
+        tmp=sinhvienID;
+        WebForm_DoCallback('ctl00$LeftCol$LoptinchiDangky1',args,hienLoptinchi,context,null,false);
+        showWaiting(loptcID);
+    }
+    function hienLoptinchi(data, context){
+        if (data.indexOf("Lỗi: ")>=0){
+            alert(data);
+            return;
+        }
+        var dv = document.getElementById(context);
+        dv.innerHTML = data;
+        if(context=='dvLopChoDangky')
+            getLopVuaDangky();
+    }
+    function getLopVuaDangky(){
+        var args = "list:" + tmp;
+        var context='dvLopVuaDangky';
+        WebForm_DoCallback('ctl00$LeftCol$LoptinchiDangky1',args,hienLoptinchi,context,null,false);
+    }
+    function showWaiting(lid){
+        var obj = document.getElementById('a' + lid);
+        var w = document.createElement('img');
+        w.setAttribute("src","/images/ajax.gif");
+        obj.parentNode.replaceChild(w, obj);
+    }
+</script>
+
+<h3>
+    Sinh viên
+    </h3>
+<span id="LeftCol_LoptinchiDangky1_lblHocphi" class="thongbao"></span>
+<div id="dvLopChoDangky" class="noprint">
+    
+</div>
+<div id="dvLopVuaDangky">
+    
+</div>
+
+    </div>
+    
+                <!--ABC-->
+                
+                <div style="width: 45%; float: left; margin-right: 10px;"  class="noprint">
+                    
+                </div>
+                <div style="width: 45%; float: left" class="noprint">
+                    
+
+<script type="text/javascript" src="/Scripts/RateScript.js"></script>
+<script type="text/javascript">
+   
+    function rateCH(item, cahocID, rating) {
+        if(rating!=undefined)
+        {
+            var arg = "rate:" + cahocID + ":" + rating;
+            for(var i=1; i<=rating;i++)
+            {
+                var a = document.getElementById("RateCahoc"+cahocID+i);
+                a.className = "ratingStar filledStar";
+            }
+            var context = cahocID;
+            WebForm_DoCallback('ctl00$RateCahoc1',arg,rateResult,context,null,true)
+        }
+    }
+
+    function rateResult(arg, context) {
+        var id = "saveImageCH"+context;
+        if(arg!="false")
+        {
+            document.getElementById("dvCahoc").innerHTML = arg;
+            hienGiatriTrungbinh('dvCahoc');
+            document.getElementById(id).setAttribute('display','block');
+            document.getElementById(id).className = "pull-right";
+        }
+    }
+    function hoverCH(element, cahocID) {
+        //reset về trắng hết
+        for (var i = 1; i <= 5; i++) {
+            var a = document.getElementById("RateCahoc" + cahocID + i);
+            a.className = "ratingStar emptyStar";
+        }
+
+        var rate = element.title;
+        for(var i=1; i<=rate;i++){
+            var a = document.getElementById("RateCahoc"+cahocID+i);
+            a.className = "ratingStar filledStar";
+        }
+    }
+    function outCH(element,cahocID){
+        var a = element.getElementsByTagName('a');
+        for(var i=1; i<=5;i++)
+        {
+            var a = document.getElementById("RateCahoc"+cahocID+i);
+            a.className = "ratingStar emptyStar";
+        }
+        var input = element.getElementsByTagName('input');
+        if (input[0] != undefined) {
+            var rate = input[0].value;
+            var arrTagA = element.getElementsByTagName('a');
+            for (var j = 0; j < rate; j++) {
+                if (j >= 5)
+                    break;
+                arrTagA[j].className = "ratingStar filledStar ";
+            }
+        }
+    }
+</script>
+<div id="dvCahoc" class="rcBox">
+    
+</div>
+
+                </div>
+                
+                <div class="clear">
+                </div>
+            </div>
+            <div id="rightcontent">
+                
+                <div class="noprint">
+                
+
+<script type="text/javascript" src="/Scripts/RateScript.js"></script>
+<script type="text/javascript">
+    function rateCM(item, chuyenmonID, rating) {
+        if(rating!=undefined)
+        {
+            var arg = "rate:" + chuyenmonID + ":" + rating;
+            for(var i=1; i<=rating;i++)
+            {
+                var a = document.getElementById("RateChuyenmon"+chuyenmonID+i);
+                a.className = "ratingStar filledStar";
+            }
+            var context = chuyenmonID;
+            WebForm_DoCallback('ctl00$RateChuyenmon1',arg,rateResultCM,context,null,true)
+        }
+    }
+
+    function rateResultCM(arg, context) {
+        var id = "saveImageCM"+context;
+        if(arg!="false")
+        {
+            document.getElementById("dvChuyenmon").innerHTML = arg;
+            hienGiatriTrungbinh('dvChuyenmon');
+            document.getElementById(id).setAttribute('display','block');
+            document.getElementById(id).className = "pull-right";
+        }
+    }
+    function hoverCM(element, chuyenmonID) {
+        //Reset về trắng toàn bộ
+        for (var i = 1; i <= 5; i++) {
+            var a = document.getElementById("RateChuyenmon" + chuyenmonID + i);
+            a.className = "ratingStar emptyStar";
+        }
+
+        var rate = element.title;
+        for(var i=1; i<=rate;i++){
+            var a = document.getElementById("RateChuyenmon"+chuyenmonID+i);
+            a.className = "ratingStar filledStar";
+        }
+    }
+    function outCM(element,chuyenmonID){
+        var a = element.getElementsByTagName('a');
+        for(var i=1; i<=5;i++)
+        {
+            var a = document.getElementById("RateChuyenmon"+chuyenmonID+i);
+            a.className = "ratingStar emptyStar";
+        }
+        var input = element.getElementsByTagName('input');
+        if (input[0] != undefined)
+        {
+            var rate = input[0].value;
+            var arrTagA = element.getElementsByTagName('a');
+            for (var j = 0; j < rate; j++) {
+                if (j >= 5)
+                    break;
+                arrTagA[j].className = "ratingStar filledStar ";
+            }
+        }
+    }
+</script>
+<div id="dvChuyenmon" class="rcBox">
+    
+</div>
+</div>
+                
+
+            </div>
+            <div class="clear">
+            </div>            
+        </div>
+        <!--FOOTER-->
+        <div id="footer" class="noprint">
+            <div class="menu jqueryslidemenu" id="menubottom" style="color: White; text-align: center;">
+                Hiện có
+                368
+                truy cập.
+                <div class="clear">
+                </div>
+            </div>
+            <div id="copyright">
+                <div class="CenterElement w3-center w3-margin-top">
+                    Một sản phẩm của <a href='http://otsc.fithou.net.vn' target="_blank">OTSC</a>.</div>
+                <div class="clear">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+<script type="text/javascript">
+//<![CDATA[
+
+WebForm_InitCallback();//]]>
+</script>
+</form>
+</body>
+</html>

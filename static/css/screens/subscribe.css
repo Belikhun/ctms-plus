@@ -331,10 +331,14 @@ body.dark .subscribeScreen > .content > .item {
 	background-color: #242424;
 }
 
+body.dark .subscribeScreen > .content > .item > .details > .right > div > span > .label {
+	border-bottom-color: rgba(70, 70, 70, 0.6);
+}
+
 body.dark .subscribeScreen > .content > .item > .details > .right > .top > .subProgress > .bar {
 	background-color: rgb(75, 75, 75);
 }
 
 body.dark .subscribeScreen > .content > .item > .details > .right > .top > .subProgress > .min {
-	--color: rgb(255, 117, 53);
+	--color: rgb(255, 156, 173);
 }

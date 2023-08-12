@@ -1262,7 +1262,12 @@ var core = {
 			let container = document.createElement("span");
 			container.classList.add("component", "account");
 
-			this.background = triBg(container, { color: "darkBlue", scale: 1, triangleCount: 8, speed: 6 });
+			this.background = triBg(container, {
+				color: "darkBlue",
+				scale: 1,
+				triangleCount: 8,
+				speed: 6
+			});
 
 			this.avatarNode = new lazyload({
 				source: "./static/img/guest.png",
@@ -1401,6 +1406,7 @@ var core = {
 					classes: "logout",
 					style: "big",
 					icon: "reload",
+					triangleStyle: "border",
 					complex: true
 				}),
 
@@ -1409,6 +1415,7 @@ var core = {
 					classes: "logout",
 					style: "big",
 					icon: "signout",
+					triangleStyle: "border",
 					complex: true
 				})
 			});
@@ -1582,7 +1589,7 @@ var core = {
 			if (email === this.email)
 				return;
 
-			this.avatarNode.src = this.detailView.userCard.top.avatar.src = `https://www.gravatar.com/avatar/${md5(email)}?s=160`;
+			this.avatarNode.src = this.detailView.userCard.top.avatar.src = `https://www.gravatar.com/avatar/${md5(email)}?s=160&d=identicon`;
 			this.detailView.userCard.top.info.email.innerText = email;
 			this.email = email;
 		},

@@ -190,13 +190,10 @@ const api = {
 				await this.__handleResponse("error", error);
 
 				// Check maintain mode
-				if (error.data.status === 503 && error.data.data && error.data.data.response) {
-					let dom = document.createElement("template");
-					dom.innerHTML = error.data.data.response;
-
-					throw { code: -1, description: `api.request(): CTMS đang bảo trì!`, data: {
-						code: -1,
-						description: dom.content.querySelector("h1").innerText
+				if (error.data.status === 503) {
+					throw { code: -1, description: `CTMS hiện đang dừng hoạt động để bảo trì! CTMS_HTTP_503`, data: {
+						code: 503,
+						description: error.data.description
 					}}
 				}
 	

@@ -20,10 +20,20 @@
         }
     },
     "middleware": {
-        "maylockhongkhi": {
-            "host": "https://2eb9-2405-4802-1d74-f690-e65f-1ff-fe45-8c7f.ngrok-free.app",
-            "name": "maylockhongkhi (Node)",
+        "houdev": {
+            "host": "https://lrs.hou.edu.vn/mw",
+            "name": "hát o u (dev)",
             "default": true
+        },
+
+        "lambda": {
+            "host": "http://103.172.238.138:22075",
+            "name": "lambda"
+        },
+
+        "maylockhongkhi": {
+            "host": "https://out-of-service.now",
+            "name": "maylockhongkhi (Node)"
         },
 
         "render": {

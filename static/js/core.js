@@ -1145,7 +1145,7 @@ var core = {
 						checkData[key].status = "error";
 						row.status.dataset.status = "error";
 
-						resolve();
+						resolve(key);
 						return;
 					}
 
@@ -1153,7 +1153,7 @@ var core = {
 					checkData[key].ping = performance.now() - start;
 					row.status.dataset.status = "good";
 					row.ping.innerText = `${round(checkData[key].ping, 2)}ms`;
-					resolve();
+					resolve(key);
 				}));
 			}
 
@@ -1175,23 +1175,19 @@ var core = {
 			}, 100);
 
 			// Await all check to complete
-			await Promise.all(promises);
+			let target = await new Promise((resolve) => {
+				for (let promise of promises) {
+					promise.then((key) => {
+						if (checkData[key].status !== "good")
+							return;
+		
+						resolve(key);
+					});
+				}
+			});
 
 			if (cancelled)
 				return;
-
-			// Find suitable middleware
-			let minPing = 999999;
-			let target;
-			for (let key of Object.keys(checkData)) {
-				if (checkData[key].status !== "good")
-					continue;
-
-				if (checkData[key].ping < minPing) {
-					target = key;
-					minPing = checkData[key].ping;
-				}
-			}
 			
 			// Hack the popup
 			if (popup.showing) {
@@ -1206,7 +1202,7 @@ var core = {
 					color: oscColor("blue")
 				}, `(${this.list[target].host})`);
 
-				popup.popup.header.dataset.triColor = "green";
+				popup.background.color = "green";
 				popup.popup.body.top.description.innerHTML = `Đã chuyển sang middleware <b>${this.list[target].name}</b>!`;
 				this.select.set({ value: target });
 			} else {
@@ -1221,7 +1217,7 @@ var core = {
 				}
 
 				this.log("WARN", `No suitable middleware found!`);
-				popup.popup.header.dataset.triColor = "red";
+				popup.background.color = "red";
 				popup.popup.body.top.description.innerHTML = `Không tìm thấy middleware phù hợp!
 					Bạn có thể <a target="_blank" href="${REPORT_ERROR}">báo cáo sự cố này</a> để được khắc phục sớm nhất!`;
 			}

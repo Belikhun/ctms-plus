@@ -1,7 +1,7 @@
 {
     "name": "CTMS+",
-    "version": "0.1",
-    "branch": "development",
+    "version": "0.1.260/810faaf",
+    "branch": "refs/heads/main",
     "link": {
         "repo": "https://github.com/Belikhun/ctms-plus",
         "report": "https://github.com/Belikhun/ctms-plus/issues",
@@ -13,7 +13,6 @@
             "host": "http://ctms.fithou.net.vn",
             "default": true
         },
-
         "kinhte": {
             "name": "CTMS4KINHTE",
             "host": "http://ctms4kinhte.fithou.net.vn"
@@ -22,10 +21,9 @@
     "middleware": {
         "houdev": {
             "host": "https://lrs.hou.edu.vn/mw",
-            "name": "hát o u (dev)",
+            "name": "h\u00e1t o u (dev)",
             "default": true
         },
-        
         "local": {
             "host": "http://localhost:21075",
             "name": "localhost"
@@ -39,5 +37,18 @@
             "role": "Founder\nLead Developer"
         }
     },
-    "contributors": {}
+    "contributors": {
+        "Belikhun": {
+            "contributions": 592
+        },
+        "kakashi250802": {
+            "contributions": 30
+        },
+        "evakhai": {
+            "contributions": 16
+        },
+        "pcldev": {
+            "contributions": 2
+        }
+    }
 }

@@ -195,6 +195,19 @@ const ResultScreen = {
 			description: "xem toàn bộ kết quả học tập của các môn!"
 		});
 
+		// Check if we are testing using testing framework.
+		// If not, temporary disable this screen.
+		if (typeof oapi !== "object") {
+			this.screen.overlay({
+				show: true,
+				icon: "seedling",
+				title: "Tính năng tạm thời bị vô hiệu hóa!",
+				description: "Tính năng này hiện đã tạm dừng hoạt động do thay đổi hệ thống mới. CTMS+ sẽ tạm dừng hoạt động cho tới khi có thông báo mới."
+			});
+
+			return false;
+		}
+
 		let scanButton = createButton("XẾP NHÓM", {
 			icon: "search",
 			color: "orange",

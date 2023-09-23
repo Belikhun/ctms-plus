@@ -25,21 +25,6 @@
             "name": "hát o u (dev)",
             "default": true
         },
-
-        "lambda": {
-            "host": "http://103.172.238.138:22075",
-            "name": "lambda"
-        },
-
-        "maylockhongkhi": {
-            "host": "https://out-of-service.now",
-            "name": "maylockhongkhi (Node)"
-        },
-
-        "render": {
-            "host": "https://ctmsmw.onrender.com",
-            "name": "Render (Node)"
-        },
         
         "local": {
             "host": "http://localhost:21075",

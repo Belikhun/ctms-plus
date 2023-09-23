@@ -212,6 +212,7 @@ const HomeScreen = {
 		});
 
 		this.setInputNow();
+		this.screen.show();
 	},
 
 	/**
